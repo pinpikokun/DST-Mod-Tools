@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>キャラクターセリフ（Speech）ファイル作成ガイド — DST MOD 開発</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Noto+Sans+JP:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-primary: #faf9f7;
+    --bg-card: #ffffff;
+    --bg-warm: #f5f0eb;
+    --bg-dark: #191919;
+    --text-primary: #1a1a1a;
+    --text-secondary: #6b6560;
+    --text-light: #9a938d;
+    --accent-warm: #c4704b;
+    --accent-green: #2d7a5f;
+    --accent-red: #b85450;
+    --border: #e8e2db;
+    --border-light: #f0ece7;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.8;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Hero */
+  .hero {
+    background: var(--bg-dark);
+    color: #fff;
+    padding: 100px 0 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(196,112,75,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-inner {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 0 40px;
+    position: relative;
+  }
+  .hero-label {
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent-warm);
+    margin-bottom: 24px;
+    font-weight: 500;
+  }
+  .hero h1 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 38px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 20px;
+    letter-spacing: -0.5px;
+  }
+  .hero-sub {
+    font-size: 16px;
+    color: rgba(255,255,255,0.6);
+    font-weight: 300;
+    line-height: 1.8;
+  }
+
+  /* Main */
+  .content {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  /* Section */
+  .section {
+    padding: 72px 0;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .section:last-child { border-bottom: none; }
+
+  .section-label {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .section h2 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+  .section h3 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin-top: 40px;
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
+  .section h4 {
+    font-size: 17px;
+    font-weight: 600;
+    margin-top: 32px;
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+  .section p {
+    font-size: 16px;
+    color: var(--text-secondary);
+    line-height: 2;
+    font-weight: 300;
+  }
+  .section p + p {
+    margin-top: 12px;
+  }
+  .section ul, .section ol {
+    margin: 16px 0;
+    padding-left: 24px;
+    color: var(--text-secondary);
+    font-size: 15px;
+    font-weight: 300;
+    line-height: 2;
+  }
+  .section li {
+    margin-bottom: 4px;
+  }
+
+  /* Callout */
+  .callout {
+    margin: 32px 0;
+    padding: 24px 28px;
+    border-radius: 12px;
+    font-size: 15px;
+    line-height: 1.9;
+  }
+  .callout.note {
+    background: #fef8f0;
+    border-left: 3px solid var(--accent-warm);
+    color: var(--text-primary);
+  }
+  .callout.tip {
+    background: #f0f8f3;
+    border-left: 3px solid var(--accent-green);
+    color: var(--text-primary);
+  }
+  .callout.warning {
+    background: #fef3ef;
+    border-left: 3px solid var(--accent-red);
+    color: var(--text-primary);
+  }
+  .callout strong {
+    font-weight: 600;
+  }
+
+  /* Nav Path (vertical timeline) */
+  .nav-path {
+    margin: 12px 0;
+    padding: 0;
+    list-style: none;
+  }
+  .nav-path li {
+    position: relative;
+    padding: 4px 0 4px 32px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+  .nav-path li::before {
+    content: '';
+    position: absolute;
+    left: 9px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--border);
+  }
+  .nav-path li::after {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 10px;
+    width: 10px;
+    height: 10px;
+    background: var(--accent-warm);
+    border-radius: 50%;
+    z-index: 1;
+  }
+  .nav-path li:first-child::before {
+    top: 10px;
+  }
+  .nav-path li:last-child::before {
+    bottom: calc(100% - 16px);
+  }
+
+  /* Code Block */
+  .code-block {
+    margin: 24px 0;
+    background: #1e1e2e;
+    border-radius: 12px;
+    padding: 28px 32px;
+    overflow-x: auto;
+    position: relative;
+  }
+  .code-block code {
+    font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #cdd6f4;
+    white-space: pre;
+  }
+  .code-block .lang-label {
+    position: absolute;
+    top: 10px;
+    right: 16px;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+  .code-block .comment { color: #6c7086; }
+  .code-block .string { color: #a6e3a1; }
+  .code-block .keyword { color: #cba6f7; }
+  .code-block .flag { color: #f9e2af; }
+  .code-block .var { color: #89b4fa; }
+  .code-block .tag { color: #f38ba8; }
+  .code-block .attr { color: #fab387; }
+
+  /* Inline code */
+  code.inline {
+    font-family: 'Cascadia Code', 'Fira Code', monospace;
+    font-size: 13px;
+    background: #f0ece7;
+    padding: 2px 8px;
+    border-radius: 4px;
+    color: var(--accent-warm);
+  }
+
+  /* Table */
+  .styled-table {
+    width: 100%;
+    margin: 24px 0;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    font-size: 14px;
+  }
+  .styled-table thead {
+    background: var(--bg-warm);
+  }
+  .styled-table th {
+    padding: 14px 20px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border);
+  }
+  .styled-table td {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border-light);
+    color: var(--text-secondary);
+    font-weight: 300;
+    vertical-align: top;
+  }
+  .styled-table tr:last-child td {
+    border-bottom: none;
+  }
+  .styled-table td code {
+    font-family: 'Cascadia Code', 'Fira Code', monospace;
+    font-size: 12px;
+    background: #f0ece7;
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: var(--accent-warm);
+  }
+
+  /* Steps */
+  .steps {
+    margin: 32px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .step {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+  .step-num {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    border-radius: 50%;
+    background: var(--accent-warm);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 14px;
+    margin-top: 2px;
+  }
+  .step-content {
+    flex: 1;
+  }
+  .step-content h4 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    margin-top: 0;
+  }
+  .step-content p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    font-weight: 300;
+    line-height: 1.8;
+  }
+
+  /* Folder Tree */
+  .folder-tree {
+    margin: 24px 0;
+    background: #1e1e2e;
+    border-radius: 12px;
+    padding: 28px 32px;
+    overflow-x: auto;
+  }
+  .folder-tree pre {
+    font-family: 'Cascadia Code', 'Fira Code', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #cdd6f4;
+  }
+  .folder-tree .folder { color: #89b4fa; }
+  .folder-tree .file-lua { color: #cba6f7; }
+  .folder-tree .annotation { color: #6c7086; }
+
+  /* Error Card */
+  .error-card {
+    margin: 24px 0;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .error-card-header {
+    padding: 16px 28px;
+    background: #fef3ef;
+    border-bottom: 1px solid #e8d5c4;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--accent-red);
+  }
+  .error-card-body {
+    padding: 0;
+  }
+  .error-row {
+    display: flex;
+    border-bottom: 1px solid var(--border-light);
+    padding: 16px 28px;
+    gap: 20px;
+  }
+  .error-row:last-child { border-bottom: none; }
+  .error-cause {
+    flex: 1;
+    font-size: 14px;
+    color: var(--text-secondary);
+    font-weight: 400;
+  }
+  .error-fix {
+    flex: 1;
+    font-size: 14px;
+    color: var(--accent-green);
+    font-weight: 400;
+  }
+
+  /* References */
+  .ref-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 24px;
+  }
+  .ref-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 16px 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: border-color 0.2s;
+  }
+  .ref-item:hover { border-color: var(--accent-warm); }
+  .ref-item .ref-source {
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .ref-item .ref-url {
+    font-size: 12px;
+    color: var(--text-light);
+    word-break: break-all;
+    margin-top: 4px;
+    font-weight: 300;
+  }
+
+  /* TOC */
+  .toc {
+    margin: 40px 0;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 36px 40px;
+  }
+  .toc-title {
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 20px;
+    font-weight: 500;
+  }
+  .toc-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .toc-list a {
+    text-decoration: none;
+    font-size: 15px;
+    color: var(--text-secondary);
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 0;
+    transition: color 0.2s;
+  }
+  .toc-list a:hover {
+    color: var(--accent-warm);
+  }
+  .toc-num {
+    font-size: 12px;
+    color: var(--text-light);
+    font-weight: 500;
+    min-width: 28px;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 48px 0;
+    font-size: 12px;
+    color: var(--text-light);
+    font-weight: 300;
+  }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .hero h1 { font-size: 26px; }
+    .hero { padding: 72px 0 56px; }
+    .content { padding: 0 24px; }
+    .hero-inner { padding: 0 24px; }
+    .code-block { padding: 20px; }
+    .toc { padding: 24px; }
+    .section h2 { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="hero-label">DST Mod Development Guide</div>
+      <h1>キャラクターセリフ（Speech）ファイル作成ガイド</h1>
+      <p class="hero-sub">Don't Starve Together のキャラクター MOD で表示されるセリフをカスタマイズし、<br>キャラクターに独自の個性と口調を持たせる方法を解説します。</p>
+    </div>
+  </header>
+
+  <main class="content">
+
+    <!-- 目次 -->
+    <section class="section">
+      <div class="toc">
+        <div class="toc-title">Table of Contents</div>
+        <ol class="toc-list">
+          <li><a href="#speech"><span class="toc-num">01</span>Speech ファイルとは</a></li>
+          <li><a href="#prepare"><span class="toc-num">02</span>Speech ファイルの入手と準備</a></li>
+          <li><a href="#structure"><span class="toc-num">03</span>ファイルの全体構造</a></li>
+          <li><a href="#categories"><span class="toc-num">04</span>主要カテゴリの解説</a></li>
+          <li><a href="#patterns"><span class="toc-num">05</span>セリフの書き方パターン</a></li>
+          <li><a href="#modmain"><span class="toc-num">06</span>modmain.lua での読み込み設定</a></li>
+          <li><a href="#techniques"><span class="toc-num">07</span>セリフ作成の実践テクニック</a></li>
+          <li><a href="#errors"><span class="toc-num">08</span>よくあるトラブルと解決法</a></li>
+          <li><a href="#tips"><span class="toc-num">09</span>Tips・参考情報</a></li>
+          <li><a href="#references"><span class="toc-num">10</span>参考リンク</a></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- 1. Speech ファイルとは -->
+    <section class="section" id="speech">
+      <div class="section-label">01 — Introduction</div>
+      <h2>Speech ファイルとは</h2>
+      <p>Speech ファイルとは、キャラクターがゲーム内で発するセリフデータを定義した Lua ファイルです。</p>
+      <ul>
+        <li>プレイヤーがアイテムや生物を <strong>調べた時</strong>（右クリック）</li>
+        <li><strong>空腹・寒い・暑い</strong> などの状態変化が起きた時</li>
+        <li><strong>戦闘開始時</strong> や <strong>撤退時</strong></li>
+        <li><strong>食事をした時</strong></li>
+        <li><strong>暗闇に入った時</strong></li>
+      </ul>
+      <p>など、さまざまな場面でキャラクターがセリフを表示します。このセリフをカスタマイズすることで、キャラクターに独自の性格や口調を持たせることができます。</p>
+
+      <h3>ファイルの配置場所</h3>
+      <div class="code-block">
+        <span class="lang-label">PATH</span>
+        <code>mods/my_character/scripts/speech_my_character.lua</code>
+      </div>
+
+      <div class="callout note">
+        <strong>なぜセリフが重要なのか？：</strong>DST にはキャラクターボイスがありますが、プレイヤーが実際に「読む」のはセリフです。同じアイテムを調べても、ウィルソンは科学者らしいコメントをし、ウェンディは暗い発言をします。セリフこそがキャラクターの個性を伝える最大の手段です。
+      </div>
+    </section>
+
+    <!-- 2. Speech ファイルの入手と準備 -->
+    <section class="section" id="prepare">
+      <div class="section-label">02 — Preparation</div>
+      <h2>Speech ファイルの入手と準備</h2>
+      <p>オリジナルの Speech ファイルをゼロから書くのは非常に大変です（数千行あります）。ウィルソンの Speech ファイルをコピーして、セリフを書き換える方法が最も効率的です。</p>
+
+      <h3>Step 1: scripts.zip を展開する</h3>
+      <p>DST のスクリプトは ZIP にバンドル（まとめて格納）されています。</p>
+      <div class="code-block">
+        <span class="lang-label">PATH</span>
+        <code>C:\Program Files (x86)\Steam\steamapps\common\Don't Starve Together\data\databundles\scripts.zip</code>
+      </div>
+
+      <div class="callout note">
+        <strong>見つけ方：</strong>
+        <ol class="nav-path">
+          <li>Steam を開く</li>
+          <li>Don't Starve Together を右クリック</li>
+          <li><strong>管理</strong> を選択</li>
+          <li><strong>ローカルファイルを閲覧</strong> をクリック</li>
+          <li><code class="inline">data</code> フォルダを開く</li>
+          <li><code class="inline">databundles</code> フォルダを開く</li>
+          <li><code class="inline">scripts.zip</code> を見つける</li>
+        </ol>
+      </div>
+      <p>この ZIP を右クリック → <strong>すべて展開</strong> で展開してください。展開先はどこでも構いません（デスクトップなど分かりやすい場所で OK）。</p>
+
+      <h3>Step 2: speech_wilson.lua をコピーする</h3>
+      <p>展開したフォルダの中に <code class="inline">scripts\speech_wilson.lua</code> があります。このファイルをコピーして、自分の MOD フォルダに配置します。</p>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <h4>ファイルをコピー</h4>
+            <p><code class="inline">speech_wilson.lua</code> をコピー（Ctrl+C）</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <h4>MOD フォルダに貼り付け</h4>
+            <p><code class="inline">mods/my_character/scripts/</code> フォルダに貼り付け（Ctrl+V）</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <h4>ファイル名を変更</h4>
+            <p>ファイル名を <code class="inline">speech_my_character.lua</code> に変更（右クリック → 名前の変更）</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout warning">
+        <strong>重要：</strong>ファイル名の <code class="inline">my_character</code> 部分は、自分のキャラクター名（小文字）に合わせてください。modmain.lua の <code class="inline">require "speech_my_character"</code> と一致する必要があります。
+      </div>
+
+      <h3>最小構成（まずは動かしたい場合）</h3>
+      <p>セリフのカスタマイズは後回しにして、まず MOD を動かしたい場合は以下の 1 行だけのファイルでも動作します。</p>
+      <div class="code-block">
+        <span class="lang-label">LUA</span>
+        <code><span class="keyword">return</span> <span class="var">require</span>(<span class="string">"speech_wilson"</span>)</code>
+      </div>
+
+      <div class="callout tip">
+        <strong>ポイント：</strong>この方法はウィルソンのセリフをそのまま使います。MOD が正常に動くことを確認してから、セリフのカスタマイズに取り掛かるのがおすすめです。
+      </div>
+    </section>
+
+    <!-- 3. ファイルの全体構造 -->
+    <section class="section" id="structure">
+      <div class="section-label">03 — Structure</div>
+      <h2>ファイルの全体構造</h2>
+      <p>Speech ファイルは、1 つの大きな Lua テーブル（データのまとまり）を <code class="inline">return</code> で返す構造です。</p>
+
+      <div class="code-block">
+        <span class="lang-label">LUA</span>
+        <code><span class="keyword">return</span> {
+    <span class="comment">-- ========== アクション失敗時のセリフ ==========</span>
+    <span class="var">ACTIONFAIL</span> = {
+        <span class="var">SHAVE</span> = {
+            <span class="var">AWAKEBEEFALO</span> = <span class="string">"I'm not going to try that while it's awake."</span>,
+            <span class="var">GENERIC</span> = <span class="string">"I can't shave that!"</span>,
+        },
+        <span class="var">STORE</span> = {
+            <span class="var">GENERIC</span> = <span class="string">"It's full."</span>,
+            <span class="var">NOTALLOWED</span> = <span class="string">"That doesn't go there."</span>,
+        },
+        <span class="comment">-- ... 他のアクション</span>
+    },
+
+    <span class="comment">-- ========== イベント告知 ==========</span>
+    <span class="var">ANNOUNCE_HUNGRY</span> = <span class="string">"I need to eat!"</span>,
+    <span class="var">ANNOUNCE_COLD</span> = <span class="string">"Brrr! It's freezing!"</span>,
+    <span class="comment">-- ... 他のイベント</span>
+
+    <span class="comment">-- ========== 戦闘セリフ ==========</span>
+    <span class="var">BATTLECRY</span> = {
+        <span class="var">GENERIC</span> = {<span class="string">"Fight me!"</span>, <span class="string">"Take this!"</span>},
+        <span class="comment">-- ...</span>
+    },
+
+    <span class="comment">-- ========== アイテム・生物の調査 ==========</span>
+    <span class="var">DESCRIBE</span> = {
+        <span class="var">CAMPFIRE</span> = {
+            <span class="var">EMBERS</span> = <span class="string">"The fire is almost out."</span>,
+            <span class="var">GENERIC</span> = <span class="string">"A nice fire."</span>,
+            <span class="var">HIGH</span> = <span class="string">"That fire is getting out of hand!"</span>,
+            <span class="var">LOW</span> = <span class="string">"The fire is getting low."</span>,
+            <span class="var">NORMAL</span> = <span class="string">"Nice and warm."</span>,
+            <span class="var">OUT</span> = <span class="string">"I should start a new fire."</span>,
+        },
+        <span class="comment">-- ... 数百のアイテム・生物</span>
+    },
+
+    <span class="comment">-- ========== 食事時のセリフ ==========</span>
+    <span class="var">EAT_FOOD</span> = {
+        <span class="var">GENERIC</span> = <span class="string">"Yum!"</span>,
+        <span class="var">PAINFUL</span> = <span class="string">"That was a bad idea."</span>,
+        <span class="var">SPOILED</span> = <span class="string">"Yuck! That was spoiled!"</span>,
+        <span class="var">STALE</span> = <span class="string">"That wasn't the freshest."</span>,
+    },
+
+    <span class="comment">-- ... 他のカテゴリ</span>
+}</code>
+      </div>
+
+      <div class="callout note">
+        <strong>なぜこの構造なのか？：</strong>DST のゲームエンジンは、状況に応じてこのテーブルから適切なキーを参照してセリフを取得します。テーブルの構造（キーの名前やネストの深さ）はゲームエンジンが期待する形式に合わせる必要があります。
+      </div>
+    </section>
+
+    <!-- 4. 主要カテゴリの解説 -->
+    <section class="section" id="categories">
+      <div class="section-label">04 — Categories</div>
+      <h2>主要カテゴリの解説</h2>
+      <p>Speech ファイルに含まれるカテゴリは数十種類あります。ここでは特に重要なものを解説します。</p>
+
+      <h3>ACTIONFAIL — アクション失敗時</h3>
+      <p>プレイヤーが何かを実行しようとして失敗した時に表示されるセリフです。</p>
+      <div class="code-block">
+        <span class="lang-label">LUA</span>
+        <code><span class="var">ACTIONFAIL</span> = {
+    <span class="var">SHAVE</span> = {                                        <span class="comment">-- 毛を剃ろうとした時</span>
+        <span class="var">AWAKEBEEFALO</span> = <span class="string">"That beast is awake!"</span>,       <span class="comment">-- 起きているビーファロー</span>
+        <span class="var">GENERIC</span> = <span class="string">"I can't shave that!"</span>,             <span class="comment">-- 剃れないもの</span>
+    },
+    <span class="var">STORE</span> = {                                        <span class="comment">-- 収納しようとした時</span>
+        <span class="var">GENERIC</span> = <span class="string">"It's full."</span>,                      <span class="comment">-- 容量いっぱい</span>
+        <span class="var">NOTALLOWED</span> = <span class="string">"That doesn't go there."</span>,       <span class="comment">-- 入れられないもの</span>
+    },
+    <span class="var">COOK</span> = {                                         <span class="comment">-- 調理しようとした時</span>
+        <span class="var">GENERIC</span> = <span class="string">"I can't cook that."</span>,              <span class="comment">-- 調理できないもの</span>
+        <span class="var">TOOFAR</span> = <span class="string">"I need to get closer."</span>,            <span class="comment">-- 遠すぎる</span>
+    },
+    <span class="var">GIVE</span> = {                                         <span class="comment">-- 渡そうとした時</span>
+        <span class="var">GENERIC</span> = <span class="string">"They don't want that."</span>,           <span class="comment">-- 受け取らない</span>
+        <span class="var">DEAD</span> = <span class="string">"They can't use this anymore."</span>,       <span class="comment">-- 死んでいる</span>
+    },
+    <span class="comment">-- ... 他のアクション</span>
+},</code>
+      </div>
+
+      <h3>ANNOUNCE_* — イベント告知</h3>
+      <p>ゲーム内でさまざまなイベントが発生した時にキャラクターが自動的に発するセリフです。</p>
+      <div class="code-block">
+        <span class="lang-label">LUA</span>
+        <code><span class="comment">-- 生存に関する告知</span>
+<span class="var">ANNOUNCE_HUNGRY</span> = <span class="string">"I need to eat!"</span>,                  <span class="comment">-- お腹が空いた</span>
+<span class="var">ANNOUNCE_COLD</span> = <span class="string">"Brrr! It's freezing!"</span>,              <span class="comment">-- 寒い</span>
+<span class="var">ANNOUNCE_HOT</span> = <span class="string">"It's so hot..."</span>,                     <span class="comment">-- 暑い</span>
+
+<span class="comment">-- 時間帯</span>
+<span class="var">ANNOUNCE_DUSK</span> = <span class="string">"It'll be dark soon."</span>,               <span class="comment">-- 夕方になった</span>
+
+<span class="comment">-- 危険の接近</span>
+<span class="var">ANNOUNCE_HOUNDS</span> = <span class="string">"Something is coming!"</span>,            <span class="comment">-- ハウンドの襲撃予告</span>
+<span class="var">ANNOUNCE_CHARLIE_ATTACK</span> = <span class="string">"Something hit me!"</span>,       <span class="comment">-- 暗闇で攻撃された</span>
+
+<span class="comment">-- 明暗の変化</span>
+<span class="var">ANNOUNCE_ENTER_DARK</span> = <span class="string">"I can't see a thing!"</span>,        <span class="comment">-- 暗闇に入った</span>
+<span class="var">ANNOUNCE_ENTER_LIGHT</span> = <span class="string">"That's better."</span>,             <span class="comment">-- 明るい場所に入った</span>
+
+<span class="comment">-- 食事の反応</span>
+<span class="var">ANNOUNCE_EAT</span> = {
+    <span class="var">GENERIC</span> = <span class="string">"Yum!"</span>,                                <span class="comment">-- 通常</span>
+    <span class="var">PAINFUL</span> = <span class="string">"Ugh... that was bad."</span>,                 <span class="comment">-- 体力を減らす食べ物</span>
+    <span class="var">SPOILED</span> = <span class="string">"That was rotten!"</span>,                     <span class="comment">-- 腐った食べ物</span>
+    <span class="var">STALE</span> = <span class="string">"That wasn't very fresh."</span>,                <span class="comment">-- 鮮度が落ちた食べ物</span>
+    <span class="var">INVALID</span> = <span class="string">"I can't eat that!"</span>,                    <span class="comment">-- 食べられないもの</span>
+},
+
+<span class="comment">-- 睡眠関連</span>
+<span class="var">ANNOUNCE_NODANGERSLEEP</span> = <span class="string">"It's too dangerous!"</span>,      <span class="comment">-- 危険で眠れない</span>
+<span class="var">ANNOUNCE_NOHUNGERSLEEP</span> = <span class="string">"I'm too hungry to sleep."</span>, <span class="comment">-- 空腹で眠れない</span>
+<span class="var">ANNOUNCE_NODAYSLEEP</span> = <span class="string">"I'm not tired yet."</span>,          <span class="comment">-- 昼は眠れない</span></code>
+      </div>
+
+      <h3>BATTLECRY — 戦闘開始時の掛け声</h3>
+      <p>戦闘を開始した時にキャラクターが叫ぶセリフです。配列（複数の候補）で指定すると、ランダムに 1 つが選ばれます。</p>
+      <div class="code-block">
+        <span class="lang-label">LUA</span>
+        <code><span class="var">BATTLECRY</span> = {
+    <span class="var">GENERIC</span> = {                                      <span class="comment">-- 通常の敵</span>
+        <span class="string">"Fight me!"</span>,
+        <span class="string">"Take this!"</span>,
+        <span class="string">"Prepare yourself!"</span>,
+    },
+    <span class="var">PIG</span> = {                                          <span class="comment">-- ブタへの掛け声</span>
+        <span class="string">"Sorry, pig!"</span>,
+        <span class="string">"Nothing personal!"</span>,
+    },
+    <span class="var">PREY</span> = {                                         <span class="comment">-- 獲物（ウサギ等）への掛け声</span>
+        <span class="string">"Come here!"</span>,
+        <span class="string">"Got you!"</span>,
+    },
+    <span class="var">SPIDER</span> = {                                       <span class="comment">-- クモへの掛け声</span>
+        <span class="string">"Die, spider!"</span>,
+        <span class="string">"Ugh, spiders!"</span>,
+    },
+},</code>
+      </div>
+
+      <h3>COMBAT_QUIT — 戦闘撤退時</h3>
+      <p>戦闘をやめた時のセリフです。こちらも配列で複数指定できます。</p>
+      <div class="code-block">
+        <span class="lang-label">LUA</span>
+        <code><span class="var">COMBAT_QUIT</span> = {
+    <span class="var">GENERIC</span> = {
+        <span class="string">"That was close."</span>,
+        <span class="string">"I should run."</span>,
+        <span class="string">"Not worth the fight."</span>,
+    },
+},</code>
+      </div>
+
+      <h3>DESCRIBE — アイテム・生物の調査（最大のセクション）</h3>
+      <p><strong>DESCRIBE は Speech ファイルの大部分を占める最大のカテゴリ</strong> です。プレイヤーがアイテムや生物を調べた時のセリフを定義します。数百のアイテムがあり、それぞれに状態別のサブカテゴリがある場合もあります。</p>
+
+      <h4>単純な調査セリフ</h4>
+      <div class="code-block">
+        <span class="lang-label">LUA</span>
+        <code><span class="var">DESCRIBE</span> = {
+    <span class="var">AXE</span> = <span class="string">"A trusty axe."</span>,                           <span class="comment">-- オノ</span>
+    <span class="var">PICKAXE</span> = <span class="string">"Good for mining."</span>,                    <span class="comment">-- つるはし</span>
+    <span class="var">TORCH</span> = <span class="string">"It lights the way."</span>,                    <span class="comment">-- たいまつ</span>
+    <span class="var">FLINT</span> = <span class="string">"A sharp piece of flint."</span>,               <span class="comment">-- フリント</span>
+    <span class="var">TWIGS</span> = <span class="string">"Some twigs."</span>,                            <span class="comment">-- 小枝</span>
+    <span class="var">ROCKS</span> = <span class="string">"Just some rocks."</span>,                      <span class="comment">-- 岩</span>
+    <span class="comment">-- ...</span>
+},</code>
+      </div>
+
+      <h4>状態別のセリフ</h4>
+      <p>一部のアイテムには複数の状態があり、状態ごとに異なるセリフを設定できます。</p>
+      <div class="code-block">
+        <span class="lang-label">LUA</span>
+        <code><span class="var">DESCRIBE</span> = {
+    <span class="var">CAMPFIRE</span> = {                                     <span class="comment">-- たき火</span>
+        <span class="var">EMBERS</span> = <span class="string">"The fire is almost out."</span>,          <span class="comment">-- 残り火</span>
+        <span class="var">GENERIC</span> = <span class="string">"A nice fire."</span>,                    <span class="comment">-- 通常</span>
+        <span class="var">HIGH</span> = <span class="string">"That fire is out of hand!"</span>,          <span class="comment">-- 大きすぎる</span>
+        <span class="var">LOW</span> = <span class="string">"The fire is getting low."</span>,            <span class="comment">-- 小さくなってきた</span>
+        <span class="var">NORMAL</span> = <span class="string">"Nice and warm."</span>,                   <span class="comment">-- 普通</span>
+        <span class="var">OUT</span> = <span class="string">"I should start a new fire."</span>,          <span class="comment">-- 消えた</span>
+    },
+    <span class="var">BEEFALO</span> = {                                      <span class="comment">-- ビーファロー</span>
+        <span class="var">GENERIC</span> = <span class="string">"A big hairy beast."</span>,              <span class="comment">-- 通常</span>
+        <span class="var">FOLLOWER</span> = <span class="string">"It likes me!"</span>,                   <span class="comment">-- 懐いている</span>
+        <span class="var">NAKED</span> = <span class="string">"It's been shaved."</span>,                 <span class="comment">-- 毛を刈られた</span>
+        <span class="var">SLEEPING</span> = <span class="string">"It's sleeping."</span>,                 <span class="comment">-- 寝ている</span>
+    },
+    <span class="comment">-- ...</span>
+},</code>
+      </div>
+
+      <h4>PLAYER（他のプレイヤーキャラクター）の調査</h4>
+      <p>マルチプレイで他のプレイヤーを調べた時のセリフです。相手の行動によって異なるセリフが表示されます。</p>
+      <div class="code-block">
+        <span class="lang-label">LUA</span>
+        <code><span class="var">DESCRIBE</span> = {
+    <span class="var">PLAYER</span> = {
+        <span class="var">GENERIC</span> = <span class="string">"Hi, %s!"</span>,                         <span class="comment">-- 通常（%s にプレイヤー名が入る）</span>
+        <span class="var">ATTACKER</span> = <span class="string">"%s looks aggressive..."</span>,          <span class="comment">-- 攻撃的なプレイヤー</span>
+        <span class="var">MURDERER</span> = <span class="string">"%s is a murderer!"</span>,              <span class="comment">-- 殺人を犯したプレイヤー</span>
+        <span class="var">REVIVER</span> = <span class="string">"%s is a good friend."</span>,             <span class="comment">-- 蘇生してくれたプレイヤー</span>
+        <span class="var">GHOST</span> = <span class="string">"%s could use a heart."</span>,              <span class="comment">-- ゴースト状態</span>
+    },
+    <span class="comment">-- ...</span>
+},</code>
+      </div>
+
+      <div class="callout tip">
+        <strong>ポイント：</strong><code class="inline">%s</code> はプレースホルダー（置き換え記号）です。ゲーム実行時に相手プレイヤーの名前に自動的に置き換えられます。
+      </div>
+
+      <h3>EAT_FOOD — 食事時</h3>
+      <p>食べ物を食べた時のセリフです。</p>
+      <div class="code-block">
+        <span class="lang-label">LUA</span>
+        <code><span class="var">EAT_FOOD</span> = {
+    <span class="var">GENERIC</span> = <span class="string">"Yum!"</span>,                                <span class="comment">-- 通常の食べ物</span>
+    <span class="var">PAINFUL</span> = <span class="string">"That was a bad idea."</span>,                 <span class="comment">-- ダメージを受ける食べ物</span>
+    <span class="var">SPOILED</span> = <span class="string">"That was awful!"</span>,                      <span class="comment">-- 腐った食べ物</span>
+    <span class="var">STALE</span> = <span class="string">"It could have been fresher."</span>,            <span class="comment">-- 鮮度が落ちた食べ物</span>
+    <span class="var">YUCKY</span> = <span class="string">"I don't want to eat that!"</span>,             <span class="comment">-- 食べたくないもの</span>
+},</code>
+      </div>
+
+      <h3>DESCRIBE_GENERIC — 汎用調査</h3>
+      <p>DESCRIBE テーブルに該当するキーがないアイテムを調べた時のフォールバック（代替）セリフです。</p>
+      <div class="code-block">
+        <span class="lang-label">LUA</span>
+        <code><span class="var">DESCRIBE_GENERIC</span> = <span class="string">"I'm not sure what that is."</span>,
+<span class="var">DESCRIBE_TOODARK</span> = <span class="string">"It's too dark to see!"</span>,          <span class="comment">-- 暗くて見えない時</span>
+<span class="var">DESCRIBE_SMOLDERING</span> = <span class="string">"It's about to catch fire!"</span>,   <span class="comment">-- くすぶっている時</span></code>
+      </div>
+    </section>
+
+    <!-- 5. セリフの書き方パターン -->
+    <section class="section" id="patterns">
+      <div class="section-label">05 — Patterns</div>
+      <h2>セリフの書き方パターン</h2>
+      <p>DST の Speech ファイルでは、セリフの書き方に 4 つのパターンがあります。</p>
+
+      <h3>パターン 1: 単一文字列</h3>
+      <p>最もシンプルな形式です。常に同じセリフが表示されます。</p>
+      <div class="code-block">
+        <span class="lang-label">LUA</span>
+        <code><span class="var">ANNOUNCE_HUNGRY</span> = <span class="string">"I need to eat!"</span>,</code>
+      </div>
+
+      <h3>パターン 2: 配列（ランダム選択）</h3>
+      <p>複数のセリフを配列で指定すると、表示されるたびにランダムで 1 つが選ばれます。セリフにバリエーションを持たせたい時に使います。</p>
+      <div class="code-block">
+        <span class="lang-label">LUA</span>
+        <code><span class="var">BATTLECRY</span> = {
+    <span class="var">GENERIC</span> = {
+        <span class="string">"Fight me!"</span>,
+        <span class="string">"Prepare yourself!"</span>,
+        <span class="string">"Take this!"</span>,
+        <span class="string">"You asked for it!"</span>,
+    },
+},</code>
+      </div>
+
+      <div class="callout note">
+        <strong>なぜ配列を使うのか？：</strong>何度も同じセリフが表示されると単調になります。特に戦闘セリフなど頻繁に表示されるものは、配列で複数用意するとキャラクターが生き生きして見えます。
+      </div>
+
+      <h3>パターン 3: ネストテーブル（状態分岐）</h3>
+      <p>アイテムの状態に応じて異なるセリフを表示したい場合に使います。</p>
+      <div class="code-block">
+        <span class="lang-label">LUA</span>
+        <code><span class="var">CAMPFIRE</span> = {
+    <span class="var">EMBERS</span> = <span class="string">"The fire is dying..."</span>,
+    <span class="var">GENERIC</span> = <span class="string">"A campfire."</span>,
+    <span class="var">HIGH</span> = <span class="string">"Too big!"</span>,
+    <span class="var">LOW</span> = <span class="string">"Getting dim."</span>,
+    <span class="var">NORMAL</span> = <span class="string">"Warm and cozy."</span>,
+    <span class="var">OUT</span> = <span class="string">"It went out."</span>,
+},</code>
+      </div>
+
+      <div class="callout warning">
+        <strong>重要：</strong>ネストテーブルのキー名（<code class="inline">EMBERS</code>、<code class="inline">HIGH</code> 等）はゲームエンジンが決めた名前です。自分で新しいキーを追加しても機能しません。ウィルソンの Speech ファイルにあるキー構造をそのまま使ってください。
+      </div>
+
+      <h3>パターン 4: プレースホルダー（%s）</h3>
+      <p><code class="inline">%s</code> を使うと、ゲーム実行時に動的な値（プレイヤー名やアイテム名など）に置き換えられます。</p>
+      <div class="code-block">
+        <span class="lang-label">LUA</span>
+        <code><span class="var">DESCRIBE</span> = {
+    <span class="var">PLAYER</span> = {
+        <span class="var">GENERIC</span> = <span class="string">"Hey there, %s!"</span>,                  <span class="comment">-- %s → プレイヤー名</span>
+        <span class="var">ATTACKER</span> = <span class="string">"%s looks like trouble..."</span>,
+    },
+},</code>
+      </div>
+
+      <h3>エスケープ文字</h3>
+      <p>セリフ内に引用符（<code class="inline">"</code>）を含めたい場合は、バックスラッシュ（<code class="inline">\</code>）でエスケープします。</p>
+      <div class="code-block">
+        <span class="lang-label">LUA</span>
+        <code><span class="var">DESCRIBE</span> = {
+    <span class="var">BOOK</span> = <span class="string">"It says \"Do Not Read\" on the cover."</span>,
+},</code>
+      </div>
+
+      <div class="callout warning">
+        <strong>注意：</strong>エスケープを忘れると Lua の文法エラーになり、MOD がクラッシュします。
+      </div>
+    </section>
+
+    <!-- 6. modmain.lua での読み込み設定 -->
+    <section class="section" id="modmain">
+      <div class="section-label">06 — Configuration</div>
+      <h2>modmain.lua での読み込み設定</h2>
+      <p>Speech ファイルを作成したら、modmain.lua でゲームに読み込ませる設定が必要です。</p>
+
+      <h3>基本設定</h3>
+      <p>modmain.lua に以下のように記述します（既に <a href="README.html" style="color:var(--accent-warm)">DST-Lua-Scripting ガイド</a> の手順で記述済みの場合は確認のみで OK です）。</p>
+      <div class="code-block">
+        <span class="lang-label">LUA</span>
+        <code><span class="comment">-- セリフデータの読み込み</span>
+<span class="comment">-- ★ MY_CHARACTER は大文字、speech_my_character は小文字であることに注意</span>
+<span class="var">STRINGS</span>.<span class="var">CHARACTERS</span>.<span class="var">MY_CHARACTER</span> = <span class="var">GLOBAL</span>.<span class="keyword">require</span> <span class="string">"speech_my_character"</span></code>
+      </div>
+
+      <div class="callout warning">
+        <strong>重要：</strong><code class="inline">STRINGS.CHARACTERS</code> のキーは <strong>大文字</strong>（<code class="inline">MY_CHARACTER</code>）、<code class="inline">require</code> のファイル名は <strong>小文字</strong>（<code class="inline">speech_my_character</code>）です。この対応を間違えるとセリフが表示されないか、クラッシュの原因になります。
+      </div>
+
+      <h3>他キャラクターからの呼ばれ方</h3>
+      <p>マルチプレイで他のキャラクターがあなたのキャラクターを調べた時に表示されるセリフも設定します。</p>
+      <div class="code-block">
+        <span class="lang-label">LUA</span>
+        <code><span class="var">STRINGS</span>.<span class="var">CHARACTERS</span>.<span class="var">GENERIC</span>.<span class="var">DESCRIBE</span>.<span class="var">MY_CHARACTER</span> = {
+    <span class="var">GENERIC</span> = <span class="string">"It's My Character!"</span>,
+    <span class="var">ATTACKER</span> = <span class="string">"That one looks dangerous..."</span>,
+    <span class="var">MURDERER</span> = <span class="string">"Murderer!"</span>,
+    <span class="var">REVIVER</span> = <span class="string">"A helpful soul."</span>,
+    <span class="var">GHOST</span> = <span class="string">"My Character could use a heart."</span>,
+}</code>
+      </div>
+
+      <div class="callout tip">
+        <strong>ポイント：</strong><code class="inline">GENERIC.DESCRIBE</code> は「すべてのキャラクター共通の調査セリフ」を意味します。ここに設定した内容が、他の全キャラクターがあなたのキャラクターを調べた時に表示されます。
+      </div>
+    </section>
+
+    <!-- 7. セリフ作成の実践テクニック -->
+    <section class="section" id="techniques">
+      <div class="section-label">07 — Techniques</div>
+      <h2>セリフ作成の実践テクニック</h2>
+
+      <h3>キャラクターの性格設定を最初に決める</h3>
+      <p>セリフを書き始める前に、キャラクターの <strong>性格・口調</strong> を決めておくと統一感が出ます。</p>
+      <ul>
+        <li><strong>丁寧語キャラ</strong>: 「これは素敵なアイテムですね。」</li>
+        <li><strong>乱暴なキャラ</strong>: 「なんだこのガラクタは！」</li>
+        <li><strong>怖がりなキャラ</strong>: 「こ、これは怖くないぞ...たぶん。」</li>
+        <li><strong>研究者タイプ</strong>: 「興味深い標本だ。詳しく調べたい。」</li>
+        <li><strong>食いしん坊キャラ</strong>: 「食べられるかな？...やっぱり無理か。」</li>
+      </ul>
+
+      <div class="callout tip">
+        <strong>ヒント：</strong>口調を決めたら、3〜5 個のサンプルセリフを先に書いてみてください。「このキャラならどう言うか？」を考える基準になります。
+      </div>
+
+      <h3>段階的にカスタマイズする</h3>
+      <p>数千行あるセリフを一度に全部書き換えるのは大変です。以下の順番で段階的に進めることをおすすめします。</p>
+
+      <h4>ステージ 1: まず動かす（最小構成）</h4>
+      <div class="code-block">
+        <span class="lang-label">LUA</span>
+        <code><span class="comment">-- speech_my_character.lua</span>
+<span class="keyword">return</span> <span class="var">require</span>(<span class="string">"speech_wilson"</span>)</code>
+      </div>
+      <p>ウィルソンのセリフをそのまま使い、MOD が正常に動くことを確認します。</p>
+
+      <h4>ステージ 2: 重要なセリフだけ変更する</h4>
+      <p>ウィルソンのセリフをベースにしつつ、よく目にするセリフだけ書き換えます。特に変更すると効果が高いカテゴリ:</p>
+
+      <table class="styled-table">
+        <thead>
+          <tr>
+            <th>カテゴリ</th>
+            <th>理由</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>DESCRIBE.PLAYER</code></td>
+            <td>マルチプレイで頻繁に見る</td>
+          </tr>
+          <tr>
+            <td><code>BATTLECRY</code></td>
+            <td>戦闘のたびに表示される</td>
+          </tr>
+          <tr>
+            <td><code>COMBAT_QUIT</code></td>
+            <td>戦闘撤退時に表示される</td>
+          </tr>
+          <tr>
+            <td><code>ANNOUNCE_HUNGRY</code></td>
+            <td>空腹時に何度も表示される</td>
+          </tr>
+          <tr>
+            <td><code>ANNOUNCE_COLD</code> / <code>ANNOUNCE_HOT</code></td>
+            <td>季節ごとに頻繁に表示される</td>
+          </tr>
+          <tr>
+            <td><code>ANNOUNCE_HOUNDS</code></td>
+            <td>襲撃イベントで目立つ</td>
+          </tr>
+          <tr>
+            <td><code>EAT_FOOD</code></td>
+            <td>食事のたびに表示される</td>
+          </tr>
+          <tr>
+            <td><code>DESCRIBE_GENERIC</code></td>
+            <td>対応するセリフがないアイテム全部に使われる</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>ステージ 3: DESCRIBE を充実させる</h4>
+      <p>時間がある時に、アイテムや生物の調査セリフ（<code class="inline">DESCRIBE</code>）を少しずつカスタマイズしていきます。全部変える必要はありません。特にキャラクターの個性が出るものから優先的に変更しましょう。</p>
+
+      <div class="callout tip">
+        <strong>初心者向けTip：</strong>全部のセリフを書き換えなくても、MOD は正常に動作します。ウィルソンのセリフファイルをコピーした場合、書き換えていない箇所はウィルソンのセリフがそのまま表示されるだけです。心配いりません。
+      </div>
+
+      <h3>セリフの長さに注意する</h3>
+      <p>ゲーム内でセリフはキャラクターの頭上に吹き出しとして表示されます。あまり長いセリフは途中で切れたり、読みにくくなります。</p>
+      <ul>
+        <li><strong>推奨</strong>: 1 文〜2 文（英語で 10 単語程度まで）</li>
+        <li><strong>NG</strong>: 3 文以上の長いセリフ（吹き出しに収まらない可能性）</li>
+      </ul>
+
+      <div class="code-block">
+        <span class="lang-label">LUA</span>
+        <code><span class="comment">-- 良い例</span>
+<span class="var">DESCRIBE</span> = {
+    <span class="var">AXE</span> = <span class="string">"A trusty axe. I like it."</span>,
+},
+
+<span class="comment">-- 悪い例（長すぎる）</span>
+<span class="var">DESCRIBE</span> = {
+    <span class="var">AXE</span> = <span class="string">"This is a very fine axe made of the best materials I have ever seen in my entire life and I would like to keep it forever."</span>,
+},</code>
+      </div>
+    </section>
+
+    <!-- 8. よくあるトラブルと解決法 -->
+    <section class="section" id="errors">
+      <div class="section-label">08 — Troubleshooting</div>
+      <h2>よくあるトラブルと解決法</h2>
+
+      <h3>セリフが表示されない</h3>
+      <table class="styled-table">
+        <thead>
+          <tr>
+            <th>症状</th>
+            <th>原因</th>
+            <th>解決法</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>セリフが一切表示されない</td>
+            <td>modmain.lua に <code>STRINGS.CHARACTERS</code> の設定がない</td>
+            <td>modmain.lua に <code>STRINGS.CHARACTERS.MY_CHARACTER = GLOBAL.require "speech_my_character"</code> を追加</td>
+          </tr>
+          <tr>
+            <td>セリフが一切表示されない</td>
+            <td>ファイル名と require のパスが不一致</td>
+            <td><code>scripts/speech_my_character.lua</code> のファイル名と <code>require "speech_my_character"</code> が一致しているか確認</td>
+          </tr>
+          <tr>
+            <td>特定の状況だけセリフが出ない</td>
+            <td>該当するキーが Speech ファイルに存在しない</td>
+            <td>ウィルソンの Speech ファイルを参照して不足しているキーを追加</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>MOD がクラッシュする</h3>
+      <table class="styled-table">
+        <thead>
+          <tr>
+            <th>症状</th>
+            <th>原因</th>
+            <th>解決法</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>PANIC: Error loading module 'speech_my_character'</code></td>
+            <td>ファイルが見つからない、または Lua 文法エラー</td>
+            <td>ファイルの存在確認 + 文法チェック（カンマ抜け、引用符の閉じ忘れ等）</td>
+          </tr>
+          <tr>
+            <td><code>attempt to index a nil value</code></td>
+            <td>テーブル構造のキー名が間違っている</td>
+            <td>ウィルソンの元ファイルとキー名を比較して修正</td>
+          </tr>
+          <tr>
+            <td>特定アイテムを調べるとクラッシュ</td>
+            <td>そのアイテムのセリフ定義に文法エラーがある</td>
+            <td>該当箇所のカンマ、括弧、引用符を確認</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>よくある文法エラー</h3>
+
+      <h4>カンマの抜け</h4>
+      <div class="code-block">
+        <span class="lang-label">LUA</span>
+        <code><span class="comment">-- NG: カンマが抜けている</span>
+<span class="var">DESCRIBE</span> = {
+    <span class="var">AXE</span> = <span class="string">"An axe."</span>      <span class="comment">-- ← ここにカンマがない！</span>
+    <span class="var">PICKAXE</span> = <span class="string">"A pick."</span>
+}
+
+<span class="comment">-- OK</span>
+<span class="var">DESCRIBE</span> = {
+    <span class="var">AXE</span> = <span class="string">"An axe."</span>,
+    <span class="var">PICKAXE</span> = <span class="string">"A pick."</span>,
+}</code>
+      </div>
+
+      <h4>引用符の閉じ忘れ</h4>
+      <div class="code-block">
+        <span class="lang-label">LUA</span>
+        <code><span class="comment">-- NG: 引用符が閉じていない</span>
+<span class="var">ANNOUNCE_HUNGRY</span> = <span class="string">"I need to eat!</span>,
+
+<span class="comment">-- OK</span>
+<span class="var">ANNOUNCE_HUNGRY</span> = <span class="string">"I need to eat!"</span>,</code>
+      </div>
+
+      <h4>括弧の対応ミス</h4>
+      <div class="code-block">
+        <span class="lang-label">LUA</span>
+        <code><span class="comment">-- NG: 閉じ括弧が足りない</span>
+<span class="var">BATTLECRY</span> = {
+    <span class="var">GENERIC</span> = {
+        <span class="string">"Fight!"</span>,
+        <span class="string">"Attack!"</span>,
+    },
+<span class="comment">-- ← BATTLECRY の閉じ括弧がない！</span>
+
+<span class="comment">-- OK</span>
+<span class="var">BATTLECRY</span> = {
+    <span class="var">GENERIC</span> = {
+        <span class="string">"Fight!"</span>,
+        <span class="string">"Attack!"</span>,
+    },
+},</code>
+      </div>
+
+      <div class="callout tip">
+        <strong>ヒント：</strong>VSCode を使っている場合、括弧の上にカーソルを置くと対応する括弧がハイライトされます。この機能を使うと括弧の対応ミスを見つけやすくなります。
+      </div>
+    </section>
+
+    <!-- 9. Tips・参考情報 -->
+    <section class="section" id="tips">
+      <div class="section-label">09 — Tips</div>
+      <h2>Tips・参考情報</h2>
+
+      <h3>他のキャラクターの Speech ファイルを参考にする</h3>
+      <p>ウィルソン以外のキャラクターの Speech ファイルも <code class="inline">scripts.zip</code> に含まれています。個性的なキャラクターの Speech ファイルを参考にすると、セリフ作成のヒントが得られます。</p>
+
+      <div class="folder-tree">
+        <pre><span class="folder">scripts/</span>
+├── <span class="file-lua">speech_wilson.lua</span>      <span class="annotation">← ウィルソン（科学者、標準的）</span>
+├── <span class="file-lua">speech_willow.lua</span>      <span class="annotation">← ウィロウ（火が好き）</span>
+├── <span class="file-lua">speech_wendy.lua</span>       <span class="annotation">← ウェンディ（暗い性格）</span>
+├── <span class="file-lua">speech_wolfgang.lua</span>    <span class="annotation">← ウルフガング（筋肉バカ）</span>
+├── <span class="file-lua">speech_wickerbottom.lua</span> <span class="annotation">← ウィッカーボトム（知的）</span>
+├── <span class="file-lua">speech_wes.lua</span>         <span class="annotation">← ウェス（しゃべらない）</span>
+└── ...                    <span class="annotation">← 他のキャラクター</span></pre>
+      </div>
+
+      <h3>効率的な書き換え方法</h3>
+      <p>VSCode の <strong>検索と置換</strong>（Ctrl+H）機能を使うと効率的に書き換えられます。</p>
+      <ol>
+        <li>VSCode で <code class="inline">speech_my_character.lua</code> を開く</li>
+        <li><strong>Ctrl+H</strong> で検索と置換パネルを開く</li>
+        <li>書き換えたいセリフを検索して、新しいセリフに置換する</li>
+      </ol>
+
+      <div class="callout tip">
+        <strong>Tips：</strong>一括置換ではなく、1 つずつ確認しながら置換する方が安全です。意図しない箇所まで変更してしまうのを防げます。
+      </div>
+
+      <h3>セリフの言語について</h3>
+      <p>DST のセリフは <strong>英語</strong> で書くのが標準です。日本語でセリフを書くことも技術的には可能ですが、以下の点に注意してください。</p>
+      <ul>
+        <li>DST はゲーム内フォントの関係で、日本語が正しく表示されない場合があります</li>
+        <li>Steam Workshop に公開する場合、英語の方が多くのプレイヤーに楽しんでもらえます</li>
+        <li>日本語を使う場合は、UTF-8 エンコーディングでファイルを保存してください</li>
+      </ul>
+
+      <h3>このガイドで扱わないもの</h3>
+      <table class="styled-table">
+        <thead>
+          <tr>
+            <th>内容</th>
+            <th>参照先ガイド</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>modmain.lua の書き方全般</td>
+            <td><a href="README.html" style="color:var(--accent-warm)">DST-Lua-Scripting ガイド</a></td>
+          </tr>
+          <tr>
+            <td>modinfo.lua のコンフィグオプション</td>
+            <td><a href="README-modinfo-config.html" style="color:var(--accent-warm)">modinfo コンフィグガイド</a></td>
+          </tr>
+          <tr>
+            <td>キャラクターボイス（音声）の作成</td>
+            <td><a href="../DST-FMOD-Designer/README.html" style="color:var(--accent-warm)">DST-FMOD-Designer ガイド</a></td>
+          </tr>
+          <tr>
+            <td>AI 音声合成によるボイス生成</td>
+            <td><a href="../DST-Chatterbox/README.html" style="color:var(--accent-warm)">DST-Chatterbox ガイド</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 10. 参考リンク -->
+    <section class="section" id="references">
+      <div class="section-label">10 — References</div>
+      <h2>参考リンク</h2>
+      <div class="ref-list">
+        <a href="https://dontstarve.wiki.gg/wiki/Modding" class="ref-item" target="_blank">
+          <div>
+            <div class="ref-source">Don't Starve Wiki — Modding</div>
+            <div class="ref-url">dontstarve.wiki.gg/wiki/Modding</div>
+          </div>
+        </a>
+        <a href="https://forums.kleientertainment.com/forums/forum/79-modding-tools-tutorials/" class="ref-item" target="_blank">
+          <div>
+            <div class="ref-source">Klei Forums — Mods and Tools</div>
+            <div class="ref-url">forums.kleientertainment.com/forums/forum/79-modding-tools-tutorials/</div>
+          </div>
+        </a>
+        <a href="README.html" class="ref-item">
+          <div>
+            <div class="ref-source">DST-Lua-Scripting ガイドに戻る</div>
+            <div class="ref-url">DST-Lua-Scripting/README.html</div>
+          </div>
+        </a>
+        <a href="../README.html" class="ref-item">
+          <div>
+            <div class="ref-source">メインガイドに戻る</div>
+            <div class="ref-url">README.html</div>
+          </div>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    キャラクターセリフ（Speech）ファイル作成ガイド &#8212; このドキュメントは自由に利用・改変・再配布できます。DST MOD 制作にお役立てください。
+    <br><span style="display:inline-block;margin-top:8px"><a href="https://steamcommunity.com/profiles/76561198076111536/" style="color:inherit;text-decoration:none">Author: pinpikokun</a></span><br><span style="display:inline-flex;gap:6px;margin-top:6px"><a href="https://github.com/pinpikokun/DST-teemo"><img src="https://img.shields.io/badge/GitHub-Repository-black?logo=github" alt="GitHub"></a> <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=390684095"><img src="https://img.shields.io/badge/Steam%20Workshop-Subscribe-blue?logo=steam" alt="Steam Workshop"></a></span>
+  </footer>
+
+</body>
+</html>

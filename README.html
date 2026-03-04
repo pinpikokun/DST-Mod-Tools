@@ -633,6 +633,21 @@
           <div class="desc">AI 音声合成によるボイス生成</div>
           <a href="DST-Chatterbox/README.md">ガイドを開く →</a>
         </div>
+        <div class="card">
+          <h4>DST-Lua-Scripting</h4>
+          <div class="desc">Lua スクリプティング（キャラクター固有能力・カスタムコンポーネント・レシピ追加など）</div>
+          <a href="DST-Lua-Scripting/README.md">ガイドを開く →</a>
+        </div>
+        <div class="card">
+          <h4>Speech ファイル</h4>
+          <div class="desc">キャラクターのセリフ（Speech）カスタマイズ</div>
+          <a href="DST-Lua-Scripting/README-speech.md">ガイドを開く →</a>
+        </div>
+        <div class="card">
+          <h4>modinfo コンフィグ</h4>
+          <div class="desc">MOD のコンフィグオプション（設定画面）</div>
+          <a href="DST-Lua-Scripting/README-modinfo-config.md">ガイドを開く →</a>
+        </div>
       </div>
     </section>
 
@@ -880,6 +895,7 @@
         <p><code>name</code>: Steam Workshop やゲーム内 MOD 一覧に表示される名前</p>
         <p><code>api_version = 10</code>: DST の現在の API バージョン（変更不要）</p>
         <p><code>all_clients_require_mod = true</code>: マルチプレイで全員がこの MOD を必要とする設定</p>
+        <p><code>configuration_options</code>: ゲーム内で設定を変更できるオプションです。今回は使わないので空にします。詳しくは <a href="DST-Lua-Scripting/README-modinfo-config.md">modinfo コンフィグガイド</a> を参照</p>
       </div>
     </section>
 
@@ -1034,6 +1050,7 @@ STRINGS.SKIN_NAMES.<span class="fn">my_character_none</span> = <span class="str"
         <span class="callout-label">解説</span>
         <p><code>require("speech_wilson")</code> はウィルソンのセリフデータをそのまま使うという意味です。オリジナルのセリフに変更したい場合は、ウィルソンの speech ファイルの内容をコピーして各行を書き換えてください。</p>
       </div>
+      <p>セリフのカスタマイズ方法について詳しくは <a href="DST-Lua-Scripting/README-speech.md">Speech ファイル作成ガイド</a> を参照してください。</p>
     </section>
 
     <!-- Step 6 -->
@@ -1368,6 +1385,16 @@ my_character\anim\ghost_my_character_build.zip</code></pre>
           <div class="desc">AI 音声合成によるボイス生成</div>
           <a href="DST-Chatterbox/README.md">ガイドを開く →</a>
         </div>
+        <div class="card">
+          <h4>Speech ファイル</h4>
+          <div class="desc">キャラクターのセリフカスタマイズ</div>
+          <a href="DST-Lua-Scripting/README-speech.md">ガイドを開く →</a>
+        </div>
+        <div class="card">
+          <h4>modinfo コンフィグ</h4>
+          <div class="desc">MOD 設定画面のオプション作成</div>
+          <a href="DST-Lua-Scripting/README-modinfo-config.md">ガイドを開く →</a>
+        </div>
       </div>
 
       <h3>おすすめの学習順序</h3>
@@ -1376,6 +1403,8 @@ my_character\anim\ghost_my_character_build.zip</code></pre>
         <li>DST-Spriter ガイドでオリジナルアニメーションの作り方を学ぶ</li>
         <li>DST-TextureConverter ガイドで画像変換の詳細を理解する</li>
         <li>DST-ktools ガイドで既存アセットのデコンパイルを学ぶ</li>
+        <li><a href="DST-Lua-Scripting/README-speech.md">Speech ファイル作成ガイド</a> でキャラクターのセリフをカスタマイズする</li>
+        <li><a href="DST-Lua-Scripting/README-modinfo-config.md">modinfo コンフィグガイド</a> で設定オプションを追加する</li>
         <li>DST-FMOD-Designer ガイドでキャラクターボイスを追加する</li>
         <li>DST-Chatterbox ガイドで AI 音声を作成する</li>
       </ol>

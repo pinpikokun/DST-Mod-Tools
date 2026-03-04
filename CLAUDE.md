@@ -256,7 +256,9 @@ DST-Mod-Tools/
 │   └── README.md / .html          ← krane/ktech デコンパイルガイド
 ├── DST-Lua-Scripting/
 │   ├── README.md / .html          ← Lua スクリプティング総合ガイド
-│   └── README-DST-teemo.md / .html ← Captain Teemo MOD 実践解説
+│   ├── README-DST-teemo.md / .html ← Captain Teemo MOD 実践解説
+│   ├── README-speech.md / .html   ← キャラクターセリフ（Speech）作成ガイド
+│   └── README-modinfo-config.md / .html ← modinfo コンフィグオプション詳細ガイド
 ├── DST-Workshop-Upload/
 │   └── README.md / .html          ← Steam ワークショップ公開ガイド
 ├── DST-FMOD-Designer/

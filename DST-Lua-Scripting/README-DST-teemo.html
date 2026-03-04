@@ -85,24 +85,35 @@ code.inline{font-family:'Cascadia Code','Fira Code',monospace;font-size:13px;bac
 <div class="toc">
 <div class="toc-title">Table of Contents</div>
 <ol class="toc-list">
-<li><a href="#overview"><span class="toc-num">01</span>Captain Teemo MOD の概要</a></li>
-<li><a href="#structure"><span class="toc-num">02</span>ファイル構成</a></li>
-<li><a href="#modinfo"><span class="toc-num">03</span>modinfo.lua の実装</a></li>
-<li><a href="#modmain"><span class="toc-num">04</span>modmain.lua の実装</a></li>
-<li><a href="#prefab"><span class="toc-num">05</span>キャラクター prefab &mdash; teemo.lua</a></li>
-<li><a href="#items"><span class="toc-num">06</span>カスタムアイテムの実装</a></li>
-<li><a href="#components"><span class="toc-num">07</span>カスタムコンポーネントの実装</a></li>
-<li><a href="#util"><span class="toc-num">08</span>ユーティリティ &mdash; teemo_poison_util.lua</a></li>
-<li><a href="#network"><span class="toc-num">09</span>ネットワーク同期の実装</a></li>
-<li><a href="#widgets"><span class="toc-num">10</span>UI ウィジェットの実装</a></li>
-<li><a href="#saveload"><span class="toc-num">11</span>セーブ・ロードの実装</a></li>
-<li><a href="#abilities"><span class="toc-num">12</span>能力一覧まとめ</a></li>
-<li><a href="#references"><span class="toc-num">13</span>参考リンク</a></li>
+<li><a href="#about"><span class="toc-num">01</span>DST-teemo モッドについて</a></li>
+<li><a href="#overview"><span class="toc-num">02</span>Captain Teemo MOD の概要</a></li>
+<li><a href="#structure"><span class="toc-num">03</span>ファイル構成</a></li>
+<li><a href="#modinfo"><span class="toc-num">04</span>modinfo.lua の実装</a></li>
+<li><a href="#modmain"><span class="toc-num">05</span>modmain.lua の実装</a></li>
+<li><a href="#prefab"><span class="toc-num">06</span>キャラクター prefab &mdash; teemo.lua</a></li>
+<li><a href="#items"><span class="toc-num">07</span>カスタムアイテムの実装</a></li>
+<li><a href="#components"><span class="toc-num">08</span>カスタムコンポーネントの実装</a></li>
+<li><a href="#util"><span class="toc-num">09</span>ユーティリティ &mdash; teemo_poison_util.lua</a></li>
+<li><a href="#network"><span class="toc-num">10</span>ネットワーク同期の実装</a></li>
+<li><a href="#widgets"><span class="toc-num">11</span>UI ウィジェットの実装</a></li>
+<li><a href="#saveload"><span class="toc-num">12</span>セーブ・ロードの実装</a></li>
+<li><a href="#abilities"><span class="toc-num">13</span>能力一覧まとめ</a></li>
+<li><a href="#references"><span class="toc-num">14</span>参考リンク</a></li>
 </ol>
 </div>
 </section>
+<section class="section" id="about">
+<div class="section-label">01 &mdash; About</div>
+<h2>DST-teemo モッドについて</h2>
+<p>
+<a href="https://steamcommunity.com/sharedfiles/filedetails/?id=390684095"><img src="https://img.shields.io/badge/Steam%20Workshop-Subscribe-blue?logo=steam" alt="Steam Workshop"></a>
+<a href="https://github.com/pinpikokun/DST-teemo"><img src="https://img.shields.io/badge/GitHub-Repository-black?logo=github" alt="GitHub"></a>
+</p>
+<p>ゲーム内画像は CLIP STUDIO PAINT で作成しており、キャラクターボイスはすべて生成 AI で作成しています。</p>
+</section>
+
 <section class="section" id="overview">
-<div class="section-label">01 &mdash; Overview</div>
+<div class="section-label">02 &mdash; Overview</div>
 <h2>Captain Teemo MOD の概要</h2>
 <p>Captain Teemo MOD は、League of Legends のキャラクター「テーモ」を DST に再現した MOD です。ステルス、毒吹き矢、キノコ罠、サモナースペルなど、多彩な機能を実装しています。</p>
 <p>本ガイドでは、この MOD の実際のソースコードを読み解きながら、<a href="README.html" style="color:var(--accent-warm);">Lua スクリプティングガイド</a>で学んだ概念がどのように実装されるかを実践的に解説します。</p>
@@ -118,11 +129,11 @@ code.inline{font-family:'Cascadia Code','Fira Code',monospace;font-size:13px;bac
 <tr><td>毒による食料腐敗</td><td>パッシブ</td><td>毒で倒した敵のドロップ食料が腐敗</td></tr>
 </tbody>
 </table>
-<div class="callout note"><strong>ポイント:</strong> この MOD は DST の多くの仕組み（カスタムアクション、Net Variables、RPC、UI ウィジェット、コンポーネント、ステートグラフ等）を活用しており、実践的な学習素材として最適です。</div>
+<div class="callout note"><strong>ポイント:</strong> この MOD はカスタムアクション、Net Variables、RPC、UI ウィジェット、コンポーネント、ステートグラフ等を活用しており、実践的な学習素材として利用可能です。</div>
 </section>
 
 <section class="section" id="structure">
-<div class="section-label">02 &mdash; File Structure</div>
+<div class="section-label">03 &mdash; File Structure</div>
 <h2>ファイル構成</h2>
 <div class="folder-tree"><pre><span class="folder">DST-teemo/</span>
 &#9500;&#9472;&#9472; <span class="file-lua">modinfo.lua</span>                          <span class="annotation">&larr; MOD 設定（20 個の設定オプション）</span>
@@ -163,7 +174,7 @@ code.inline{font-family:'Cascadia Code','Fira Code',monospace;font-size:13px;bac
 </section>
 
 <section class="section" id="modinfo">
-<div class="section-label">03 &mdash; modinfo.lua</div>
+<div class="section-label">04 &mdash; modinfo.lua</div>
 <h2>modinfo.lua の実装</h2>
 <p>teemo の modinfo.lua は <strong>20 個の設定オプション</strong>を持つ、高度にカスタマイズ可能な設計です。</p>
 
@@ -217,7 +228,7 @@ code.inline{font-family:'Cascadia Code','Fira Code',monospace;font-size:13px;bac
 </div>
 </section>
 <section class="section" id="modmain">
-<div class="section-label">04 &mdash; modmain.lua</div>
+<div class="section-label">05 &mdash; modmain.lua</div>
 <h2>modmain.lua の実装</h2>
 <p>teemo の modmain.lua は約 800 行あり、以下の機能を担当しています。</p>
 
@@ -532,7 +543,7 @@ GLOBAL.ACTIONS.TEEMO_SHOOT_DART.distance = <span class="flag">5</span>     <span
 <div class="callout note"><strong>なぜ <code class="inline">rebuild_pending</code> を設定するのか？:</strong> <code class="inline">Rebuild</code> メソッドをオーバーライドしただけでは、既に構築済みのインベントリバーには反映されません。<code class="inline">rebuild_pending = true</code> を設定することで、次フレームで再構築が実行されます。</div>
 </section>
 <section class="section" id="prefab">
-<div class="section-label">05 &mdash; Character Prefab</div>
+<div class="section-label">06 &mdash; Character Prefab</div>
 <h2>キャラクター prefab &mdash; teemo.lua</h2>
 <p>teemo.lua はキャラクターの中核ファイルで、パッシブ能力「カモフラージュ」やステータス設定を実装しています。</p>
 
@@ -698,7 +709,7 @@ rawset(<span class="var">inst</span>.components.inventory, <span class="string">
 <div class="callout note"><strong>なぜ <code class="inline">rawset</code> を使うのか？:</strong> DST の <code class="inline">inventory</code> コンポーネントはメタテーブルでメソッドを定義しています。単純に <code class="inline">self.CanTakeItemInSlot = ...</code> と書くとメタテーブルではなくインスタンスに書き込まれ、意図した動作にならない場合があります。<code class="inline">rawset</code> で確実にインスタンスレベルで上書きします。</div>
 </section>
 <section class="section" id="items">
-<div class="section-label">06 &mdash; Custom Items</div>
+<div class="section-label">07 &mdash; Custom Items</div>
 <h2>カスタムアイテムの実装</h2>
 
 <h3>Blind Dart（吹き矢武器）</h3>
@@ -857,7 +868,7 @@ rawset(<span class="var">inst</span>.components.inventory, <span class="string">
 </section>
 
 <section class="section" id="components">
-<div class="section-label">07 &mdash; Custom Components</div>
+<div class="section-label">08 &mdash; Custom Components</div>
 <h2>カスタムコンポーネントの実装</h2>
 
 <h3>characterspecific.lua &mdash; キャラクター専用制限</h3>
@@ -920,7 +931,7 @@ rawset(<span class="var">inst</span>.components.inventory, <span class="string">
 </section>
 
 <section class="section" id="util">
-<div class="section-label">08 &mdash; Utility</div>
+<div class="section-label">09 &mdash; Utility</div>
 <h2>ユーティリティ &mdash; teemo_poison_util.lua</h2>
 <p>毒で倒した敵の食料ドロップを腐敗させるシステムです。<code class="inline">require</code> で複数のファイルから共有しています。</p>
 <div class="code-block"><span class="lang-label">LUA</span>
@@ -962,7 +973,7 @@ rawset(<span class="var">inst</span>.components.inventory, <span class="string">
 <div class="callout note"><strong>なぜ <code class="inline">unmark</code> で他の DOT を確認するのか？:</strong> Blind Dart と Noxious Trap の両方が同じターゲットに毒を付与する可能性があります。一方の DOT が終了しても、もう一方がまだ続いているなら毒マークを維持する必要があります。</div>
 </section>
 <section class="section" id="network">
-<div class="section-label">09 &mdash; Network Sync</div>
+<div class="section-label">10 &mdash; Network Sync</div>
 <h2>ネットワーク同期の実装</h2>
 <p>teemo の Net Variables は <code class="inline">common_postinit</code>（クライアント＆サーバー）で定義しています。</p>
 
@@ -1018,7 +1029,7 @@ rawset(<span class="var">inst</span>.components.inventory, <span class="string">
 </section>
 
 <section class="section" id="widgets">
-<div class="section-label">10 &mdash; UI Widgets</div>
+<div class="section-label">11 &mdash; UI Widgets</div>
 <h2>UI ウィジェットの実装</h2>
 
 <h3>NoxiousTrapSlot &mdash; トラップスタック UI</h3>
@@ -1156,7 +1167,7 @@ rawset(<span class="var">inst</span>.components.inventory, <span class="string">
 </section>
 
 <section class="section" id="saveload">
-<div class="section-label">11 &mdash; Save &amp; Load</div>
+<div class="section-label">12 &mdash; Save &amp; Load</div>
 <h2>セーブ・ロードの実装</h2>
 <p>teemo では Net Variables の値とタイマーをセーブデータに保存しています。</p>
 <div class="code-block"><span class="lang-label">LUA</span>
@@ -1211,7 +1222,7 @@ rawset(<span class="var">inst</span>.components.inventory, <span class="string">
 </div>
 </section>
 <section class="section" id="abilities">
-<div class="section-label">12 &mdash; Ability Summary</div>
+<div class="section-label">13 &mdash; Ability Summary</div>
 <h2>能力一覧まとめ</h2>
 <table class="styled-table">
 <thead><tr><th>能力</th><th>種類</th><th>持続時間</th><th>クールダウン</th><th>設定項目</th></tr></thead>
@@ -1231,7 +1242,7 @@ rawset(<span class="var">inst</span>.components.inventory, <span class="string">
 </section>
 
 <section class="section" id="references">
-<div class="section-label">13 &mdash; References</div>
+<div class="section-label">14 &mdash; References</div>
 <h2>参考リンク</h2>
 <div class="ref-list">
 <a class="ref-item" href="README.html">

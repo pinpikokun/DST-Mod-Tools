@@ -43,6 +43,8 @@ DST の MOD（モッド）とは、ゲームに **自分だけのキャラクタ
 | サウンドの追加 | [DST-FMOD-Designer ガイド](DST-FMOD-Designer/README.md) |
 | AI 音声合成によるボイス生成 | [DST-Chatterbox ガイド](DST-Chatterbox/README.md) |
 | Lua スクリプティング（キャラクター固有能力・カスタムコンポーネント・レシピ追加など） | [DST-Lua-Scripting ガイド](DST-Lua-Scripting/README.md) |
+| キャラクターのセリフ（Speech）カスタマイズ | [Speech ファイル作成ガイド](DST-Lua-Scripting/README-speech.md) |
+| MOD のコンフィグオプション（設定画面） | [modinfo コンフィグガイド](DST-Lua-Scripting/README-modinfo-config.md) |
 
 ### 対象読者
 
@@ -348,7 +350,7 @@ configuration_options = {}
 > - `name`: Steam Workshop やゲーム内 MOD 一覧に表示される名前です
 > - `api_version = 10`: DST の現在の API バージョンです。**変更しないでください**
 > - `all_clients_require_mod = true`: マルチプレイで遊ぶとき、全員がこの MOD を入れている必要があるという設定です
-> - `configuration_options`: ゲーム内で設定を変更できるオプションです。今回は使わないので空にします
+> - `configuration_options`: ゲーム内で設定を変更できるオプションです。今回は使わないので空にします。詳しくは [modinfo コンフィグガイド](DST-Lua-Scripting/README-modinfo-config.md) を参照
 
 ---
 
@@ -510,6 +512,8 @@ return require("speech_wilson")
 > ```
 > 展開すると `scripts\speech_wilson.lua` が見つかります。
 > このファイルは非常に長い（数千行）ですが、構造はシンプルで、各アイテムやイベントに対する一言セリフが並んでいるだけです。
+>
+> セリフのカスタマイズ方法について詳しくは [Speech ファイル作成ガイド](DST-Lua-Scripting/README-speech.md) を参照してください。
 
 ---
 
@@ -922,6 +926,8 @@ C:\Users\<ユーザー名>\Documents\Klei\DoNotStarveTogether\client_log.txt
 | **DST-ktools** | ゲームアセットのデコンパイル・TEX ↔ PNG 変換 | [DST-ktools/README.md](DST-ktools/README.md) |
 | **DST-FMOD-Designer** | キャラクターボイス・サウンド作成 | [DST-FMOD-Designer/README.md](DST-FMOD-Designer/README.md) |
 | **DST-Chatterbox** | AI 音声合成によるボイス生成 | [DST-Chatterbox/README.md](DST-Chatterbox/README.md) |
+| **Speech ファイル** | キャラクターのセリフカスタマイズ | [DST-Lua-Scripting/README-speech.md](DST-Lua-Scripting/README-speech.md) |
+| **modinfo コンフィグ** | MOD 設定画面のオプション作成 | [DST-Lua-Scripting/README-modinfo-config.md](DST-Lua-Scripting/README-modinfo-config.md) |
 
 ### おすすめの学習順序
 
@@ -929,8 +935,10 @@ C:\Users\<ユーザー名>\Documents\Klei\DoNotStarveTogether\client_log.txt
 2. [DST-Spriter ガイド](DST-Spriter/README.md) で **オリジナルアニメーション** の作り方を学ぶ
 3. [DST-TextureConverter ガイド](DST-TextureConverter/README.md) で **画像変換の詳細** を理解する
 4. [DST-ktools ガイド](DST-ktools/README.md) で **既存アセットのデコンパイル** を学ぶ
-5. [DST-FMOD-Designer ガイド](DST-FMOD-Designer/README.md) で **キャラクターボイス** を追加する
-6. [DST-Chatterbox ガイド](DST-Chatterbox/README.md) で **AI 音声** を作成する
+5. [Speech ファイル作成ガイド](DST-Lua-Scripting/README-speech.md) で **キャラクターのセリフ** をカスタマイズする
+6. [modinfo コンフィグガイド](DST-Lua-Scripting/README-modinfo-config.md) で **設定オプション** を追加する
+7. [DST-FMOD-Designer ガイド](DST-FMOD-Designer/README.md) で **キャラクターボイス** を追加する
+8. [DST-Chatterbox ガイド](DST-Chatterbox/README.md) で **AI 音声** を作成する
 
 ---
 

@@ -130,6 +130,8 @@
       <tr><td>PNG から TEX への画像変換</td><td><a href="../DST-TextureConverter/README.html" style="color:var(--accent-warm)">DST-TextureConverter ガイド</a></td></tr>
       <tr><td>ゲームアセットのデコンパイル</td><td><a href="../DST-ktools/README.html" style="color:var(--accent-warm)">DST-ktools ガイド</a></td></tr>
       <tr><td>サウンド・ボイスの作成</td><td><a href="../DST-FMOD-Designer/README.html" style="color:var(--accent-warm)">DST-FMOD-Designer ガイド</a></td></tr>
+      <tr><td>キャラクターのセリフカスタマイズ</td><td><a href="README-speech.md" style="color:var(--accent-warm)">Speech ファイル作成ガイド</a></td></tr>
+      <tr><td>MOD のコンフィグオプション詳細</td><td><a href="README-modinfo-config.md" style="color:var(--accent-warm)">modinfo コンフィグガイド</a></td></tr>
     </tbody>
   </table>
 </section>
@@ -310,6 +312,9 @@
   <div class="callout note">
     <strong>ポイント:</strong> <code class="inline">name</code> を空文字にしたエントリはカテゴリの見出しとして使えます。設定項目が多い MOD では、カテゴリごとに区切ると見やすくなります。
   </div>
+  <div class="callout note">
+    <strong>補足:</strong> コンフィグオプションの詳細（データ型別の書き方、prefab での使い方、実践テンプレート等）は <a href="README-modinfo-config.md" style="color:var(--accent-warm)">modinfo コンフィグオプション詳細ガイド</a> を参照してください。
+  </div>
 </section>
 
 <!-- 06 modmain.lua -->
@@ -409,6 +414,7 @@ STRINGS.CHARACTER_QUOTES.my_character = <span class="string">"\"Ready for advent
 STRINGS.CHARACTER_ABOUTME.my_character = <span class="string">"A brave adventurer."</span>
 
 <span class="comment">-- セリフファイルの読み込み</span>
+<span class="comment">-- 詳細は <a href="README-speech.md">Speech ファイル作成ガイド</a> を参照</span>
 STRINGS.CHARACTERS.MY_CHARACTER = GLOBAL.<span class="keyword">require</span> <span class="string">"speech_my_character"</span>
 
 <span class="comment">-- キャラクター名（他プレイヤーから見た時の名前）</span>
