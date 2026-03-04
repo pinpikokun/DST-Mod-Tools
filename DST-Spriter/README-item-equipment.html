@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>アイテム・武器防具アニメーション編 — DST-Spriter</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Noto+Sans+JP:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-primary: #faf9f7;
+    --bg-card: #ffffff;
+    --bg-warm: #f5f0eb;
+    --bg-dark: #191919;
+    --text-primary: #1a1a1a;
+    --text-secondary: #6b6560;
+    --text-light: #9a938d;
+    --accent-warm: #c4704b;
+    --accent-green: #2d7a5f;
+    --accent-red: #b85450;
+    --accent-blue: #4a7ab5;
+    --border: #e8e2db;
+    --border-light: #f0ece7;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.8;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .hero {
+    background: var(--bg-dark);
+    color: #fff;
+    padding: 100px 0 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(196,112,75,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-inner {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 40px;
+    position: relative;
+  }
+  .hero-label {
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent-warm);
+    margin-bottom: 24px;
+    font-weight: 500;
+  }
+  .hero h1 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 40px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 16px;
+    letter-spacing: -0.5px;
+  }
+  .hero-desc {
+    font-size: 16px;
+    color: rgba(255,255,255,0.6);
+    font-weight: 300;
+    line-height: 1.8;
+  }
+  .hero-nav {
+    margin-top: 28px;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .hero-nav a {
+    color: rgba(255,255,255,0.5);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 400;
+    transition: color 0.2s;
+  }
+  .hero-nav a:hover { color: var(--accent-warm); }
+
+  .content {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  .section {
+    padding: 72px 0;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .section:last-child { border-bottom: none; }
+
+  .section-label {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .section h2 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+  .section h3 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin: 40px 0 16px;
+    line-height: 1.5;
+  }
+  .section h4 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 32px 0 12px;
+    color: var(--text-primary);
+  }
+  .section p {
+    font-size: 16px;
+    color: var(--text-secondary);
+    line-height: 2;
+    font-weight: 300;
+    margin-bottom: 12px;
+  }
+  .section p:last-child { margin-bottom: 0; }
+
+  /* Callout */
+  .callout {
+    margin: 24px 0;
+    padding: 24px 28px;
+    border-radius: 12px;
+    font-size: 15px;
+    line-height: 1.9;
+    font-weight: 400;
+    color: var(--text-primary);
+  }
+  .callout p { font-size: 15px; color: var(--text-primary); font-weight: 400; margin-bottom: 6px; }
+  .callout p:last-child { margin-bottom: 0; }
+  .callout.warn { background: #fef8f0; border-left: 3px solid var(--accent-warm); }
+  .callout.danger { background: #fef2f0; border-left: 3px solid var(--accent-red); }
+  .callout.tip { background: #f0f8f4; border-left: 3px solid var(--accent-green); }
+  .callout.info { background: #f0f4f8; border-left: 3px solid var(--accent-blue); }
+  .callout-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+  }
+  .callout.warn .callout-label { color: var(--accent-warm); }
+  .callout.danger .callout-label { color: var(--accent-red); }
+  .callout.tip .callout-label { color: var(--accent-green); }
+  .callout.info .callout-label { color: var(--accent-blue); }
+
+  /* Steps */
+  .steps {
+    counter-reset: step;
+    list-style: none;
+    margin: 20px 0;
+    padding: 0;
+  }
+  .steps li {
+    counter-increment: step;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border-light);
+    font-size: 15px;
+    color: var(--text-secondary);
+    font-weight: 400;
+    line-height: 1.8;
+  }
+  .steps li:last-child { border-bottom: none; }
+  .steps li::before {
+    content: counter(step);
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    background: var(--bg-dark);
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 13px;
+    margin-top: 2px;
+  }
+
+  /* Tables */
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 14px;
+    background: var(--bg-card);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 16px 0 20px;
+    border: 1px solid var(--border);
+  }
+  th {
+    background: #292524;
+    color: #fafaf9;
+    padding: 12px 18px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 13px;
+  }
+  td {
+    padding: 11px 18px;
+    border-bottom: 1px solid var(--border-light);
+    vertical-align: top;
+    color: var(--text-secondary);
+    font-weight: 400;
+    line-height: 1.7;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) td { background: #fafaf8; }
+
+  /* Panel */
+  .panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    margin: 24px 0;
+  }
+  .panel-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .panel-content {
+    font-size: 15px;
+    color: var(--text-secondary);
+    font-weight: 300;
+    line-height: 2;
+  }
+  .panel-content p { font-size: 15px; color: var(--text-secondary); font-weight: 300; }
+
+  /* Flow diagram */
+  .flow-diagram {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    flex-wrap: wrap;
+    margin: 24px 0;
+  }
+  .flow-box {
+    padding: 14px 22px;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+    background: var(--bg-warm);
+    color: var(--text-primary);
+  }
+  .flow-connector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 12px;
+    color: var(--text-light);
+  }
+  .flow-connector .arrow { font-size: 20px; line-height: 1; }
+
+  /* File tree */
+  .file-tree {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px 32px;
+    font-family: 'Cascadia Code', 'Consolas', monospace;
+    font-size: 13px;
+    line-height: 2;
+    margin: 24px 0;
+  }
+  .file-tree .comment {
+    color: var(--text-light);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 12px;
+  }
+
+  /* Code */
+  pre {
+    background: #1e1e2e;
+    color: #cdd6f4;
+    padding: 24px 28px;
+    border-radius: 12px;
+    overflow-x: auto;
+    font-family: 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.8;
+    margin: 16px 0 20px;
+  }
+  code {
+    font-family: 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+    font-size: 0.88em;
+    background: #f0ece7;
+    color: #92400e;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+  .kw { color: #cba6f7; }
+  .fn { color: #89b4fa; }
+  .str { color: #a6e3a1; }
+  .cm { color: #6c7086; font-style: italic; }
+
+  /* Accordion */
+  .acc {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  .acc-head {
+    padding: 20px 24px;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--text-primary);
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .acc-head::after {
+    content: '+';
+    color: var(--text-light);
+    font-size: 20px;
+    font-weight: 300;
+    flex-shrink: 0;
+    margin-left: 16px;
+  }
+  .acc.open .acc-head::after { content: '\2212'; }
+  .acc-body {
+    display: none;
+    padding: 0 24px 24px;
+    color: var(--text-secondary);
+    font-size: 15px;
+    font-weight: 300;
+    line-height: 2;
+    border-top: 1px solid var(--border-light);
+  }
+  .acc.open .acc-body { display: block; padding-top: 20px; }
+  .acc-body p { font-size: 15px; color: var(--text-secondary); font-weight: 300; margin-bottom: 8px; }
+
+  /* Spec grid */
+  .spec-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .spec-item {
+    background: var(--bg-warm);
+    border-radius: 10px;
+    padding: 14px 18px;
+  }
+  .spec-label {
+    font-size: 11px;
+    color: var(--text-light);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 500;
+    display: block;
+    margin-bottom: 4px;
+  }
+  .spec-value {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  /* Conclusion */
+  .conclusion {
+    background: var(--bg-dark);
+    color: #fff;
+    border-radius: 20px;
+    padding: 48px;
+    margin: 40px 0;
+  }
+  .conclusion h3 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 22px;
+    margin-bottom: 16px;
+    font-weight: 700;
+  }
+  .conclusion p {
+    color: rgba(255,255,255,0.7);
+    font-size: 15px;
+    line-height: 2;
+    font-weight: 300;
+  }
+  .conclusion code {
+    background: rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.9);
+  }
+
+  /* Navigation */
+  .page-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 0;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .page-nav a {
+    color: var(--accent-warm);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: opacity 0.2s;
+  }
+  .page-nav a:hover { opacity: 0.7; }
+
+  a.anchor { color: var(--accent-warm); text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 0.2s; }
+  a.anchor:hover { border-bottom-color: var(--accent-warm); }
+
+  .footer {
+    text-align: center;
+    padding: 48px 0;
+    font-size: 12px;
+    color: var(--text-light);
+    font-weight: 300;
+  }
+
+  @media (max-width: 640px) {
+    .hero h1 { font-size: 28px; }
+    .hero { padding: 72px 0 56px; }
+    .content { padding: 0 24px; }
+    .hero-inner { padding: 0 24px; }
+    .panel { padding: 24px 20px; }
+    .conclusion { padding: 32px 24px; }
+    .spec-grid { grid-template-columns: 1fr 1fr; }
+    .flow-diagram { flex-direction: column; gap: 8px; }
+    .flow-connector { flex-direction: row; padding: 4px 0; }
+    .flow-connector .arrow { transform: rotate(90deg); }
+  }
+</style>
+</head>
+<body>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="hero-label">Item &amp; Equipment Animation</div>
+      <h1>アイテム・武器防具<br>アニメーション編</h1>
+      <p class="hero-desc">アイテム（武器・防具・ツール・食べ物など）を MOD に追加するときに必要なアニメーションについて解説します。<br>「地面に置いたときの見た目」と「キャラクターが装備したときの見た目」の 2 種類があります。</p>
+      <div class="hero-nav">
+        <a href="README.html">&larr; README に戻る</a>
+        <a href="README-character.html">&larr; キャラクター編</a>
+        <a href="README-effect.html">エフェクト編 &rarr;</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="content">
+
+    <!-- アイテムアニメーションとは -->
+    <section class="section">
+      <div class="section-label">Ground Item</div>
+      <h2>アイテムアニメーションとは</h2>
+      <p>DST でアイテムを地面にドロップすると、そのアイテムの見た目が表示されます。この見た目が「アイテムアニメーション」です。ほとんどのアイテムは <code>idle</code>（静止状態）のアニメーション 1 つだけで十分です。</p>
+
+      <div class="spec-grid">
+        <div class="spec-item">
+          <span class="spec-label">Bank</span>
+          <span class="spec-value">独自の名前</span>
+        </div>
+        <div class="spec-item">
+          <span class="spec-label">Build</span>
+          <span class="spec-value">Bank と同じ名前</span>
+        </div>
+        <div class="spec-item">
+          <span class="spec-label">必要なアニメーション</span>
+          <span class="spec-value">idle（静止状態）</span>
+        </div>
+      </div>
+
+      <h3>Spriter での作り方</h3>
+      <ol class="steps">
+        <li>新規プロジェクトを作成する</li>
+        <li>アイテムの画像（PNG）を 1 枚配置する</li>
+        <li>Entity 名（= Bank 名）をアイテム名に設定する</li>
+        <li><code>idle</code> という名前のアニメーションを作成する</li>
+        <li>画像のピボット（回転軸）を画像の中央下部に設定する</li>
+      </ol>
+
+      <div class="callout tip">
+        <span class="callout-label">ヒント</span>
+        <p>アイテムアニメーションは基本的に静止画 1 枚で OK です。動く必要がなければ、1 フレームだけのアニメーションで問題ありません。</p>
+      </div>
+
+      <div class="panel">
+        <div class="panel-label">Lua 設定例</div>
+<pre><code><span class="cm">-- prefab ファイル</span>
+<span class="kw">local</span> assets = {
+    <span class="fn">Asset</span>(<span class="str">"ANIM"</span>, <span class="str">"anim/my_weapon.zip"</span>),
+}
+
+<span class="kw">local function</span> <span class="fn">fn</span>()
+    <span class="kw">local</span> inst = <span class="fn">CreateEntity</span>()
+
+    inst.entity:<span class="fn">AddAnimState</span>()
+    inst.AnimState:<span class="fn">SetBank</span>(<span class="str">"my_weapon"</span>)
+    inst.AnimState:<span class="fn">SetBuild</span>(<span class="str">"my_weapon"</span>)
+    inst.AnimState:<span class="fn">PlayAnimation</span>(<span class="str">"idle"</span>)
+
+    <span class="cm">-- ... 他の設定</span>
+    <span class="kw">return</span> inst
+<span class="kw">end</span></code></pre>
+      </div>
+    </section>
+
+    <!-- 装備スワップアニメーション -->
+    <section class="section">
+      <div class="section-label">Equipment Swap</div>
+      <h2>装備スワップアニメーションとは</h2>
+      <p>キャラクターが武器やツールを手に持ったとき、キャラクターの手元に表示される見た目が「装備スワップアニメーション」です。</p>
+
+      <div class="panel">
+        <div class="panel-label">swap_object の仕組み</div>
+        <div class="file-tree">
+          キャラクターの手（swap_object レイヤー）<br>
+          ├── 何も持っていない <span class="comment">→ 空</span><br>
+          ├── 斧を装備 <span class="comment">→ 斧の画像に差し替え</span><br>
+          └── MOD武器を装備 <span class="comment">→ MOD武器の画像に差し替え</span>
+        </div>
+      </div>
+
+      <div class="spec-grid">
+        <div class="spec-item">
+          <span class="spec-label">Bank</span>
+          <span class="spec-value">swap_object（流用）</span>
+        </div>
+        <div class="spec-item">
+          <span class="spec-label">Build</span>
+          <span class="spec-value">swap_&lt;アイテム名&gt;</span>
+        </div>
+        <div class="spec-item">
+          <span class="spec-label">シンボル名</span>
+          <span class="spec-value">Build 名と同じ</span>
+        </div>
+      </div>
+
+      <div class="callout danger">
+        <span class="callout-label">重要</span>
+        <p>Bank は必ず <code>swap_object</code> を使ってください。これは DST 本体が定義している Bank で、キャラクターの手に持つアイテムの動きを制御しています。</p>
+      </div>
+
+      <h3>Spriter での作り方</h3>
+      <ol class="steps">
+        <li>新規プロジェクトを作成する（ファイル名を <code>swap_&lt;アイテム名&gt;</code> にする）</li>
+        <li>Entity 名を <code>swap_object</code> に設定する（<strong>重要</strong>: 独自名ではなく <code>swap_object</code> にする）</li>
+        <li>手に持った状態のアイテム画像（PNG）を配置する</li>
+        <li>ピボットをキャラクターの手の位置に合わせる</li>
+      </ol>
+
+      <div class="callout tip">
+        <span class="callout-label">ヒント</span>
+        <p>ピボット位置は、DST 本体の既存武器（斧やハンマーなど）の <code>.scml</code> を参考にすると合わせやすいです。</p>
+      </div>
+
+      <div class="panel">
+        <div class="panel-label">Lua 設定例</div>
+<pre><code><span class="cm">-- prefab ファイルの assets</span>
+<span class="kw">local</span> assets = {
+    <span class="fn">Asset</span>(<span class="str">"ANIM"</span>, <span class="str">"anim/my_weapon.zip"</span>),         <span class="cm">-- 地面のアイテム</span>
+    <span class="fn">Asset</span>(<span class="str">"ANIM"</span>, <span class="str">"anim/swap_my_weapon.zip"</span>),     <span class="cm">-- 装備時の見た目</span>
+}
+
+<span class="cm">-- 装備したとき</span>
+<span class="kw">local function</span> <span class="fn">onequip</span>(inst, owner)
+    <span class="cm">-- キャラクターの swap_object シンボルを差し替える</span>
+    owner.AnimState:<span class="fn">OverrideSymbol</span>(<span class="str">"swap_object"</span>, <span class="str">"swap_my_weapon"</span>, <span class="str">"swap_my_weapon"</span>)
+    <span class="cm">-- 装備アニメーションのレイヤーを表示</span>
+    owner.AnimState:<span class="fn">Show</span>(<span class="str">"ARM_carry"</span>)
+    owner.AnimState:<span class="fn">Hide</span>(<span class="str">"ARM_normal"</span>)
+<span class="kw">end</span>
+
+<span class="cm">-- 装備を外したとき</span>
+<span class="kw">local function</span> <span class="fn">onunequip</span>(inst, owner)
+    owner.AnimState:<span class="fn">ClearOverrideSymbol</span>(<span class="str">"swap_object"</span>)
+    owner.AnimState:<span class="fn">Hide</span>(<span class="str">"ARM_carry"</span>)
+    owner.AnimState:<span class="fn">Show</span>(<span class="str">"ARM_normal"</span>)
+<span class="kw">end</span></code></pre>
+      </div>
+
+      <div class="acc open" onclick="this.classList.toggle('open')">
+        <div class="acc-head">OverrideSymbol の引数の詳細</div>
+        <div class="acc-body">
+<pre><code>owner.AnimState:<span class="fn">OverrideSymbol</span>(<span class="str">"swap_object"</span>, <span class="str">"swap_my_weapon"</span>, <span class="str">"swap_my_weapon"</span>)
+<span class="cm">--                               ↑ 差し替え先      ↑ Build 名          ↑ シンボル名</span>
+<span class="cm">--                          （キャラの手）   （ZIP の Build）    （ZIP 内のシンボル）</span></code></pre>
+          <table>
+            <tr><th>引数</th><th>説明</th></tr>
+            <tr><td><strong>第 1 引数</strong></td><td>差し替えるシンボル名（キャラクター側）。武器なら <code>"swap_object"</code></td></tr>
+            <tr><td><strong>第 2 引数</strong></td><td>差し替え元の Build 名（装備アニメーション ZIP の Build）</td></tr>
+            <tr><td><strong>第 3 引数</strong></td><td>差し替え元のシンボル名（通常は Build 名と同じ）</td></tr>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 帽子・防具の装備 -->
+    <section class="section">
+      <div class="section-label">Hat &amp; Armor</div>
+      <h2>帽子・防具の装備</h2>
+      <p>帽子や防具もスワップの仕組みは同じですが、差し替えるシンボルが異なります。</p>
+
+      <table>
+        <tr><th>装備スロット</th><th>差し替えるシンボル</th><th>例</th></tr>
+        <tr><td><strong>手</strong>（武器・ツール）</td><td><code>swap_object</code></td><td>斧、ハンマー、杖</td></tr>
+        <tr><td><strong>頭</strong>（帽子）</td><td><code>swap_hat</code></td><td>ヘルメット、花飾り</td></tr>
+        <tr><td><strong>胴体</strong>（防具）</td><td><code>swap_body</code></td><td>ログスーツ、バックパック</td></tr>
+      </table>
+
+      <div class="panel">
+        <div class="panel-label">各スロットの Lua コード</div>
+<pre><code><span class="cm">-- 帽子の場合</span>
+owner.AnimState:<span class="fn">OverrideSymbol</span>(<span class="str">"swap_hat"</span>, <span class="str">"swap_my_hat"</span>, <span class="str">"swap_my_hat"</span>)
+
+<span class="cm">-- 防具の場合</span>
+owner.AnimState:<span class="fn">OverrideSymbol</span>(<span class="str">"swap_body"</span>, <span class="str">"swap_my_armor"</span>, <span class="str">"swap_my_armor"</span>)</code></pre>
+      </div>
+    </section>
+
+    <!-- インベントリアイコン -->
+    <section class="section">
+      <div class="section-label">Inventory Icon</div>
+      <h2>インベントリアイコンも忘れずに</h2>
+      <p>アイテムを追加する場合、Spriter アニメーションとは別に <strong>インベントリアイコン</strong>（持ち物欄に表示される画像）が必要です。インベントリアイコンは PNG → TEX + XML 形式で作成します。</p>
+
+      <div class="callout info">
+        <span class="callout-label">参照</span>
+        <p>詳しくは <a class="anchor" href="README.html">README の Appendix A</a> を参照してください。</p>
+      </div>
+    </section>
+
+    <!-- まとめ -->
+    <section class="section">
+      <div class="section-label">Summary</div>
+      <h2>まとめ</h2>
+
+      <table>
+        <tr><th>作るもの</th><th>Bank</th><th>Build</th><th>用途</th></tr>
+        <tr><td><strong>アイテム（地面）</strong></td><td>独自</td><td>独自</td><td>地面に置いたときの見た目</td></tr>
+        <tr><td><strong>装備スワップ（武器）</strong></td><td><code>swap_object</code>（流用）</td><td><code>swap_&lt;アイテム名&gt;</code></td><td>手に持ったときの見た目</td></tr>
+        <tr><td><strong>装備スワップ（帽子）</strong></td><td><code>swap_hat</code>（流用）</td><td><code>swap_&lt;帽子名&gt;</code></td><td>頭に装備したときの見た目</td></tr>
+        <tr><td><strong>装備スワップ（防具）</strong></td><td><code>swap_body</code>（流用）</td><td><code>swap_&lt;防具名&gt;</code></td><td>胴体に装備したときの見た目</td></tr>
+        <tr><td><strong>インベントリアイコン</strong></td><td>—</td><td>—</td><td>TEX + XML 形式（Spriter 不要）</td></tr>
+      </table>
+
+      <!-- ナビゲーション -->
+      <div class="page-nav">
+        <a href="README.html">&larr; README に戻る</a>
+        <span>
+          <a href="README-character.html">&larr; キャラクター編</a>
+          &nbsp;&nbsp;
+          <a href="README-effect.html">エフェクト編 &rarr;</a>
+        </span>
+      </div>
+    </section>
+
+    <!-- ライセンス -->
+    <section class="section">
+      <div class="conclusion">
+        <h3>ライセンス</h3>
+        <p>このドキュメントは自由に利用・改変・再配布できます。DST MOD 制作にお役立てください。</p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    DST-Spriter — アイテム・武器防具アニメーション編
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DST-Spriter — Don't Starve Together MOD アニメーション作成ガイド</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Noto+Sans+JP:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-primary: #faf9f7;
+    --bg-card: #ffffff;
+    --bg-warm: #f5f0eb;
+    --bg-dark: #191919;
+    --text-primary: #1a1a1a;
+    --text-secondary: #6b6560;
+    --text-light: #9a938d;
+    --accent-warm: #c4704b;
+    --accent-green: #2d7a5f;
+    --accent-red: #b85450;
+    --accent-blue: #4a7ab5;
+    --border: #e8e2db;
+    --border-light: #f0ece7;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.8;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .hero {
+    background: var(--bg-dark);
+    color: #fff;
+    padding: 100px 0 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(196,112,75,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-inner {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 40px;
+    position: relative;
+  }
+  .hero-label {
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent-warm);
+    margin-bottom: 24px;
+    font-weight: 500;
+  }
+  .hero h1 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 40px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 16px;
+    letter-spacing: -0.5px;
+  }
+  .hero-desc {
+    font-size: 16px;
+    color: rgba(255,255,255,0.6);
+    font-weight: 300;
+    line-height: 1.8;
+  }
+
+  .content {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  .section {
+    padding: 72px 0;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .section:last-child { border-bottom: none; }
+
+  .section-label {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .section h2 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+  .section h3 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin: 40px 0 16px;
+    line-height: 1.5;
+  }
+  .section h4 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 32px 0 12px;
+    color: var(--text-primary);
+  }
+  .section p {
+    font-size: 16px;
+    color: var(--text-secondary);
+    line-height: 2;
+    font-weight: 300;
+    margin-bottom: 12px;
+  }
+  .section p:last-child { margin-bottom: 0; }
+
+  /* Callout */
+  .callout {
+    margin: 24px 0;
+    padding: 24px 28px;
+    border-radius: 12px;
+    font-size: 15px;
+    line-height: 1.9;
+    font-weight: 400;
+    color: var(--text-primary);
+  }
+  .callout p { font-size: 15px; color: var(--text-primary); font-weight: 400; margin-bottom: 6px; }
+  .callout p:last-child { margin-bottom: 0; }
+  .callout.warn { background: #fef8f0; border-left: 3px solid var(--accent-warm); }
+  .callout.danger { background: #fef2f0; border-left: 3px solid var(--accent-red); }
+  .callout.tip { background: #f0f8f4; border-left: 3px solid var(--accent-green); }
+  .callout.info { background: #f0f4f8; border-left: 3px solid var(--accent-blue); }
+  .callout-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+  }
+  .callout.warn .callout-label { color: var(--accent-warm); }
+  .callout.danger .callout-label { color: var(--accent-red); }
+  .callout.tip .callout-label { color: var(--accent-green); }
+  .callout.info .callout-label { color: var(--accent-blue); }
+
+  /* Steps */
+  .steps {
+    counter-reset: step;
+    list-style: none;
+    margin: 20px 0;
+    padding: 0;
+  }
+  .steps li {
+    counter-increment: step;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border-light);
+    font-size: 15px;
+    color: var(--text-secondary);
+    font-weight: 400;
+    line-height: 1.8;
+  }
+  .steps li:last-child { border-bottom: none; }
+  .steps li::before {
+    content: counter(step);
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    background: var(--bg-dark);
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 13px;
+    margin-top: 2px;
+  }
+
+  /* Code */
+  pre {
+    background: #1e1e2e;
+    color: #cdd6f4;
+    padding: 24px 28px;
+    border-radius: 12px;
+    overflow-x: auto;
+    font-family: 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.8;
+    margin: 16px 0 20px;
+  }
+  code {
+    font-family: 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+    font-size: 0.88em;
+    background: #f0ece7;
+    color: #92400e;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+  .kw { color: #cba6f7; }
+  .fn { color: #89b4fa; }
+  .str { color: #a6e3a1; }
+  .cm { color: #6c7086; font-style: italic; }
+  .tree-note { color: var(--text-light); font-size: 0.9em; }
+
+  /* Tables */
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 14px;
+    background: var(--bg-card);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 16px 0 20px;
+    border: 1px solid var(--border);
+  }
+  th {
+    background: #292524;
+    color: #fafaf9;
+    padding: 12px 18px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 13px;
+  }
+  td {
+    padding: 11px 18px;
+    border-bottom: 1px solid var(--border-light);
+    vertical-align: top;
+    color: var(--text-secondary);
+    font-weight: 400;
+    line-height: 1.7;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) td { background: #fafaf8; }
+
+  /* Panel */
+  .panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    margin: 24px 0;
+  }
+  .panel-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .panel-content {
+    font-size: 15px;
+    color: var(--text-secondary);
+    font-weight: 300;
+    line-height: 2;
+  }
+  .panel-content p { font-size: 15px; color: var(--text-secondary); font-weight: 300; }
+
+  /* Cards grid */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+    margin: 24px 0;
+  }
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: var(--accent-warm); }
+  .card h4 {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0 0 8px;
+    color: var(--text-primary);
+  }
+  .card .desc {
+    font-size: 14px;
+    color: var(--text-secondary);
+    font-weight: 300;
+    line-height: 1.7;
+  }
+  .card a { color: var(--accent-warm); text-decoration: none; font-size: 13px; }
+  .card a:hover { text-decoration: underline; }
+
+  /* Spec grid */
+  .spec-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .spec-item {
+    background: var(--bg-warm);
+    border-radius: 10px;
+    padding: 14px 18px;
+  }
+  .spec-label {
+    font-size: 11px;
+    color: var(--text-light);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 500;
+    display: block;
+    margin-bottom: 4px;
+  }
+  .spec-value {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  /* Flow diagram */
+  .flow-diagram {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    flex-wrap: wrap;
+    margin: 24px 0;
+  }
+  .flow-box {
+    padding: 14px 22px;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+    background: var(--bg-warm);
+    color: var(--text-primary);
+  }
+  .flow-connector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 12px;
+    color: var(--text-light);
+  }
+  .flow-connector .arrow { font-size: 20px; line-height: 1; }
+
+  /* Accordion */
+  .acc {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  .acc-head {
+    padding: 20px 24px;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--text-primary);
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .acc-head::after {
+    content: '+';
+    color: var(--text-light);
+    font-size: 20px;
+    font-weight: 300;
+    flex-shrink: 0;
+    margin-left: 16px;
+  }
+  .acc.open .acc-head::after { content: '\2212'; }
+  .acc-body {
+    display: none;
+    padding: 0 24px 24px;
+    color: var(--text-secondary);
+    font-size: 15px;
+    font-weight: 300;
+    line-height: 2;
+    border-top: 1px solid var(--border-light);
+  }
+  .acc.open .acc-body { display: block; padding-top: 20px; }
+  .acc-body p { font-size: 15px; color: var(--text-secondary); font-weight: 300; margin-bottom: 8px; }
+
+  /* File tree */
+  .file-tree {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px 32px;
+    font-family: 'Cascadia Code', 'Consolas', monospace;
+    font-size: 13px;
+    line-height: 2;
+    margin: 24px 0;
+  }
+  .file-tree .comment {
+    color: var(--text-light);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 12px;
+  }
+
+  /* Reference links */
+  .ref-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 24px;
+  }
+  .ref-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 16px 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: border-color 0.2s;
+  }
+  .ref-item:hover { border-color: var(--accent-warm); }
+  .ref-item .ref-source { font-size: 14px; font-weight: 500; }
+  .ref-item .ref-url { font-size: 12px; color: var(--text-light); word-break: break-all; margin-top: 4px; font-weight: 300; }
+
+  /* Conclusion */
+  .conclusion {
+    background: var(--bg-dark);
+    color: #fff;
+    border-radius: 20px;
+    padding: 48px;
+    margin: 40px 0;
+  }
+  .conclusion h3 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 22px;
+    margin-bottom: 16px;
+    font-weight: 700;
+  }
+  .conclusion p {
+    color: rgba(255,255,255,0.7);
+    font-size: 15px;
+    line-height: 2;
+    font-weight: 300;
+  }
+  .conclusion code {
+    background: rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.9);
+  }
+
+  /* Anchor */
+  a.anchor { color: var(--accent-warm); text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 0.2s; }
+  a.anchor:hover { border-bottom-color: var(--accent-warm); }
+
+  .footer {
+    text-align: center;
+    padding: 48px 0;
+    font-size: 12px;
+    color: var(--text-light);
+    font-weight: 300;
+  }
+
+  @media (max-width: 640px) {
+    .hero h1 { font-size: 28px; }
+    .hero { padding: 72px 0 56px; }
+    .content { padding: 0 24px; }
+    .hero-inner { padding: 0 24px; }
+    .panel { padding: 24px 20px; }
+    .conclusion { padding: 32px 24px; }
+    .card-grid { grid-template-columns: 1fr; }
+    .spec-grid { grid-template-columns: 1fr 1fr; }
+    .flow-diagram { flex-direction: column; gap: 8px; }
+    .flow-connector { flex-direction: row; padding: 4px 0; }
+    .flow-connector .arrow { transform: rotate(90deg); }
+  }
+</style>
+</head>
+<body>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="hero-label">Animation Guide</div>
+      <h1>DST-Spriter</h1>
+      <p class="hero-desc">Don't Starve Together の MOD アニメーション作成ガイド。<br>Spriter の使い方から、MOD として動かすまでの手順を初心者にもわかりやすく解説します。</p>
+    </div>
+  </header>
+
+  <main class="content">
+
+    <!-- ガイド構成 -->
+    <section class="section">
+      <div class="section-label">Guide Structure</div>
+      <h2>このガイドで学べること</h2>
+      <p>全体共通の基礎知識（このページ）と、カテゴリ別の詳細ガイドで構成されています。</p>
+
+      <div class="card-grid">
+        <div class="card">
+          <h4>README（このページ）</h4>
+          <div class="desc">DST アニメーションの基礎、環境準備、フォルダ構成、ビルド手順、Lua 設定、画像変換</div>
+        </div>
+        <div class="card">
+          <h4>キャラクター編</h4>
+          <div class="desc">メインキャラ・ゴースト・スキンのアニメーション作成</div>
+          <a href="README-character.html">キャラクター編 →</a>
+        </div>
+        <div class="card">
+          <h4>アイテム・武器防具編</h4>
+          <div class="desc">地面の見た目・装備時の見た目のアニメーション作成</div>
+          <a href="README-item-equipment.html">アイテム・武器防具編 →</a>
+        </div>
+        <div class="card">
+          <h4>エフェクト編</h4>
+          <div class="desc">視覚効果・投射物・範囲表示のアニメーション作成</div>
+          <a href="README-effect.html">エフェクト編 →</a>
+        </div>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-label">ヒント</span>
+        <p>まずはこのページを最後まで読んで全体像をつかみ、それから興味のあるカテゴリの詳細ガイドに進んでください。</p>
+      </div>
+    </section>
+
+    <!-- アニメーションとは -->
+    <section class="section">
+      <div class="section-label">Overview</div>
+      <h2>DST のアニメーション（Spriter）とは</h2>
+      <p>DST に登場するキャラクター・アイテム・エフェクトは、すべて 2D のスプライトアニメーションで表現されています。これらのアニメーションは Spriter というツールで作られています。</p>
+
+      <div class="panel">
+        <div class="panel-label">全体の流れ</div>
+        <div class="flow-diagram">
+          <div class="flow-box">PNG 画像を用意</div>
+          <div class="flow-connector"><span class="arrow">→</span></div>
+          <div class="flow-box" style="background:#e8f0ea; color:var(--accent-green);">Spriter で配置<br><small>.scml ファイル</small></div>
+          <div class="flow-connector"><span class="arrow">→</span></div>
+          <div class="flow-box">Mod Tools でビルド<br><small>.zip に変換</small></div>
+          <div class="flow-connector"><span class="arrow">→</span></div>
+          <div class="flow-box">anim/ に配置</div>
+          <div class="flow-connector"><span class="arrow">→</span></div>
+          <div class="flow-box" style="background:#fef3ef; color:var(--accent-warm);">Lua で読み込み</div>
+        </div>
+      </div>
+
+      <h3>Bank・Build・Animation — 3 つの重要な概念</h3>
+      <p>DST のアニメーションシステムには、3 つのキーワードがあります。これを理解することが MOD 作成の第一歩です。</p>
+
+      <table>
+        <tr><th>用語</th><th>一言で言うと</th><th>決まり方</th><th>例</th></tr>
+        <tr><td><strong>Bank</strong></td><td>動きのグループ</td><td>Spriter の Entity 名</td><td><code>my_sword</code></td></tr>
+        <tr><td><strong>Build</strong></td><td>見た目のセット</td><td>Spriter のファイル名（拡張子なし）</td><td><code>my_sword</code></td></tr>
+        <tr><td><strong>Animation</strong></td><td>個々のアニメーション名</td><td>Spriter の Animation 名</td><td><code>idle</code></td></tr>
+      </table>
+
+      <div class="callout tip">
+        <span class="callout-label">ヒント</span>
+        <p>Bank は「動きの型」、Build は「見た目の着せ替え」と考えるとわかりやすいです。同じ Bank（動きの型）に対して Build（見た目）を差し替えれば、動きはそのままに見た目だけ変えられます。DST のキャラクタースキンもこの仕組みを利用しています。</p>
+      </div>
+    </section>
+
+    <!-- 環境準備 -->
+    <section class="section">
+      <div class="section-label">Environment</div>
+      <h2>環境準備</h2>
+      <p>MOD のアニメーションを作るには、以下の 3 つのツールが必要です。</p>
+
+      <div class="spec-grid">
+        <div class="spec-item">
+          <span class="spec-label">必須</span>
+          <span class="spec-value">DST Mod Tools</span>
+        </div>
+        <div class="spec-item">
+          <span class="spec-label">同梱</span>
+          <span class="spec-value">Spriter</span>
+        </div>
+        <div class="spec-item">
+          <span class="spec-label">コマンド実行用</span>
+          <span class="spec-value">Git Bash</span>
+        </div>
+      </div>
+
+      <div class="acc open" onclick="this.classList.toggle('open')">
+        <div class="acc-head">1. DST Mod Tools（必須）</div>
+        <div class="acc-body">
+          <p>Spriter 本体やビルドツールがすべて含まれています。</p>
+          <ol class="steps">
+            <li>Steam を起動する</li>
+            <li>ライブラリを開き、上部のフィルタで「ツール」を選択する</li>
+            <li>「Don't Starve Mod Tools」を検索してインストールする</li>
+          </ol>
+          <div class="callout info">
+            <span class="callout-label">インストール先</span>
+            <p><code>C:\Program Files (x86)\Steam\steamapps\common\Don't Starve Mod Tools\</code></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc" onclick="this.classList.toggle('open')">
+        <div class="acc-head">2. Spriter（DST Mod Tools に同梱）</div>
+        <div class="acc-body">
+          <p>DST Mod Tools をインストールすると、Spriter も一緒にインストールされます。追加の操作は不要です。</p>
+        </div>
+      </div>
+
+      <div class="acc" onclick="this.classList.toggle('open')">
+        <div class="acc-head">3. Git Bash（ビルドコマンド実行用）</div>
+        <div class="acc-body">
+          <p>ビルド手順で使う bash コマンドを実行するために必要です。</p>
+          <ol class="steps">
+            <li><a class="anchor" href="https://gitforwindows.org/">Git for Windows</a> をダウンロードしてインストールする</li>
+            <li>インストール後、フォルダを右クリック →「Git Bash Here」で起動できる</li>
+          </ol>
+          <div class="callout danger">
+            <span class="callout-label">注意</span>
+            <p>Windows のコマンドプロンプト（cmd）では本ガイドのコマンドは動作しません。必ず Git Bash を使ってください。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MOD フォルダ構成 -->
+    <section class="section">
+      <div class="section-label">Folder Structure</div>
+      <h2>MOD のフォルダ構成</h2>
+      <p>DST MOD は決まったフォルダ構成を持っています。アニメーションに関連する部分を中心に説明します。</p>
+
+      <div class="file-tree">
+        &lt;MOD名&gt;/<br>
+        ├── modmain.lua <span class="comment">← MOD のメインスクリプト（Asset 宣言など）</span><br>
+        ├── modinfo.lua <span class="comment">← MOD の情報（名前・説明・設定）</span><br>
+        ├── modicon.tex / .xml <span class="comment">← Steam ワークショップのアイコン</span><br>
+        │<br>
+        ├── <strong>anim/</strong> <span class="comment">← ★ Spriter アニメーション ZIP を置く場所</span><br>
+        │&nbsp;&nbsp;&nbsp;├── キャラクター名.zip<br>
+        │&nbsp;&nbsp;&nbsp;├── アイテム名.zip<br>
+        │&nbsp;&nbsp;&nbsp;└── エフェクト名.zip<br>
+        │<br>
+        ├── images/ <span class="comment">← 画像ファイル（TEX + XML 形式）</span><br>
+        │&nbsp;&nbsp;&nbsp;├── inventoryimages/ <span class="comment">← インベントリアイコン</span><br>
+        │&nbsp;&nbsp;&nbsp;├── avatars/ <span class="comment">← チャット欄のアバター</span><br>
+        │&nbsp;&nbsp;&nbsp;└── map_icons/ <span class="comment">← マップ上のアイコン</span><br>
+        │<br>
+        ├── scripts/<br>
+        │&nbsp;&nbsp;&nbsp;├── prefabs/ <span class="comment">← プレハブ（キャラ・アイテム等の定義）</span><br>
+        │&nbsp;&nbsp;&nbsp;└── components/ <span class="comment">← コンポーネント（機能の定義）</span><br>
+        │<br>
+        └── sound/ <span class="comment">← サウンドファイル（FMOD 形式）</span>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-label">ヒント</span>
+        <p>アニメーション ZIP は必ず <code>anim/</code> フォルダに配置してください。それ以外の場所に置いてもゲームは読み込みません。</p>
+      </div>
+    </section>
+
+    <!-- アニメーション種類 -->
+    <section class="section">
+      <div class="section-label">Animation Types</div>
+      <h2>アニメーションの種類一覧</h2>
+      <p>DST MOD で使われるアニメーションは、大きく分けて以下の種類があります。</p>
+
+      <table>
+        <tr><th>種類</th><th>内容</th><th>ZIP の例</th><th>詳細ガイド</th></tr>
+        <tr><td><strong>キャラクター</strong></td><td>メインキャラの全ポーズ</td><td><code>my_character.zip</code></td><td>キャラクター編</td></tr>
+        <tr><td><strong>ゴースト</strong></td><td>死亡時の幽霊の見た目</td><td><code>ghost_*_build.zip</code></td><td>キャラクター編</td></tr>
+        <tr><td><strong>アイテム</strong></td><td>地面に置いたときの見た目</td><td><code>my_sword.zip</code></td><td>アイテム編</td></tr>
+        <tr><td><strong>装備スワップ</strong></td><td>キャラが手に持ったときの見た目</td><td><code>swap_my_sword.zip</code></td><td>アイテム編</td></tr>
+        <tr><td><strong>エフェクト</strong></td><td>視覚効果（バフ・爆発等）</td><td><code>my_effect.zip</code></td><td>エフェクト編</td></tr>
+        <tr><td><strong>投射物</strong></td><td>飛んでいくもの（矢・弾等）</td><td><code>my_projectile.zip</code></td><td>エフェクト編</td></tr>
+        <tr><td><strong>範囲表示</strong></td><td>射程リングなどの UI 表示</td><td><code>my_range_ring.zip</code></td><td>エフェクト編</td></tr>
+      </table>
+
+      <div class="callout info">
+        <span class="callout-label">メモ</span>
+        <p>すべての種類を作る必要はありません。自分の MOD に必要なものだけ作ればOKです。たとえばエフェクト MOD ならキャラクターアニメーションは不要です。</p>
+      </div>
+    </section>
+
+    <!-- ビルド手順 -->
+    <section class="section">
+      <div class="section-label">Build</div>
+      <h2>ビルド手順（Spriter → DST 用 ZIP）</h2>
+      <p>Spriter で作ったアニメーションを、ゲームが読み込める <code>.zip</code> に変換する手順です。すべてのアニメーション種類で共通です。</p>
+
+      <div class="acc open" onclick="this.classList.toggle('open')">
+        <div class="acc-head">ビルド手順（5 ステップ）</div>
+        <div class="acc-body">
+
+          <h4>0. Git Bash を起動する</h4>
+          <p>フォルダを右クリック →「Git Bash Here」で起動します。</p>
+
+          <h4>1. シェル変数を設定する</h4>
+          <p>後続のコマンドで使う変数を設定します。<strong>必ず最初に実行してください。</strong></p>
+<pre><code><span class="fn">MOD_TOOLS</span>=<span class="str">"C:/Program Files (x86)/Steam/steamapps/common/Don't Starve Mod Tools/mod_tools"</span>
+<span class="fn">PROJECT_NAME</span>=<span class="str">"&lt;プロジェクト名&gt;"</span>  <span class="cm"># .scmlファイルの拡張子なしの名前</span></code></pre>
+          <div class="callout info">
+            <span class="callout-label">メモ</span>
+            <p>これは環境変数ではなく、このターミナルセッション内でのみ有効な一時的なシェル変数です。ターミナルを閉じると消えます。</p>
+          </div>
+
+          <h4>2. Spriter プロジェクトを exported/ にコピー</h4>
+<pre><code>cp -r <span class="str">"&lt;Spriterプロジェクトのフォルダ&gt;"</span> <span class="str">"$MOD_TOOLS/exported/$PROJECT_NAME"</span></code></pre>
+
+          <h4>3. scml.exe で中間 ZIP を生成</h4>
+<pre><code><span class="kw">cd</span> <span class="str">"$MOD_TOOLS"</span>
+./scml.exe <span class="str">"exported/$PROJECT_NAME/$PROJECT_NAME.scml"</span> <span class="str">"exported/$PROJECT_NAME"</span></code></pre>
+
+          <h4>4. buildanimation.py で最終 ZIP を生成</h4>
+<pre><code>./buildtools/windows/Python27/python.exe tools/scripts/buildanimation.py \
+  <span class="str">"exported/$PROJECT_NAME/$PROJECT_NAME.zip"</span> \
+  --outputdir=<span class="str">"exported/$PROJECT_NAME"</span> --force --ignoreexceptions</code></pre>
+          <div class="callout info">
+            <span class="callout-label">メモ</span>
+            <p>Python を別途インストールする必要はありません。DST Mod Tools に Python 2.7 が同梱されています。</p>
+          </div>
+
+          <h4>5. 生成された ZIP を MOD にコピー</h4>
+<pre><code>cp <span class="str">"$MOD_TOOLS/exported/$PROJECT_NAME/anim/$PROJECT_NAME.zip"</span> <span class="str">"&lt;MODフォルダ&gt;/anim/"</span></code></pre>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Lua 設定 -->
+    <section class="section">
+      <div class="section-label">Lua Configuration</div>
+      <h2>Lua 側の基本設定</h2>
+      <p>ビルドした ZIP をゲーム内で使うには、Lua コードでの設定が必要です。</p>
+
+      <div class="acc open" onclick="this.classList.toggle('open')">
+        <div class="acc-head">Asset 宣言</div>
+        <div class="acc-body">
+          <p>アニメーション ZIP はゲーム起動時に読み込む必要があります。宣言する場所は 2 箇所あります。</p>
+
+          <h4>prefab ファイル内で宣言する場合（推奨）</h4>
+<pre><code><span class="kw">local</span> assets = {
+    <span class="fn">Asset</span>(<span class="str">"ANIM"</span>, <span class="str">"anim/my_sword.zip"</span>),
+}</code></pre>
+
+          <h4>modmain.lua で宣言する場合（キャラクター等）</h4>
+<pre><code>Assets = {
+    <span class="fn">Asset</span>(<span class="str">"ANIM"</span>, <span class="str">"anim/my_character.zip"</span>),
+    <span class="fn">Asset</span>(<span class="str">"ANIM"</span>, <span class="str">"anim/ghost_my_character_build.zip"</span>),
+}</code></pre>
+        </div>
+      </div>
+
+      <div class="acc open" onclick="this.classList.toggle('open')">
+        <div class="acc-head">AnimState の基本操作</div>
+        <div class="acc-body">
+          <p>ゲーム内でアニメーションを表示・制御するには <code>AnimState</code> を使います。</p>
+<pre><code><span class="cm">-- 基本の3行セット</span>
+inst.AnimState:<span class="fn">SetBank</span>(<span class="str">"my_sword"</span>)           <span class="cm">-- Bank を指定</span>
+inst.AnimState:<span class="fn">SetBuild</span>(<span class="str">"my_sword"</span>)          <span class="cm">-- Build を指定</span>
+inst.AnimState:<span class="fn">PlayAnimation</span>(<span class="str">"idle"</span>)         <span class="cm">-- アニメーションを再生</span>
+
+<span class="cm">-- ループ再生（エフェクト等に使う）</span>
+inst.AnimState:<span class="fn">PlayAnimation</span>(<span class="str">"open"</span>)
+inst.AnimState:<span class="fn">PushAnimation</span>(<span class="str">"idle_loop"</span>, <span class="kw">true</span>)
+
+<span class="cm">-- 装備スワップ（キャラが武器を手に持つ）</span>
+owner.AnimState:<span class="fn">OverrideSymbol</span>(<span class="str">"swap_object"</span>, <span class="str">"swap_my_sword"</span>, <span class="str">"swap_my_sword"</span>)
+
+<span class="cm">-- 地面に表示するエフェクト（向きの設定）</span>
+inst.AnimState:<span class="fn">SetOrientation</span>(ANIM_ORIENTATION.OnGround)</code></pre>
+        </div>
+      </div>
+
+      <div class="acc" onclick="this.classList.toggle('open')">
+        <div class="acc-head">Bank / Build / Animation の典型的なパターン</div>
+        <div class="acc-body">
+          <table>
+            <tr><th>種類</th><th>Bank</th><th>Build</th><th>主なアニメーション</th><th>備考</th></tr>
+            <tr><td>キャラクター</td><td>独自 or <code>wilson</code></td><td>独自</td><td>idle, walk, attack 等</td><td>wilson Bank を流用すれば動きは自動</td></tr>
+            <tr><td>ゴースト</td><td><code>ghost</code>（流用）</td><td>独自</td><td>idle 等</td><td>DST 本体の Bank を流用</td></tr>
+            <tr><td>アイテム</td><td>独自</td><td>独自</td><td>idle</td><td>静止画 1 枚で OK</td></tr>
+            <tr><td>装備スワップ</td><td><code>swap_object</code>（流用）</td><td><code>swap_&lt;名前&gt;</code></td><td>—</td><td>DST 本体の Bank を流用</td></tr>
+            <tr><td>エフェクト</td><td><code>forcefield</code> 等（流用）</td><td>独自</td><td>open, idle_loop</td><td>既存 Bank を流用可能</td></tr>
+            <tr><td>投射物</td><td><code>blow_dart</code> 等（流用）</td><td>独自</td><td>idle_pipe, dart_pipe</td><td>既存 Bank を流用可能</td></tr>
+          </table>
+          <div class="callout tip">
+            <span class="callout-label">ヒント</span>
+            <p>Bank に <code>ghost</code>、<code>swap_object</code>、<code>forcefield</code> など DST 本体の Bank 名を使う場合があります。これは DST 本体の「動きの型」をそのまま流用し、見た目（Build）だけ自分のものに差し替えるテクニックです。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 命名規則 -->
+    <section class="section">
+      <div class="section-label">Naming Rules</div>
+      <h2>命名規則</h2>
+      <p>DST のアニメーションシステムでは、ファイル名やフォルダ名がそのまま Bank 名や Build 名になります。命名には注意が必要です。</p>
+
+      <div class="spec-grid">
+        <div class="spec-item">
+          <span class="spec-label">使える文字</span>
+          <span class="spec-value">英小文字・数字</span>
+        </div>
+        <div class="spec-item">
+          <span class="spec-label">使える記号</span>
+          <span class="spec-value">ハイフン - アンダースコア _</span>
+        </div>
+      </div>
+
+      <div class="callout danger">
+        <span class="callout-label">重要</span>
+        <p><strong>スペースや日本語は使わないでください。</strong>ビルド時にエラーになるか、ゲーム内で正しく読み込まれません。</p>
+      </div>
+
+      <div class="panel">
+        <div class="panel-label">その他のルール</div>
+        <div class="panel-content">
+          <p>scml ファイル名とプロジェクトフォルダ名は <strong>一致させる</strong> のが安全です。</p>
+          <p>PNG 画像のファイル名には特に命名規則はありません（自由に付けられます）。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Appendix -->
+    <section class="section">
+      <div class="section-label">Appendix</div>
+      <h2>付録</h2>
+
+      <div class="acc open" onclick="this.classList.toggle('open')">
+        <div class="acc-head">Appendix A: インベントリアイコン（PNG → TEX + XML）</div>
+        <div class="acc-body">
+          <p>アイテムをインベントリ（持ち物欄）に表示するには、アニメーション ZIP とは別に TEX + XML 形式のアイコン画像が必要です。</p>
+
+          <table>
+            <tr><th>項目</th><th>概要</th></tr>
+            <tr><td>PNG サイズ</td><td><strong>64 x 64 px</strong>（正方形・2 のべき乗。それ以外はクラッシュ）</td></tr>
+            <tr><td>変換ツール</td><td><code>TextureConverter.exe</code>（DST Mod Tools に同梱）</td></tr>
+            <tr><td>出力ファイル</td><td><code>.tex</code>（テクスチャ）+ <code>.xml</code>（アトラス定義）</td></tr>
+            <tr><td>配置先</td><td><code>&lt;MOD名&gt;/images/inventoryimages/</code></td></tr>
+            <tr><td>Asset 宣言</td><td><code>Asset("IMAGE", "...tex")</code> + <code>Asset("ATLAS", "...xml")</code></td></tr>
+          </table>
+
+          <p>詳しい変換コマンド・オプション・XML の書き方については、<a class="anchor" href="../DST-TextureConverter/README.html">DST-TextureConverter ガイド</a>を参照してください。</p>
+        </div>
+      </div>
+
+      <div class="acc" onclick="this.classList.toggle('open')">
+        <div class="acc-head">Appendix B: その他の画像アセット</div>
+        <div class="acc-body">
+          <p>キャラクター MOD を作る場合、インベントリアイコン以外にも画像が必要です。すべて PNG → TEX + XML 変換の手順は同じです。</p>
+          <table>
+            <tr><th>画像の種類</th><th>配置先</th><th>推奨サイズ</th><th>用途</th></tr>
+            <tr><td>インベントリアイコン</td><td><code>images/inventoryimages/</code></td><td>64 x 64</td><td>アイテム欄の画像</td></tr>
+            <tr><td>アバター</td><td><code>images/avatars/</code></td><td>64 x 64</td><td>チャット欄のキャラアイコン</td></tr>
+            <tr><td>マップアイコン</td><td><code>images/map_icons/</code></td><td>64 x 64</td><td>マップ上の表示</td></tr>
+            <tr><td>HUD アイコン</td><td><code>images/hud/</code></td><td>128 x 128</td><td>クラフトタブ等</td></tr>
+            <tr><td>セーブスロット肖像画</td><td><code>images/saveslot_portraits/</code></td><td>256 x 256</td><td>セーブ画面</td></tr>
+            <tr><td>キャラ選択画面</td><td><code>images/selectscreen_portraits/</code></td><td>512 x 512</td><td>キャラ選択</td></tr>
+            <tr><td>大きい肖像画</td><td><code>bigportraits/</code></td><td>1024 x 1024</td><td>キャラ選択（詳細）</td></tr>
+            <tr><td>MOD アイコン</td><td>ルート直下</td><td>128 x 128</td><td>Steam ワークショップ</td></tr>
+          </table>
+          <div class="callout danger">
+            <span class="callout-label">注意</span>
+            <p>すべて正方形・2 のべき乗サイズにしてください。サイズが合わないとクラッシュします。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- サンプルプロジェクト -->
+    <section class="section">
+      <div class="section-label">Samples</div>
+      <h2>サンプルプロジェクト</h2>
+      <p>本リポジトリには以下のサンプルが含まれています。</p>
+
+      <div class="card-grid" style="grid-template-columns: 1fr 1fr;">
+        <div class="card">
+          <h4>射程範囲リング</h4>
+          <div class="desc">ブラインドダート装備時に表示される円形アニメーションの詳細ガイド</div>
+          <a href="sample/README-blind-dart-renge-ring.html">HTML 版 →</a>
+        </div>
+        <div class="card">
+          <h4>Spriter プロジェクト</h4>
+          <div class="desc">上記ガイドの実際の Spriter プロジェクトファイル一式</div>
+          <a href="sample/DST-teemo-blind-dart-renge-ring/">フォルダを開く →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 参考リンク -->
+    <section class="section">
+      <div class="section-label">References</div>
+      <h2>参考リンク</h2>
+      <div class="ref-list">
+        <a href="https://forums.kleientertainment.com/forums/topic/59174-tutorial-the-artists-guide-to-dont-starve-together-modding/" class="ref-item" target="_blank">
+          <div>
+            <div class="ref-source">DST Modding Guide（Klei Forums）</div>
+            <div class="ref-url">公式フォーラムのアーティスト向けガイド</div>
+          </div>
+        </a>
+        <a href="https://brashmonkey.com/" class="ref-item" target="_blank">
+          <div>
+            <div class="ref-source">Spriter 公式サイト</div>
+            <div class="ref-url">BrashMonkey 製 2D アニメーションツール</div>
+          </div>
+        </a>
+        <a href="https://store.steampowered.com/app/250820/Dont_Starve_Mod_Tools/" class="ref-item" target="_blank">
+          <div>
+            <div class="ref-source">DST Mod Tools（Steam）</div>
+            <div class="ref-url">ビルドツール一式（無料）</div>
+          </div>
+        </a>
+        <a href="https://gitforwindows.org/" class="ref-item" target="_blank">
+          <div>
+            <div class="ref-source">Git for Windows</div>
+            <div class="ref-url">Git Bash 同梱</div>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- ライセンス -->
+    <section class="section">
+      <div class="conclusion">
+        <h3>ライセンス</h3>
+        <p>このドキュメントは自由に利用・改変・再配布できます。DST MOD 制作にお役立てください。</p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    DST-Spriter — Don't Starve Together MOD アニメーション作成ガイド
+  </footer>
+
+</body>
+</html>

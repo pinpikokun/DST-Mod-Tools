@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>キャラクターアニメーション編 — DST-Spriter</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Noto+Sans+JP:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-primary: #faf9f7;
+    --bg-card: #ffffff;
+    --bg-warm: #f5f0eb;
+    --bg-dark: #191919;
+    --text-primary: #1a1a1a;
+    --text-secondary: #6b6560;
+    --text-light: #9a938d;
+    --accent-warm: #c4704b;
+    --accent-green: #2d7a5f;
+    --accent-red: #b85450;
+    --accent-blue: #4a7ab5;
+    --border: #e8e2db;
+    --border-light: #f0ece7;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.8;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .hero {
+    background: var(--bg-dark);
+    color: #fff;
+    padding: 100px 0 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(196,112,75,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-inner {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 40px;
+    position: relative;
+  }
+  .hero-label {
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent-warm);
+    margin-bottom: 24px;
+    font-weight: 500;
+  }
+  .hero h1 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 40px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 16px;
+    letter-spacing: -0.5px;
+  }
+  .hero-desc {
+    font-size: 16px;
+    color: rgba(255,255,255,0.6);
+    font-weight: 300;
+    line-height: 1.8;
+  }
+  .hero-nav {
+    margin-top: 28px;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .hero-nav a {
+    color: rgba(255,255,255,0.5);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 400;
+    transition: color 0.2s;
+  }
+  .hero-nav a:hover { color: var(--accent-warm); }
+
+  .content {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  .section {
+    padding: 72px 0;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .section:last-child { border-bottom: none; }
+
+  .section-label {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .section h2 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+  .section h3 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin: 40px 0 16px;
+    line-height: 1.5;
+  }
+  .section p {
+    font-size: 16px;
+    color: var(--text-secondary);
+    line-height: 2;
+    font-weight: 300;
+    margin-bottom: 12px;
+  }
+  .section p:last-child { margin-bottom: 0; }
+
+  /* Callout */
+  .callout {
+    margin: 24px 0;
+    padding: 24px 28px;
+    border-radius: 12px;
+    font-size: 15px;
+    line-height: 1.9;
+    font-weight: 400;
+    color: var(--text-primary);
+  }
+  .callout p { font-size: 15px; color: var(--text-primary); font-weight: 400; margin-bottom: 6px; }
+  .callout p:last-child { margin-bottom: 0; }
+  .callout.warn { background: #fef8f0; border-left: 3px solid var(--accent-warm); }
+  .callout.danger { background: #fef2f0; border-left: 3px solid var(--accent-red); }
+  .callout.tip { background: #f0f8f4; border-left: 3px solid var(--accent-green); }
+  .callout.info { background: #f0f4f8; border-left: 3px solid var(--accent-blue); }
+  .callout-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+  }
+  .callout.warn .callout-label { color: var(--accent-warm); }
+  .callout.danger .callout-label { color: var(--accent-red); }
+  .callout.tip .callout-label { color: var(--accent-green); }
+  .callout.info .callout-label { color: var(--accent-blue); }
+
+  /* Tables */
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 14px;
+    background: var(--bg-card);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 16px 0 20px;
+    border: 1px solid var(--border);
+  }
+  th {
+    background: #292524;
+    color: #fafaf9;
+    padding: 12px 18px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 13px;
+  }
+  td {
+    padding: 11px 18px;
+    border-bottom: 1px solid var(--border-light);
+    vertical-align: top;
+    color: var(--text-secondary);
+    font-weight: 400;
+    line-height: 1.7;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) td { background: #fafaf8; }
+
+  /* Panel */
+  .panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    margin: 24px 0;
+  }
+  .panel-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .panel-content {
+    font-size: 15px;
+    color: var(--text-secondary);
+    font-weight: 300;
+    line-height: 2;
+  }
+  .panel-content p { font-size: 15px; color: var(--text-secondary); font-weight: 300; }
+
+  /* File tree */
+  .file-tree {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px 32px;
+    font-family: 'Cascadia Code', 'Consolas', monospace;
+    font-size: 13px;
+    line-height: 2;
+    margin: 24px 0;
+  }
+  .file-tree .comment {
+    color: var(--text-light);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 12px;
+  }
+
+  /* Code */
+  pre {
+    background: #1e1e2e;
+    color: #cdd6f4;
+    padding: 24px 28px;
+    border-radius: 12px;
+    overflow-x: auto;
+    font-family: 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.8;
+    margin: 16px 0 20px;
+  }
+  code {
+    font-family: 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+    font-size: 0.88em;
+    background: #f0ece7;
+    color: #92400e;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+  .kw { color: #cba6f7; }
+  .fn { color: #89b4fa; }
+  .str { color: #a6e3a1; }
+  .cm { color: #6c7086; font-style: italic; }
+
+  /* Accordion */
+  .acc {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  .acc-head {
+    padding: 20px 24px;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--text-primary);
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .acc-head::after {
+    content: '+';
+    color: var(--text-light);
+    font-size: 20px;
+    font-weight: 300;
+    flex-shrink: 0;
+    margin-left: 16px;
+  }
+  .acc.open .acc-head::after { content: '\2212'; }
+  .acc-body {
+    display: none;
+    padding: 0 24px 24px;
+    color: var(--text-secondary);
+    font-size: 15px;
+    font-weight: 300;
+    line-height: 2;
+    border-top: 1px solid var(--border-light);
+  }
+  .acc.open .acc-body { display: block; padding-top: 20px; }
+  .acc-body p { font-size: 15px; color: var(--text-secondary); font-weight: 300; margin-bottom: 8px; }
+
+  /* Flow diagram */
+  .flow-diagram {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    flex-wrap: wrap;
+    margin: 24px 0;
+  }
+  .flow-box {
+    padding: 14px 22px;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+    background: var(--bg-warm);
+    color: var(--text-primary);
+  }
+  .flow-connector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 12px;
+    color: var(--text-light);
+  }
+  .flow-connector .arrow { font-size: 20px; line-height: 1; }
+
+  /* Spec grid */
+  .spec-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .spec-item {
+    background: var(--bg-warm);
+    border-radius: 10px;
+    padding: 14px 18px;
+  }
+  .spec-label {
+    font-size: 11px;
+    color: var(--text-light);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 500;
+    display: block;
+    margin-bottom: 4px;
+  }
+  .spec-value {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  /* Conclusion */
+  .conclusion {
+    background: var(--bg-dark);
+    color: #fff;
+    border-radius: 20px;
+    padding: 48px;
+    margin: 40px 0;
+  }
+  .conclusion h3 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 22px;
+    margin-bottom: 16px;
+    font-weight: 700;
+  }
+  .conclusion p {
+    color: rgba(255,255,255,0.7);
+    font-size: 15px;
+    line-height: 2;
+    font-weight: 300;
+  }
+  .conclusion code {
+    background: rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.9);
+  }
+
+  /* Navigation bar */
+  .page-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 0;
+    margin: 0;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .page-nav a {
+    color: var(--accent-warm);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: opacity 0.2s;
+  }
+  .page-nav a:hover { opacity: 0.7; }
+
+  a.anchor { color: var(--accent-warm); text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 0.2s; }
+  a.anchor:hover { border-bottom-color: var(--accent-warm); }
+
+  .footer {
+    text-align: center;
+    padding: 48px 0;
+    font-size: 12px;
+    color: var(--text-light);
+    font-weight: 300;
+  }
+
+  @media (max-width: 640px) {
+    .hero h1 { font-size: 28px; }
+    .hero { padding: 72px 0 56px; }
+    .content { padding: 0 24px; }
+    .hero-inner { padding: 0 24px; }
+    .panel { padding: 24px 20px; }
+    .conclusion { padding: 32px 24px; }
+    .spec-grid { grid-template-columns: 1fr 1fr; }
+    .flow-diagram { flex-direction: column; gap: 8px; }
+    .flow-connector { flex-direction: row; padding: 4px 0; }
+    .flow-connector .arrow { transform: rotate(90deg); }
+  }
+</style>
+</head>
+<body>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="hero-label">Character Animation</div>
+      <h1>キャラクターアニメーション編</h1>
+      <p class="hero-desc">キャラクター MOD を作るときに必要なアニメーションについて解説します。<br>DST のキャラクターアニメーションは他の種類に比べて最も複雑ですが、基本の仕組みを理解すれば作成できます。</p>
+      <div class="hero-nav">
+        <a href="README.html">&larr; README に戻る</a>
+        <a href="README-item-equipment.html">アイテム・武器防具編 &rarr;</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="content">
+
+    <!-- キャラクターアニメーションとは -->
+    <section class="section">
+      <div class="section-label">Overview</div>
+      <h2>キャラクターアニメーションとは</h2>
+      <p>DST のキャラクター（ウィルソンやウェンディなど）は、<strong>身体のパーツごとに分かれた画像</strong>（シンボル）を Spriter 上で組み合わせて動かしています。</p>
+
+      <div class="panel">
+        <div class="panel-label">キャラクターを構成するパーツ（シンボル）</div>
+        <table>
+          <tr><th>パーツ名</th><th>説明</th></tr>
+          <tr><td><code>head</code></td><td>頭</td></tr>
+          <tr><td><code>face</code></td><td>顔の表情</td></tr>
+          <tr><td><code>hair</code></td><td>髪</td></tr>
+          <tr><td><code>torso</code></td><td>胴体</td></tr>
+          <tr><td><code>arm_upper</code></td><td>上腕</td></tr>
+          <tr><td><code>arm_lower</code></td><td>前腕</td></tr>
+          <tr><td><code>hand</code></td><td>手</td></tr>
+          <tr><td><code>leg</code></td><td>脚</td></tr>
+          <tr><td><code>foot</code></td><td>足</td></tr>
+          <tr><td><code>swap_object</code></td><td>手に持っているもの（装備時に差し替えられる）</td></tr>
+        </table>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-label">ヒント</span>
+        <p>この構造のおかげで、「動き（Bank）はウィルソンと同じだけど、見た目（Build）は自分のキャラ」という作り方ができます。多くのキャラクター MOD はこの方法を使っています。</p>
+      </div>
+    </section>
+
+    <!-- 必要なアニメーション -->
+    <section class="section">
+      <div class="section-label">Required Animations</div>
+      <h2>必要なアニメーション（ポーズ）一覧</h2>
+      <p>DST のキャラクターには多数のアニメーションポーズが必要です。</p>
+
+      <div class="acc open" onclick="this.classList.toggle('open')">
+        <div class="acc-head">基本ポーズ（最低限必要）</div>
+        <div class="acc-body">
+          <table>
+            <tr><th>アニメーション名</th><th>説明</th></tr>
+            <tr><td><code>idle_loop</code></td><td>待機（立っている状態）</td></tr>
+            <tr><td><code>walk_loop</code></td><td>歩行</td></tr>
+            <tr><td><code>run_loop</code></td><td>走行</td></tr>
+            <tr><td><code>attack</code></td><td>攻撃</td></tr>
+            <tr><td><code>hit</code></td><td>ダメージを受ける</td></tr>
+            <tr><td><code>death</code></td><td>死亡</td></tr>
+            <tr><td><code>pickup</code></td><td>アイテムを拾う</td></tr>
+            <tr><td><code>eat</code> / <code>eat_loop</code></td><td>食べる</td></tr>
+            <tr><td><code>chop_loop</code> / <code>chop_pre</code></td><td>木を切る</td></tr>
+            <tr><td><code>mine_loop</code> / <code>mine_pre</code></td><td>採掘する</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="acc" onclick="this.classList.toggle('open')">
+        <div class="acc-head">その他のポーズ（状況に応じて）</div>
+        <div class="acc-body">
+          <table>
+            <tr><th>アニメーション名</th><th>説明</th></tr>
+            <tr><td><code>build_loop</code> / <code>build_pre</code></td><td>クラフトする</td></tr>
+            <tr><td><code>give</code></td><td>アイテムを渡す</td></tr>
+            <tr><td><code>sleep_loop</code> / <code>sleep_pre</code></td><td>寝る</td></tr>
+            <tr><td><code>yawn</code></td><td>あくび</td></tr>
+            <tr><td><code>frozen</code></td><td>凍結</td></tr>
+            <tr><td><code>channel_loop</code></td><td>チャネリング（釣り等）</td></tr>
+            <tr><td><code>emote_*</code></td><td>エモート（ダンス等）</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="callout info">
+        <span class="callout-label">メモ</span>
+        <p>すべてのポーズを自分で一から作る必要はありません。DST の既存キャラクター（ウィルソン等）の Bank をそのまま使い、Build（見た目）だけ自分で作るのが一般的です。これにより、必要なポーズのフレーム構成が自動的に正しくなります。</p>
+      </div>
+    </section>
+
+    <!-- Bank と Build の関係 -->
+    <section class="section">
+      <div class="section-label">Bank &amp; Build</div>
+      <h2>Bank と Build の関係</h2>
+      <p>キャラクターアニメーションでは、Bank と Build の関係が特に重要です。</p>
+
+      <div class="panel">
+        <div class="panel-label">Bank の共有イメージ</div>
+        <div class="file-tree">
+          Bank "wilson" （ウィルソンの動き）<br>
+          ├── Build "wilson" <span class="comment">← ウィルソンの見た目（DST 本体）</span><br>
+          ├── Build "willow" <span class="comment">← ウィローの見た目（DST 本体）</span><br>
+          └── Build "my_character" <span class="comment">← 独自キャラの見た目（MOD で追加）</span>
+        </div>
+        <div class="panel-content">
+          <p>多くのキャラクター MOD は <strong>Bank はウィルソン（<code>wilson</code>）のものを使い</strong>、Build だけ独自に作成しています。これにより、すべての動きが自動的にウィルソンと同じように動作します。</p>
+        </div>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-label">ヒント</span>
+        <p>独自の動き（独自の攻撃モーションなど）を追加したい場合は、自分で Bank を定義することもできます。</p>
+      </div>
+    </section>
+
+    <!-- ゴーストアニメーション -->
+    <section class="section">
+      <div class="section-label">Ghost</div>
+      <h2>ゴーストアニメーション</h2>
+      <p>キャラクターが死亡すると、ゴースト（幽霊）姿になります。DST 本体にはゴースト用の Bank（<code>ghost</code>）がすでに存在するため、Build（見た目）だけ自分で作れば動きは自動的に正しくなります。</p>
+
+      <div class="spec-grid">
+        <div class="spec-item">
+          <span class="spec-label">Bank</span>
+          <span class="spec-value">ghost（流用）</span>
+        </div>
+        <div class="spec-item">
+          <span class="spec-label">Build</span>
+          <span class="spec-value">ghost_&lt;キャラ名&gt;_build</span>
+        </div>
+        <div class="spec-item">
+          <span class="spec-label">ZIP 名</span>
+          <span class="spec-value">ghost_&lt;キャラ名&gt;_build.zip</span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-label">Lua 設定例</div>
+<pre><code><span class="cm">-- prefab ファイルの assets</span>
+<span class="kw">local</span> assets = {
+    <span class="fn">Asset</span>(<span class="str">"ANIM"</span>, <span class="str">"anim/my_character.zip"</span>),
+    <span class="fn">Asset</span>(<span class="str">"ANIM"</span>, <span class="str">"anim/ghost_my_character_build.zip"</span>),
+}
+
+<span class="cm">-- キャラクター定義内の skin_modes</span>
+inst.components.skinner.skin_modes = {
+    {
+        type = <span class="str">"ghost_skin"</span>,
+        anim_bank = <span class="str">"ghost"</span>,
+        idle_anim = <span class="str">"idle"</span>,
+        scale = <span class="fn">0.75</span>,
+        offset = { <span class="fn">0</span>, <span class="fn">-25</span> },
+    },
+}</code></pre>
+      </div>
+    </section>
+
+    <!-- スキンシステム -->
+    <section class="section">
+      <div class="section-label">Skin System</div>
+      <h2>スキンシステム</h2>
+      <p>DST にはキャラクターの見た目を切り替える「スキン」システムがあります。これも Bank / Build の仕組みを活用しています。</p>
+
+      <div class="panel">
+        <div class="panel-label">スキンの仕組み</div>
+        <div class="flow-diagram">
+          <div class="flow-box">Bank<br><small>"my_character"</small></div>
+          <div class="flow-connector"><span class="arrow">→</span></div>
+          <div class="flow-box" style="background:#e8f0ea; color:var(--accent-green);">Build "my_character"<br><small>デフォルトスキン</small></div>
+        </div>
+        <div class="flow-diagram">
+          <div class="flow-box">Bank<br><small>"my_character"</small></div>
+          <div class="flow-connector"><span class="arrow">→</span></div>
+          <div class="flow-box" style="background:#fef3ef; color:var(--accent-warm);">Build "my_character_formal"<br><small>フォーマルスキン</small></div>
+        </div>
+        <div class="panel-content" style="margin-top: 16px;">
+          <p>スキンを切り替えるとは、<strong>同じ Bank に対して Build を差し替える</strong>ことです。スキンごとに新しい ZIP を用意して <code>anim/</code> に配置し、Lua 側でスキン切り替え時に <code>SetBuild()</code> を呼ぶだけです。</p>
+        </div>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-label">ヒント</span>
+        <p>スキンを作るには、デフォルト Build と同じシンボル構成（パーツ名・レイヤー構成）で別の見た目を描くだけです。動きの定義は不要です。</p>
+      </div>
+    </section>
+
+    <!-- まとめ -->
+    <section class="section">
+      <div class="section-label">Summary</div>
+      <h2>まとめ</h2>
+
+      <table>
+        <tr><th>作るもの</th><th>Bank</th><th>Build</th><th>備考</th></tr>
+        <tr><td><strong>メインキャラ</strong></td><td>独自 or <code>wilson</code></td><td>独自</td><td>全ポーズのシンボルが必要</td></tr>
+        <tr><td><strong>ゴースト</strong></td><td><code>ghost</code>（流用）</td><td>独自</td><td>ゴースト用パーツだけ作ればOK</td></tr>
+        <tr><td><strong>スキン</strong></td><td>メインと同じ</td><td>独自</td><td>シンボル構成を合わせる</td></tr>
+      </table>
+
+      <!-- ナビゲーション -->
+      <div class="page-nav">
+        <a href="README.html">&larr; README に戻る</a>
+        <a href="README-item-equipment.html">アイテム・武器防具編 &rarr;</a>
+      </div>
+    </section>
+
+    <!-- ライセンス -->
+    <section class="section">
+      <div class="conclusion">
+        <h3>ライセンス</h3>
+        <p>このドキュメントは自由に利用・改変・再配布できます。DST MOD 制作にお役立てください。</p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    DST-Spriter — キャラクターアニメーション編
+  </footer>
+
+</body>
+</html>

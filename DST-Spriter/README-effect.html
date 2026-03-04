@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>エフェクトアニメーション編 — DST-Spriter</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Noto+Sans+JP:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-primary: #faf9f7;
+    --bg-card: #ffffff;
+    --bg-warm: #f5f0eb;
+    --bg-dark: #191919;
+    --text-primary: #1a1a1a;
+    --text-secondary: #6b6560;
+    --text-light: #9a938d;
+    --accent-warm: #c4704b;
+    --accent-green: #2d7a5f;
+    --accent-red: #b85450;
+    --accent-blue: #4a7ab5;
+    --border: #e8e2db;
+    --border-light: #f0ece7;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.8;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .hero {
+    background: var(--bg-dark);
+    color: #fff;
+    padding: 100px 0 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(196,112,75,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-inner {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 40px;
+    position: relative;
+  }
+  .hero-label {
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent-warm);
+    margin-bottom: 24px;
+    font-weight: 500;
+  }
+  .hero h1 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 40px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 16px;
+    letter-spacing: -0.5px;
+  }
+  .hero-desc {
+    font-size: 16px;
+    color: rgba(255,255,255,0.6);
+    font-weight: 300;
+    line-height: 1.8;
+  }
+  .hero-nav {
+    margin-top: 28px;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .hero-nav a {
+    color: rgba(255,255,255,0.5);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 400;
+    transition: color 0.2s;
+  }
+  .hero-nav a:hover { color: var(--accent-warm); }
+
+  .content {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  .section {
+    padding: 72px 0;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .section:last-child { border-bottom: none; }
+
+  .section-label {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .section h2 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+  .section h3 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin: 40px 0 16px;
+    line-height: 1.5;
+  }
+  .section h4 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 32px 0 12px;
+    color: var(--text-primary);
+  }
+  .section p {
+    font-size: 16px;
+    color: var(--text-secondary);
+    line-height: 2;
+    font-weight: 300;
+    margin-bottom: 12px;
+  }
+  .section p:last-child { margin-bottom: 0; }
+
+  /* Callout */
+  .callout {
+    margin: 24px 0;
+    padding: 24px 28px;
+    border-radius: 12px;
+    font-size: 15px;
+    line-height: 1.9;
+    font-weight: 400;
+    color: var(--text-primary);
+  }
+  .callout p { font-size: 15px; color: var(--text-primary); font-weight: 400; margin-bottom: 6px; }
+  .callout p:last-child { margin-bottom: 0; }
+  .callout.warn { background: #fef8f0; border-left: 3px solid var(--accent-warm); }
+  .callout.danger { background: #fef2f0; border-left: 3px solid var(--accent-red); }
+  .callout.tip { background: #f0f8f4; border-left: 3px solid var(--accent-green); }
+  .callout.info { background: #f0f4f8; border-left: 3px solid var(--accent-blue); }
+  .callout-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+  }
+  .callout.warn .callout-label { color: var(--accent-warm); }
+  .callout.danger .callout-label { color: var(--accent-red); }
+  .callout.tip .callout-label { color: var(--accent-green); }
+  .callout.info .callout-label { color: var(--accent-blue); }
+
+  /* Steps */
+  .steps {
+    counter-reset: step;
+    list-style: none;
+    margin: 20px 0;
+    padding: 0;
+  }
+  .steps li {
+    counter-increment: step;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border-light);
+    font-size: 15px;
+    color: var(--text-secondary);
+    font-weight: 400;
+    line-height: 1.8;
+  }
+  .steps li:last-child { border-bottom: none; }
+  .steps li::before {
+    content: counter(step);
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    background: var(--bg-dark);
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 13px;
+    margin-top: 2px;
+  }
+
+  /* Tables */
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 14px;
+    background: var(--bg-card);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 16px 0 20px;
+    border: 1px solid var(--border);
+  }
+  th {
+    background: #292524;
+    color: #fafaf9;
+    padding: 12px 18px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 13px;
+  }
+  td {
+    padding: 11px 18px;
+    border-bottom: 1px solid var(--border-light);
+    vertical-align: top;
+    color: var(--text-secondary);
+    font-weight: 400;
+    line-height: 1.7;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) td { background: #fafaf8; }
+
+  /* Panel */
+  .panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    margin: 24px 0;
+  }
+  .panel-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .panel-content {
+    font-size: 15px;
+    color: var(--text-secondary);
+    font-weight: 300;
+    line-height: 2;
+  }
+  .panel-content p { font-size: 15px; color: var(--text-secondary); font-weight: 300; }
+
+  /* Cards grid */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+    margin: 24px 0;
+  }
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: var(--accent-warm); }
+  .card h4 {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0 0 8px;
+    color: var(--text-primary);
+  }
+  .card .desc {
+    font-size: 14px;
+    color: var(--text-secondary);
+    font-weight: 300;
+    line-height: 1.7;
+  }
+
+  /* Flow diagram */
+  .flow-diagram {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    flex-wrap: wrap;
+    margin: 24px 0;
+  }
+  .flow-box {
+    padding: 14px 22px;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+    background: var(--bg-warm);
+    color: var(--text-primary);
+  }
+  .flow-connector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 12px;
+    color: var(--text-light);
+  }
+  .flow-connector .arrow { font-size: 20px; line-height: 1; }
+
+  /* File tree */
+  .file-tree {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px 32px;
+    font-family: 'Cascadia Code', 'Consolas', monospace;
+    font-size: 13px;
+    line-height: 2;
+    margin: 24px 0;
+  }
+  .file-tree .comment {
+    color: var(--text-light);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 12px;
+  }
+
+  /* Code */
+  pre {
+    background: #1e1e2e;
+    color: #cdd6f4;
+    padding: 24px 28px;
+    border-radius: 12px;
+    overflow-x: auto;
+    font-family: 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.8;
+    margin: 16px 0 20px;
+  }
+  code {
+    font-family: 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+    font-size: 0.88em;
+    background: #f0ece7;
+    color: #92400e;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+  .kw { color: #cba6f7; }
+  .fn { color: #89b4fa; }
+  .str { color: #a6e3a1; }
+  .cm { color: #6c7086; font-style: italic; }
+
+  /* Accordion */
+  .acc {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  .acc-head {
+    padding: 20px 24px;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--text-primary);
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .acc-head::after {
+    content: '+';
+    color: var(--text-light);
+    font-size: 20px;
+    font-weight: 300;
+    flex-shrink: 0;
+    margin-left: 16px;
+  }
+  .acc.open .acc-head::after { content: '\2212'; }
+  .acc-body {
+    display: none;
+    padding: 0 24px 24px;
+    color: var(--text-secondary);
+    font-size: 15px;
+    font-weight: 300;
+    line-height: 2;
+    border-top: 1px solid var(--border-light);
+  }
+  .acc.open .acc-body { display: block; padding-top: 20px; }
+  .acc-body p { font-size: 15px; color: var(--text-secondary); font-weight: 300; margin-bottom: 8px; }
+
+  /* Spec grid */
+  .spec-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .spec-item {
+    background: var(--bg-warm);
+    border-radius: 10px;
+    padding: 14px 18px;
+  }
+  .spec-label {
+    font-size: 11px;
+    color: var(--text-light);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 500;
+    display: block;
+    margin-bottom: 4px;
+  }
+  .spec-value {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  /* Conclusion */
+  .conclusion {
+    background: var(--bg-dark);
+    color: #fff;
+    border-radius: 20px;
+    padding: 48px;
+    margin: 40px 0;
+  }
+  .conclusion h3 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 22px;
+    margin-bottom: 16px;
+    font-weight: 700;
+  }
+  .conclusion p {
+    color: rgba(255,255,255,0.7);
+    font-size: 15px;
+    line-height: 2;
+    font-weight: 300;
+  }
+  .conclusion code {
+    background: rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.9);
+  }
+
+  /* Navigation */
+  .page-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 0;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .page-nav a {
+    color: var(--accent-warm);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: opacity 0.2s;
+  }
+  .page-nav a:hover { opacity: 0.7; }
+
+  a.anchor { color: var(--accent-warm); text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 0.2s; }
+  a.anchor:hover { border-bottom-color: var(--accent-warm); }
+
+  .footer {
+    text-align: center;
+    padding: 48px 0;
+    font-size: 12px;
+    color: var(--text-light);
+    font-weight: 300;
+  }
+
+  @media (max-width: 640px) {
+    .hero h1 { font-size: 28px; }
+    .hero { padding: 72px 0 56px; }
+    .content { padding: 0 24px; }
+    .hero-inner { padding: 0 24px; }
+    .panel { padding: 24px 20px; }
+    .conclusion { padding: 32px 24px; }
+    .card-grid { grid-template-columns: 1fr; }
+    .spec-grid { grid-template-columns: 1fr 1fr; }
+    .flow-diagram { flex-direction: column; gap: 8px; }
+    .flow-connector { flex-direction: row; padding: 4px 0; }
+    .flow-connector .arrow { transform: rotate(90deg); }
+  }
+</style>
+</head>
+<body>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="hero-label">Effect Animation</div>
+      <h1>エフェクトアニメーション編</h1>
+      <p class="hero-desc">エフェクト（視覚効果）・投射物・範囲表示など、キャラクターやアイテム以外のアニメーションについて解説します。<br>MOD に演出を加えるために重要な要素です。</p>
+      <div class="hero-nav">
+        <a href="README.html">&larr; README に戻る</a>
+        <a href="README-item-equipment.html">&larr; アイテム・武器防具編</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="content">
+
+    <!-- エフェクトアニメーションとは -->
+    <section class="section">
+      <div class="section-label">Overview</div>
+      <h2>エフェクトアニメーションとは</h2>
+      <p>DST の「エフェクト」とは、バフ・デバフの表示、爆発、煙、光などの <strong>一時的な視覚効果</strong> のことです。エフェクトはキャラクターやアイテムとは独立した存在（Prefab）として生成され、表示後に自動的に消えるものが多いです。</p>
+
+      <div class="card-grid">
+        <div class="card">
+          <h4>バフ / デバフ表示</h4>
+          <div class="desc">キャラクターに付与される効果の表示。シールド、毒、凍結など。</div>
+        </div>
+        <div class="card">
+          <h4>爆発 / 煙</h4>
+          <div class="desc">一瞬だけ表示される効果。トラップの爆発、毒煙など。</div>
+        </div>
+        <div class="card">
+          <h4>ループエフェクト</h4>
+          <div class="desc">条件を満たす間ずっと表示される効果。バリア、範囲表示など。</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 既存 Bank の流用 -->
+    <section class="section">
+      <div class="section-label">Bank Reuse</div>
+      <h2>既存 Bank の流用パターン</h2>
+      <p>エフェクトアニメーションの大きな特徴は、<strong>DST 本体の Bank をそのまま流用できる</strong>ことです。Bank（動きの型）は既存のものを使い、Build（見た目）だけ自分で差し替えれば、動きのタイミングや表示方法が自動的に正しくなります。</p>
+
+      <table>
+        <tr><th>Bank 名</th><th>元の用途</th><th>流用例</th></tr>
+        <tr><td><code>forcefield</code></td><td>バリアシールド</td><td>バフ / デバフの表示</td></tr>
+        <tr><td><code>poopcloud</code></td><td>肥料の煙</td><td>毒煙、爆発エフェクト</td></tr>
+        <tr><td><code>splash</code></td><td>水しぶき</td><td>衝撃エフェクト</td></tr>
+        <tr><td><code>sparks</code></td><td>火花</td><td>ヒットエフェクト</td></tr>
+      </table>
+
+      <div class="panel">
+        <div class="panel-label">流用の具体例</div>
+        <div class="file-tree">
+          Bank "forcefield" <span class="comment">(DST本体のバリアの動き)</span><br>
+          └── Build "my_shield_effect" <span class="comment">(独自: シールド効果の見た目)</span><br>
+          <br>
+          Bank "poopcloud" <span class="comment">(DST本体の煙の動き)</span><br>
+          ├── Build "my_poison_smoke" <span class="comment">(独自: 毒煙エフェクトの見た目)</span><br>
+          └── Build "my_trap_explosion" <span class="comment">(独自: トラップ爆発の見た目)</span>
+        </div>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-label">ヒント</span>
+        <p>既存 Bank を流用するには、その Bank のアニメーション名（<code>idle</code>、<code>open</code>、<code>idle_loop</code> 等）を調べ、同じ名前のアニメーションとして Build を作ります。Bank が持つアニメーション名は、DST 本体の Spriter ファイルを参照するか、Lua コードから推測できます。</p>
+      </div>
+    </section>
+
+    <!-- Spriter での作り方 -->
+    <section class="section">
+      <div class="section-label">Spriter Workflow</div>
+      <h2>エフェクトの Spriter での作り方</h2>
+
+      <div class="acc open" onclick="this.classList.toggle('open')">
+        <div class="acc-head">シンプルな 1 フレームエフェクト</div>
+        <div class="acc-body">
+          <p>煙や爆発など、1 枚の画像を表示するだけのエフェクトはとても簡単です。</p>
+          <ol class="steps">
+            <li>新規プロジェクトを作成する</li>
+            <li>エフェクト画像（PNG）を 1 枚配置する</li>
+            <li>Entity 名を流用する Bank 名に設定する（例: <code>poopcloud</code>）</li>
+            <li><code>idle</code> という名前のアニメーションを作成する</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="acc open" onclick="this.classList.toggle('open')">
+        <div class="acc-head">開始 → ループのエフェクト</div>
+        <div class="acc-body">
+          <p>バリアやシールドのように、「出現 → ループ表示」するエフェクトは 2 つのアニメーションが必要です。</p>
+          <div class="flow-diagram">
+            <div class="flow-box" style="background:#e8f0ea; color:var(--accent-green);"><code>open</code><br><small>出現（1回再生）</small></div>
+            <div class="flow-connector"><span class="arrow">→</span></div>
+            <div class="flow-box" style="background:#fef3ef; color:var(--accent-warm);"><code>idle_loop</code><br><small>ループ表示（繰り返し）</small></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-label">Lua 設定例 — 1 フレームエフェクト（煙）</div>
+<pre><code><span class="kw">local</span> assets = {
+    <span class="fn">Asset</span>(<span class="str">"ANIM"</span>, <span class="str">"anim/my_smoke_effect.zip"</span>),
+}
+
+<span class="kw">local function</span> <span class="fn">fn</span>()
+    <span class="kw">local</span> inst = <span class="fn">CreateEntity</span>()
+    inst.entity:<span class="fn">AddAnimState</span>()
+
+    inst.AnimState:<span class="fn">SetBank</span>(<span class="str">"poopcloud"</span>)
+    inst.AnimState:<span class="fn">SetBuild</span>(<span class="str">"my_smoke_effect"</span>)
+    inst.AnimState:<span class="fn">PlayAnimation</span>(<span class="str">"idle"</span>)
+
+    <span class="cm">-- アニメーション終了後に自動削除</span>
+    inst:<span class="fn">ListenForEvent</span>(<span class="str">"animover"</span>, inst.Remove)
+
+    <span class="kw">return</span> inst
+<span class="kw">end</span></code></pre>
+      </div>
+
+      <div class="panel">
+        <div class="panel-label">Lua 設定例 — 開始→ループエフェクト（シールド）</div>
+<pre><code><span class="kw">local</span> assets = {
+    <span class="fn">Asset</span>(<span class="str">"ANIM"</span>, <span class="str">"anim/my_shield_effect.zip"</span>),
+}
+
+<span class="kw">local function</span> <span class="fn">fn</span>()
+    <span class="kw">local</span> inst = <span class="fn">CreateEntity</span>()
+    inst.entity:<span class="fn">AddAnimState</span>()
+
+    inst.AnimState:<span class="fn">SetBank</span>(<span class="str">"forcefield"</span>)
+    inst.AnimState:<span class="fn">SetBuild</span>(<span class="str">"my_shield_effect"</span>)
+    inst.AnimState:<span class="fn">PlayAnimation</span>(<span class="str">"open"</span>)                <span class="cm">-- まず出現アニメーション</span>
+    inst.AnimState:<span class="fn">PushAnimation</span>(<span class="str">"idle_loop"</span>, <span class="kw">true</span>)     <span class="cm">-- 続けてループ</span>
+
+    <span class="kw">return</span> inst
+<span class="kw">end</span></code></pre>
+      </div>
+    </section>
+
+    <!-- 投射物アニメーション -->
+    <section class="section">
+      <div class="section-label">Projectile</div>
+      <h2>投射物アニメーション</h2>
+      <p>矢や弾のように飛んでいくものが「投射物」です。</p>
+
+      <div class="spec-grid">
+        <div class="spec-item">
+          <span class="spec-label">idle_pipe</span>
+          <span class="spec-value">静止状態 / 発射前</span>
+        </div>
+        <div class="spec-item">
+          <span class="spec-label">dart_pipe</span>
+          <span class="spec-value">飛行中の見た目</span>
+        </div>
+      </div>
+
+      <div class="callout warn">
+        <span class="callout-label">注意</span>
+        <p><code>ANIM_ORIENTATION.OnGround</code> を設定しないと、投射物が正面を向いたまま飛んでいく不自然な見た目になります。</p>
+      </div>
+
+      <div class="panel">
+        <div class="panel-label">Lua 設定例</div>
+<pre><code><span class="cm">-- 投射物の設定例</span>
+inst.AnimState:<span class="fn">SetBank</span>(<span class="str">"blow_dart"</span>)
+inst.AnimState:<span class="fn">SetBuild</span>(<span class="str">"blow_dart"</span>)
+inst.AnimState:<span class="fn">PlayAnimation</span>(<span class="str">"dart_pipe"</span>)
+
+<span class="cm">-- 地面と平行に表示する</span>
+inst.AnimState:<span class="fn">SetOrientation</span>(ANIM_ORIENTATION.OnGround)</code></pre>
+      </div>
+
+      <h3>流用できる既存 Bank</h3>
+      <table>
+        <tr><th>Bank 名</th><th>元の用途</th></tr>
+        <tr><td><code>blow_dart</code></td><td>吹き矢</td></tr>
+        <tr><td><code>fire_projectile</code></td><td>火の投射物</td></tr>
+        <tr><td><code>ice_projectile</code></td><td>氷の投射物</td></tr>
+      </table>
+
+      <div class="callout tip">
+        <span class="callout-label">ヒント</span>
+        <p>吹き矢系の武器を作る場合は <code>blow_dart</code> Bank を流用し、Build だけ差し替えるのが簡単です。</p>
+      </div>
+    </section>
+
+    <!-- 範囲表示アニメーション -->
+    <section class="section">
+      <div class="section-label">Range Indicator</div>
+      <h2>範囲表示アニメーション</h2>
+      <p>射程範囲やターゲットリングなど、ゲーム画面上に表示される UI 的なアニメーションです。範囲表示は他のエフェクトと異なり、いくつかの特徴があります。</p>
+
+      <div class="spec-grid">
+        <div class="spec-item">
+          <span class="spec-label">Bank</span>
+          <span class="spec-value">独自 Bank を使う</span>
+        </div>
+        <div class="spec-item">
+          <span class="spec-label">表示先</span>
+          <span class="spec-value">クライアント側のみ</span>
+        </div>
+        <div class="spec-item">
+          <span class="spec-label">向き</span>
+          <span class="spec-value">OnGround で地面に表示</span>
+        </div>
+        <div class="spec-item">
+          <span class="spec-label">再生</span>
+          <span class="spec-value">ループ再生</span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-label">Lua 設定例</div>
+<pre><code><span class="cm">-- 射程範囲リングの例</span>
+<span class="kw">local</span> fx = <span class="fn">CreateEntity</span>()
+fx.entity:<span class="fn">AddAnimState</span>()
+
+fx.AnimState:<span class="fn">SetBank</span>(<span class="str">"my_range_indicator"</span>)
+fx.AnimState:<span class="fn">SetBuild</span>(<span class="str">"my_range_ring"</span>)
+fx.AnimState:<span class="fn">PlayAnimation</span>(<span class="str">"idle"</span>, <span class="kw">true</span>)  <span class="cm">-- ループ再生</span>
+fx.AnimState:<span class="fn">SetOrientation</span>(ANIM_ORIENTATION.OnGround)</code></pre>
+      </div>
+
+      <div class="callout info">
+        <span class="callout-label">詳細サンプル</span>
+        <p>範囲表示リングの Spriter での作り方は、本リポジトリに詳細なサンプルがあります。<br><a class="anchor" href="sample/README-blind-dart-renge-ring.html">ブラインドダートの射程範囲リング作成ガイド →</a></p>
+      </div>
+    </section>
+
+    <!-- まとめ -->
+    <section class="section">
+      <div class="section-label">Summary</div>
+      <h2>まとめ</h2>
+
+      <table>
+        <tr><th>作るもの</th><th>Bank</th><th>Build</th><th>ポイント</th></tr>
+        <tr><td><strong>バフ / デバフ表示</strong></td><td><code>forcefield</code> 等（流用）</td><td>独自</td><td><code>open</code> → <code>idle_loop</code> のパターン</td></tr>
+        <tr><td><strong>爆発 / 煙</strong></td><td><code>poopcloud</code> 等（流用）</td><td>独自</td><td><code>idle</code> 1 フレームで OK。<code>animover</code> で自動削除</td></tr>
+        <tr><td><strong>投射物</strong></td><td><code>blow_dart</code> 等（流用）</td><td>独自</td><td><code>SetOrientation(OnGround)</code> を忘れずに</td></tr>
+        <tr><td><strong>範囲表示</strong></td><td>独自</td><td>独自</td><td>クライアント側のみ。ループ再生</td></tr>
+      </table>
+
+      <div class="acc" onclick="this.classList.toggle('open')">
+        <div class="acc-head">既存 Bank を調べる方法</div>
+        <div class="acc-body">
+          <p>使いたいエフェクトに近い DST 本体のエフェクトがあれば、以下の手順で Bank を調べられます。</p>
+          <ol class="steps">
+            <li>DST 本体の <code>scripts/prefabs/</code> フォルダから近いエフェクトの prefab ファイルを探す</li>
+            <li><code>SetBank("xxx")</code> の部分を確認する → これが Bank 名</li>
+            <li><code>PlayAnimation("yyy")</code> の部分を確認する → これが使えるアニメーション名</li>
+          </ol>
+          <div class="callout tip">
+            <span class="callout-label">ヒント</span>
+            <p>DST 本体のスクリプトは <code>C:\Program Files (x86)\Steam\steamapps\common\Don't Starve Together\data\scripts\prefabs\</code> にあります。テキストエディタで開いて <code>SetBank</code> を検索すると、どんな Bank が使われているか確認できます。</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ナビゲーション -->
+      <div class="page-nav">
+        <a href="README.html">&larr; README に戻る</a>
+        <a href="README-item-equipment.html">&larr; アイテム・武器防具編</a>
+      </div>
+    </section>
+
+    <!-- ライセンス -->
+    <section class="section">
+      <div class="conclusion">
+        <h3>ライセンス</h3>
+        <p>このドキュメントは自由に利用・改変・再配布できます。DST MOD 制作にお役立てください。</p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    DST-Spriter — エフェクトアニメーション編
+  </footer>
+
+</body>
+</html>

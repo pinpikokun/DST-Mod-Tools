@@ -1,0 +1,1505 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DST MOD 開発ガイド — はじめてのキャラクター MOD を作ろう</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Noto+Sans+JP:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-primary: #faf9f7;
+    --bg-card: #ffffff;
+    --bg-warm: #f5f0eb;
+    --bg-dark: #191919;
+    --text-primary: #1a1a1a;
+    --text-secondary: #6b6560;
+    --text-light: #9a938d;
+    --accent-warm: #c4704b;
+    --accent-green: #2d7a5f;
+    --accent-red: #b85450;
+    --accent-blue: #4a7ab5;
+    --border: #e8e2db;
+    --border-light: #f0ece7;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.8;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .hero {
+    background: var(--bg-dark);
+    color: #fff;
+    padding: 100px 0 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(196,112,75,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-inner {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 40px;
+    position: relative;
+  }
+  .hero-label {
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent-warm);
+    margin-bottom: 24px;
+    font-weight: 500;
+  }
+  .hero h1 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 16px;
+    letter-spacing: -0.5px;
+  }
+  .hero-desc {
+    font-size: 16px;
+    color: rgba(255,255,255,0.6);
+    font-weight: 300;
+    line-height: 1.8;
+  }
+
+  .content {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  .section {
+    padding: 72px 0;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .section:last-child { border-bottom: none; }
+
+  .section-label {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .section h2 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+  .section h3 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin: 40px 0 16px;
+    line-height: 1.5;
+  }
+  .section h4 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 32px 0 12px;
+    color: var(--text-primary);
+  }
+  .section p {
+    font-size: 16px;
+    color: var(--text-secondary);
+    line-height: 2;
+    font-weight: 300;
+    margin-bottom: 12px;
+  }
+  .section p:last-child { margin-bottom: 0; }
+
+  /* Callout */
+  .callout {
+    margin: 24px 0;
+    padding: 24px 28px;
+    border-radius: 12px;
+    font-size: 15px;
+    line-height: 1.9;
+    font-weight: 400;
+    color: var(--text-primary);
+  }
+  .callout p { font-size: 15px; color: var(--text-primary); font-weight: 400; margin-bottom: 6px; }
+  .callout p:last-child { margin-bottom: 0; }
+  .callout.warn { background: #fef8f0; border-left: 3px solid var(--accent-warm); }
+  .callout.danger { background: #fef2f0; border-left: 3px solid var(--accent-red); }
+  .callout.tip { background: #f0f8f4; border-left: 3px solid var(--accent-green); }
+  .callout.info { background: #f0f4f8; border-left: 3px solid var(--accent-blue); }
+  .callout-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+  }
+  .callout.warn .callout-label { color: var(--accent-warm); }
+  .callout.danger .callout-label { color: var(--accent-red); }
+  .callout.tip .callout-label { color: var(--accent-green); }
+  .callout.info .callout-label { color: var(--accent-blue); }
+
+  /* Steps */
+  .steps {
+    counter-reset: step;
+    list-style: none;
+    margin: 20px 0;
+    padding: 0;
+  }
+  .steps li {
+    counter-increment: step;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border-light);
+    font-size: 15px;
+    color: var(--text-secondary);
+    font-weight: 400;
+    line-height: 1.8;
+  }
+  .steps li:last-child { border-bottom: none; }
+  .steps li::before {
+    content: counter(step);
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    background: var(--bg-dark);
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 13px;
+    margin-top: 2px;
+  }
+
+  /* Code */
+  pre {
+    background: #1e1e2e;
+    color: #cdd6f4;
+    padding: 24px 28px;
+    border-radius: 12px;
+    overflow-x: auto;
+    font-family: 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.8;
+    margin: 16px 0 20px;
+  }
+  code {
+    font-family: 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+    font-size: 0.88em;
+    background: #f0ece7;
+    color: #92400e;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+  .kw { color: #cba6f7; }
+  .fn { color: #89b4fa; }
+  .str { color: #a6e3a1; }
+  .cm { color: #6c7086; font-style: italic; }
+
+  /* Tables */
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 14px;
+    background: var(--bg-card);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 16px 0 20px;
+    border: 1px solid var(--border);
+  }
+  th {
+    background: #292524;
+    color: #fafaf9;
+    padding: 12px 18px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 13px;
+  }
+  td {
+    padding: 11px 18px;
+    border-bottom: 1px solid var(--border-light);
+    vertical-align: top;
+    color: var(--text-secondary);
+    font-weight: 400;
+    line-height: 1.7;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) td { background: #fafaf8; }
+
+  /* Panel */
+  .panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    margin: 24px 0;
+  }
+  .panel-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .panel-content {
+    font-size: 15px;
+    color: var(--text-secondary);
+    font-weight: 300;
+    line-height: 2;
+  }
+  .panel-content p { font-size: 15px; color: var(--text-secondary); font-weight: 300; }
+
+  /* Cards grid */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+    margin: 24px 0;
+  }
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: var(--accent-warm); }
+  .card h4 {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0 0 8px;
+    color: var(--text-primary);
+  }
+  .card .desc {
+    font-size: 14px;
+    color: var(--text-secondary);
+    font-weight: 300;
+    line-height: 1.7;
+  }
+  .card a { color: var(--accent-warm); text-decoration: none; font-size: 13px; }
+  .card a:hover { text-decoration: underline; }
+
+  /* Spec grid */
+  .spec-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .spec-item {
+    background: var(--bg-warm);
+    border-radius: 10px;
+    padding: 14px 18px;
+  }
+  .spec-label {
+    font-size: 11px;
+    color: var(--text-light);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 500;
+    display: block;
+    margin-bottom: 4px;
+  }
+  .spec-value {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  /* Flow diagram */
+  .flow-diagram {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    flex-wrap: wrap;
+    margin: 24px 0;
+  }
+  .flow-box {
+    padding: 14px 22px;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+    background: var(--bg-warm);
+    color: var(--text-primary);
+  }
+  .flow-connector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 8px;
+    color: var(--text-light);
+  }
+  .flow-connector .arrow { font-size: 20px; line-height: 1; }
+
+  /* Vertical flow */
+  .flow-vertical {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    margin: 24px 0;
+  }
+  .flow-vertical .flow-box {
+    width: 340px;
+    max-width: 100%;
+  }
+  .flow-vertical .flow-connector {
+    padding: 6px 0;
+  }
+  .flow-vertical .flow-connector .arrow {
+    transform: rotate(90deg);
+  }
+
+  /* Accordion */
+  .acc {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  .acc-head {
+    padding: 20px 24px;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--text-primary);
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .acc-head::after {
+    content: '+';
+    color: var(--text-light);
+    font-size: 20px;
+    font-weight: 300;
+    flex-shrink: 0;
+    margin-left: 16px;
+  }
+  .acc.open .acc-head::after { content: '\2212'; }
+  .acc-body {
+    display: none;
+    padding: 0 24px 24px;
+    color: var(--text-secondary);
+    font-size: 15px;
+    font-weight: 300;
+    line-height: 2;
+    border-top: 1px solid var(--border-light);
+  }
+  .acc.open .acc-body { display: block; padding-top: 20px; }
+  .acc-body p { font-size: 15px; color: var(--text-secondary); font-weight: 300; margin-bottom: 8px; }
+  .acc-body h4 { font-size: 15px; font-weight: 600; margin: 20px 0 8px; color: var(--text-primary); }
+  .acc-body h4:first-child { margin-top: 0; }
+
+  /* File tree */
+  .file-tree {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px 32px;
+    font-family: 'Cascadia Code', 'Consolas', monospace;
+    font-size: 13px;
+    line-height: 2;
+    margin: 24px 0;
+  }
+  .file-tree .comment {
+    color: var(--text-light);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 12px;
+  }
+
+  /* Reference links */
+  .ref-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 24px;
+  }
+  .ref-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 16px 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: border-color 0.2s;
+  }
+  .ref-item:hover { border-color: var(--accent-warm); }
+  .ref-item .ref-source { font-size: 14px; font-weight: 500; }
+  .ref-item .ref-url { font-size: 12px; color: var(--text-light); word-break: break-all; margin-top: 4px; font-weight: 300; }
+
+  /* Conclusion */
+  .conclusion {
+    background: var(--bg-dark);
+    color: #fff;
+    border-radius: 20px;
+    padding: 48px;
+    margin: 40px 0;
+  }
+  .conclusion h3 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 22px;
+    margin-bottom: 16px;
+    font-weight: 700;
+  }
+  .conclusion p {
+    color: rgba(255,255,255,0.7);
+    font-size: 15px;
+    line-height: 2;
+    font-weight: 300;
+  }
+  .conclusion code {
+    background: rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.9);
+  }
+
+  /* Anchor */
+  a.anchor { color: var(--accent-warm); text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 0.2s; }
+  a.anchor:hover { border-bottom-color: var(--accent-warm); }
+
+  .footer {
+    text-align: center;
+    padding: 48px 0;
+    font-size: 12px;
+    color: var(--text-light);
+    font-weight: 300;
+  }
+
+  /* Star marker */
+  .star { color: var(--accent-warm); font-weight: 600; }
+
+  @media (max-width: 640px) {
+    .hero h1 { font-size: 26px; }
+    .hero { padding: 72px 0 56px; }
+    .content { padding: 0 24px; }
+    .hero-inner { padding: 0 24px; }
+    .panel { padding: 24px 20px; }
+    .conclusion { padding: 32px 24px; }
+    .card-grid { grid-template-columns: 1fr; }
+    .spec-grid { grid-template-columns: 1fr 1fr; }
+    .flow-diagram { flex-direction: column; gap: 8px; }
+    .flow-connector { flex-direction: row; padding: 4px 0; }
+    .flow-connector .arrow { transform: rotate(90deg); }
+    .flow-vertical .flow-box { width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="hero-label">Character MOD Guide</div>
+      <h1>DST MOD 開発ガイド<br>はじめてのキャラクター MOD を作ろう</h1>
+      <p class="hero-desc">Don't Starve Together のキャラクター MOD を作りたい人のための初心者向け総合ガイド。<br>ウィルソンをベースに、コピペ＋名前の書き換えだけでオリジナルキャラクターを作れます。</p>
+    </div>
+  </header>
+
+  <main class="content">
+
+    <!-- このガイドについて -->
+    <section class="section">
+      <div class="section-label">About</div>
+      <h2>このガイドについて</h2>
+      <p>このガイドでは、ウィルソン（ゲーム内の基本キャラクター）をベースに<strong>見た目だけを変更したオリジナルキャラクター</strong>を作成します。プログラミング経験は不要です。</p>
+
+      <div class="spec-grid">
+        <div class="spec-item">
+          <span class="spec-label">対象 OS</span>
+          <span class="spec-value">Windows 11</span>
+        </div>
+        <div class="spec-item">
+          <span class="spec-label">プログラミング</span>
+          <span class="spec-value">不要</span>
+        </div>
+        <div class="spec-item">
+          <span class="spec-label">作業方法</span>
+          <span class="spec-value">コピペ＋書換</span>
+        </div>
+        <div class="spec-item">
+          <span class="spec-label">前提</span>
+          <span class="spec-value">DST プレイ経験</span>
+        </div>
+      </div>
+
+      <h3>このガイドで作れるもの</h3>
+      <div class="card-grid">
+        <div class="card">
+          <h4>オリジナルキャラクター</h4>
+          <div class="desc">ウィルソンと同じ動きをする、見た目だけが違うキャラクター</div>
+        </div>
+        <div class="card">
+          <h4>ポートレート画像</h4>
+          <div class="desc">キャラクター選択画面に表示される立ち絵やアイコン</div>
+        </div>
+        <div class="card">
+          <h4>ゲーム内アニメーション</h4>
+          <div class="desc">歩く・走る・攻撃するなどの動きをするキャラクター</div>
+        </div>
+      </div>
+
+      <h3>関連ガイド（別途）</h3>
+      <div class="card-grid">
+        <div class="card">
+          <h4>DST-TextureConverter</h4>
+          <div class="desc">PNG から TEX ファイルへの変換手順</div>
+          <a href="DST-TextureConverter/README.md">ガイドを開く →</a>
+        </div>
+        <div class="card">
+          <h4>DST-Spriter</h4>
+          <div class="desc">アニメーションの作成詳細</div>
+          <a href="DST-Spriter/README.md">ガイドを開く →</a>
+        </div>
+        <div class="card">
+          <h4>DST-FMOD-Designer</h4>
+          <div class="desc">キャラクターボイス・サウンド作成</div>
+          <a href="DST-FMOD-Designer/README.md">ガイドを開く →</a>
+        </div>
+        <div class="card">
+          <h4>DST-Chatterbox</h4>
+          <div class="desc">AI 音声合成によるボイス生成</div>
+          <a href="DST-Chatterbox/README.md">ガイドを開く →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 必要なツール -->
+    <section class="section">
+      <div class="section-label">Installation</div>
+      <h2>必要なツールのインストール</h2>
+
+      <div class="acc open" onclick="this.classList.toggle('open')">
+        <div class="acc-head">1. Don't Starve Mod Tools（必須・無料）</div>
+        <div class="acc-body">
+          <p>MOD 開発に必要なツールがすべて入ったパッケージです。</p>
+          <ol class="steps">
+            <li>Steam を開く</li>
+            <li>上部メニューの「ライブラリ」をクリック</li>
+            <li>検索バーに <code>Don't Starve Mod Tools</code> と入力（見つからない場合はフィルターアイコンから「ツール」にチェック）</li>
+            <li>「Don't Starve Mod Tools」をクリックし「インストール」ボタンを押す</li>
+          </ol>
+          <div class="callout info">
+            <span class="callout-label">インストール先</span>
+            <p><code>C:\Program Files (x86)\Steam\steamapps\common\Don't Starve Mod Tools\mod_tools\</code></p>
+          </div>
+
+          <h4>含まれる主なツール</h4>
+          <table>
+            <tr><th>ツール</th><th>場所</th><th>用途</th></tr>
+            <tr><td><strong>Spriter</strong></td><td><code>mod_tools\Spriter\</code></td><td>アニメーション作成・編集</td></tr>
+            <tr><td><strong>FMOD Designer</strong></td><td><code>mod_tools\FMOD_Designer\</code></td><td>サウンド/ボイス作成</td></tr>
+            <tr><td><strong>TextureConverter</strong></td><td><code>mod_tools\tools\bin\TextureConverter.exe</code></td><td>PNG → TEX 画像変換</td></tr>
+            <tr><td><strong>autocompiler</strong></td><td><code>mod_tools\autocompiler.exe</code></td><td>アニメーション自動ビルド</td></tr>
+            <tr><td><strong>sample_build</strong></td><td><code>mod_tools\sample_build\</code></td><td>ウィルソンのパーツ画像テンプレート</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="acc" onclick="this.classList.toggle('open')">
+        <div class="acc-head">2. Git for Windows（Git Bash）</div>
+        <div class="acc-body">
+          <p>TextureConverter を使うために Git Bash が必要です。Windows 標準のコマンドプロンプトでも動きますが、パスにスペースが含まれる場合の扱いが面倒なため Git Bash を推奨します。</p>
+          <ol class="steps">
+            <li><a class="anchor" href="https://gitforwindows.org/">https://gitforwindows.org/</a> にアクセスし「Download」をクリック</li>
+            <li>ダウンロードした <code>Git-*.*.*-64-bit.exe</code> を実行（設定はすべてデフォルトで OK）</li>
+            <li>インストール後、フォルダの空いている場所で右クリック →「Open Git Bash here」が表示されれば成功</li>
+          </ol>
+          <div class="callout info">
+            <span class="callout-label">Windows 11 の場合</span>
+            <p>右クリックメニューに直接表示されないことがあります。「その他のオプションを確認」をクリックすると表示されます。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc" onclick="this.classList.toggle('open')">
+        <div class="acc-head">3. テキストエディタ（VSCode 推奨）</div>
+        <div class="acc-body">
+          <p>Lua コードを編集するために必要です。メモ帳でも可能ですが、色分け表示やエラー検出ができる VSCode を強く推奨します。</p>
+          <ol class="steps">
+            <li><a class="anchor" href="https://code.visualstudio.com/">https://code.visualstudio.com/</a> にアクセス</li>
+            <li>「Download for Windows」をクリック</li>
+            <li>ダウンロードしたインストーラーを実行（デフォルト設定のまま）</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- MOD フォルダ構成 -->
+    <section class="section">
+      <div class="section-label">Folder Structure</div>
+      <h2>MOD フォルダ構成の全体像</h2>
+      <p>キャラクター MOD は決まったフォルダ構成を持っています。<code>my_character</code> の部分はすべて自分のキャラクター名に統一してください。</p>
+
+      <div class="file-tree">
+        my_character/ <span class="comment">← MOD フォルダ（この名前は自由）</span><br>
+        ├── modinfo.lua <span class="comment">← MOD の情報（名前・説明・バージョン）</span><br>
+        ├── modmain.lua <span class="comment">← MOD のメインスクリプト</span><br>
+        ├── modicon.tex / .xml <span class="comment">← MOD 一覧に表示されるアイコン</span><br>
+        │<br>
+        ├── <strong>anim/</strong> <span class="comment">← アニメーション ZIP ファイル</span><br>
+        │&nbsp;&nbsp;&nbsp;├── my_character.zip<br>
+        │&nbsp;&nbsp;&nbsp;└── ghost_my_character_build.zip<br>
+        │<br>
+        ├── <strong>bigportraits/</strong> <span class="comment">← 大きなポートレート画像</span><br>
+        │&nbsp;&nbsp;&nbsp;└── my_character.tex / .xml<br>
+        │<br>
+        ├── <strong>images/</strong> <span class="comment">← 各種画像ファイル</span><br>
+        │&nbsp;&nbsp;&nbsp;├── avatars/ <span class="comment">← チャットアバター</span><br>
+        │&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── avatar_my_character.tex / .xml<br>
+        │&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── avatar_ghost_my_character.tex / .xml<br>
+        │&nbsp;&nbsp;&nbsp;├── map_icons/ <span class="comment">← ミニマップアイコン</span><br>
+        │&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── my_character.tex / .xml<br>
+        │&nbsp;&nbsp;&nbsp;├── saveslot_portraits/ <span class="comment">← セーブスロットのポートレート</span><br>
+        │&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── my_character.tex / .xml<br>
+        │&nbsp;&nbsp;&nbsp;└── selectscreen_portraits/ <span class="comment">← キャラ選択画面のポートレート</span><br>
+        │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── my_character.tex / .xml<br>
+        │<br>
+        ├── <strong>scripts/</strong> <span class="comment">← Lua スクリプト</span><br>
+        │&nbsp;&nbsp;&nbsp;├── prefabs/<br>
+        │&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── my_character.lua <span class="comment">← キャラクターの定義</span><br>
+        │&nbsp;&nbsp;&nbsp;└── speech_my_character.lua <span class="comment">← セリフ</span><br>
+        │<br>
+        └── sound/ <span class="comment">← サウンド（オプション）</span>
+      </div>
+
+      <div class="callout danger">
+        <span class="callout-label">重要</span>
+        <p>すべて小文字で統一してください。大文字・小文字の不一致はクラッシュの原因になります。</p>
+      </div>
+
+      <h3>MOD の読み込み場所</h3>
+      <p>DST はゲーム本体の <code>mods</code> フォルダから MOD を読み込みます。</p>
+      <ol class="steps">
+        <li>Steam を開く</li>
+        <li>ライブラリから Don't Starve Together を右クリック</li>
+        <li><strong>管理 → ローカルファイルを閲覧</strong> をクリック</li>
+        <li>開いたフォルダ内の <code>mods</code> フォルダが MOD の配置先</li>
+      </ol>
+      <div class="callout info">
+        <span class="callout-label">パス</span>
+        <p><code>C:\Program Files (x86)\Steam\steamapps\common\Don't Starve Together\mods\</code></p>
+        <p>Steam のインストール先を変更している場合はパスが異なります。上記の手順で Steam から開けば正しい場所が開きます。</p>
+      </div>
+    </section>
+
+    <!-- 全体フロー -->
+    <section class="section">
+      <div class="section-label">Workflow</div>
+      <h2>MOD 開発の全体フロー</h2>
+
+      <div class="flow-vertical">
+        <div class="flow-box">Step 1: MOD フォルダを作成する</div>
+        <div class="flow-connector"><span class="arrow">→</span></div>
+        <div class="flow-box">Step 2: modinfo.lua を作成する</div>
+        <div class="flow-connector"><span class="arrow">→</span></div>
+        <div class="flow-box">Step 3: modmain.lua を作成する</div>
+        <div class="flow-connector"><span class="arrow">→</span></div>
+        <div class="flow-box">Step 4: prefab ファイルを作成する</div>
+        <div class="flow-connector"><span class="arrow">→</span></div>
+        <div class="flow-box">Step 5: セリフファイルを作成する</div>
+        <div class="flow-connector"><span class="arrow">→</span></div>
+        <div class="flow-box" style="background:#e8f0ea; color:var(--accent-green);">Step 6: キャラクター画像を用意する</div>
+        <div class="flow-connector"><span class="arrow">→</span></div>
+        <div class="flow-box">Step 7: アニメーションをビルドする</div>
+        <div class="flow-connector"><span class="arrow">→</span></div>
+        <div class="flow-box" style="background:#fef3ef; color:var(--accent-warm);">Step 8: ポートレート画像を TEX に変換する</div>
+        <div class="flow-connector"><span class="arrow">→</span></div>
+        <div class="flow-box">Step 9: ファイルの最終確認</div>
+        <div class="flow-connector"><span class="arrow">→</span></div>
+        <div class="flow-box" style="background:#e8eaf0; color:var(--accent-blue);">Step 10: ゲーム内でテストする</div>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-label">ポートレートとは？</span>
+        <p>キャラクター選択画面の立ち絵、セーブスロットのアイコン、チャットアイコンなど、ゲーム内の各所に表示されるキャラクターの画像をまとめて「ポートレート」と呼びます。</p>
+      </div>
+
+      <h3>最低限必要なファイル</h3>
+      <table>
+        <tr><th>ファイル</th><th>役割</th></tr>
+        <tr><td><code>modinfo.lua</code></td><td>MOD の名前・説明・バージョン情報</td></tr>
+        <tr><td><code>modmain.lua</code></td><td>MOD のメインスクリプト（何をするかを記述）</td></tr>
+        <tr><td><code>modicon.tex</code> + <code>.xml</code></td><td>MOD 一覧に表示されるアイコン</td></tr>
+        <tr><td><code>anim/&lt;キャラ名&gt;.zip</code></td><td>キャラクターのアニメーション</td></tr>
+        <tr><td><code>scripts/prefabs/&lt;キャラ名&gt;.lua</code></td><td>キャラクターの定義</td></tr>
+        <tr><td><code>scripts/speech_&lt;キャラ名&gt;.lua</code></td><td>キャラクターのセリフ</td></tr>
+        <tr><td>各種画像ファイル</td><td>ポートレート・アバター・マップアイコン</td></tr>
+      </table>
+    </section>
+
+    <!-- Step 1 -->
+    <section class="section">
+      <div class="section-label">Step 1</div>
+      <h2>MOD フォルダを作成する</h2>
+      <p>この章からキャラクター名を <code>my_character</code> として進めます。自分のキャラクター名に置き換えてください。</p>
+
+      <div class="callout warn">
+        <span class="callout-label">命名ルール</span>
+        <p><strong>半角英数字とアンダースコア <code>_</code> のみ</strong>使用可能。<strong>すべて小文字</strong>を推奨。</p>
+        <p>スペース・日本語・ハイフン <code>-</code> は使用不可。</p>
+        <p>例: <code>my_character</code>、<code>fire_knight</code>、<code>sakura_witch</code></p>
+      </div>
+
+      <ol class="steps">
+        <li>以下のフォルダを開く: <code>C:\Program Files (x86)\Steam\steamapps\common\Don't Starve Mod Tools\mod_tools\</code></li>
+        <li>このフォルダ内に <code>my_character</code> という名前のフォルダを作成</li>
+        <li><code>my_character</code> フォルダの中にサブフォルダを作成</li>
+      </ol>
+
+      <div class="file-tree">
+        my_character/<br>
+        ├── anim/<br>
+        ├── bigportraits/<br>
+        ├── images/<br>
+        │&nbsp;&nbsp;&nbsp;├── avatars/<br>
+        │&nbsp;&nbsp;&nbsp;├── map_icons/<br>
+        │&nbsp;&nbsp;&nbsp;├── saveslot_portraits/<br>
+        │&nbsp;&nbsp;&nbsp;└── selectscreen_portraits/<br>
+        ├── scripts/<br>
+        │&nbsp;&nbsp;&nbsp;└── prefabs/<br>
+        └── sound/
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-label">なぜここに作るの？</span>
+        <p>この場所に MOD フォルダを置くと、<code>autocompiler.exe</code> がアニメーションを自動的にビルドしてくれます。開発が完了したら、ゲームの mods フォルダにコピーします。</p>
+      </div>
+    </section>
+
+    <!-- Step 2 -->
+    <section class="section">
+      <div class="section-label">Step 2</div>
+      <h2>modinfo.lua を作成する</h2>
+      <p>MOD の基本情報を定義するファイルです。以下のコードをコピペして、<span class="star">★</span>マークの部分を自分のキャラクター名に書き換えてください。</p>
+
+<pre><code><span class="cm">-- MOD の基本情報</span>
+<span class="fn">name</span> = <span class="str">"My Character"</span>                    <span class="cm">-- ★書き換え: MOD の名前</span>
+<span class="fn">description</span> = <span class="str">"My first DST character!"</span>  <span class="cm">-- ★書き換え: MOD の説明文</span>
+<span class="fn">author</span> = <span class="str">"Your Name"</span>                     <span class="cm">-- ★書き換え: 作者名</span>
+<span class="fn">version</span> = <span class="str">"1.0.0"</span>
+
+<span class="cm">-- DST の API バージョン（そのまま）</span>
+<span class="fn">api_version</span> = <span class="str">10</span>
+
+<span class="cm">-- DST 専用 MOD（そのまま）</span>
+<span class="fn">dont_starve_compatible</span> = <span class="kw">false</span>
+<span class="fn">reign_of_giants_compatible</span> = <span class="kw">false</span>
+<span class="fn">dst_compatible</span> = <span class="kw">true</span>
+
+<span class="cm">-- MOD アイコン（そのまま）</span>
+<span class="fn">icon_atlas</span> = <span class="str">"modicon.xml"</span>
+<span class="fn">icon</span> = <span class="str">"modicon.tex"</span>
+
+<span class="cm">-- マルチプレイ設定（そのまま）</span>
+<span class="fn">all_clients_require_mod</span> = <span class="kw">true</span>
+<span class="fn">clients_only_mod</span> = <span class="kw">false</span>
+
+<span class="cm">-- 設定オプション（そのまま）</span>
+<span class="fn">configuration_options</span> = {}</code></pre>
+
+      <div class="callout info">
+        <span class="callout-label">各行の意味</span>
+        <p><code>name</code>: Steam Workshop やゲーム内 MOD 一覧に表示される名前</p>
+        <p><code>api_version = 10</code>: DST の現在の API バージョン（変更不要）</p>
+        <p><code>all_clients_require_mod = true</code>: マルチプレイで全員がこの MOD を必要とする設定</p>
+      </div>
+    </section>
+
+    <!-- Step 3 -->
+    <section class="section">
+      <div class="section-label">Step 3</div>
+      <h2>modmain.lua を作成する</h2>
+      <p>MOD のメインスクリプトです。<span class="star">★</span>マークのある <code>my_character</code> をすべて自分のキャラクター名に書き換えてください。</p>
+
+      <div class="acc open" onclick="this.classList.toggle('open')">
+        <div class="acc-head">modmain.lua の全コード</div>
+        <div class="acc-body">
+<pre><code><span class="cm">-- ========================================</span>
+<span class="cm">-- アセット（画像・アニメーション）の登録</span>
+<span class="cm">-- ★以下すべての "my_character" を自分のキャラクター名に書き換えてください</span>
+<span class="cm">-- ========================================</span>
+
+Assets = {
+    <span class="cm">-- キャラクターアニメーション</span>
+    <span class="fn">Asset</span>(<span class="str">"ANIM"</span>, <span class="str">"anim/my_character.zip"</span>),                   <span class="cm">-- ★書き換え</span>
+    <span class="fn">Asset</span>(<span class="str">"ANIM"</span>, <span class="str">"anim/ghost_my_character_build.zip"</span>),           <span class="cm">-- ★書き換え</span>
+
+    <span class="cm">-- キャラクター選択画面の画像</span>
+    <span class="fn">Asset</span>(<span class="str">"IMAGE"</span>, <span class="str">"images/saveslot_portraits/my_character.tex"</span>),    <span class="cm">-- ★書き換え</span>
+    <span class="fn">Asset</span>(<span class="str">"ATLAS"</span>, <span class="str">"images/saveslot_portraits/my_character.xml"</span>),    <span class="cm">-- ★書き換え</span>
+    <span class="fn">Asset</span>(<span class="str">"IMAGE"</span>, <span class="str">"images/selectscreen_portraits/my_character.tex"</span>), <span class="cm">-- ★書き換え</span>
+    <span class="fn">Asset</span>(<span class="str">"ATLAS"</span>, <span class="str">"images/selectscreen_portraits/my_character.xml"</span>), <span class="cm">-- ★書き換え</span>
+    <span class="fn">Asset</span>(<span class="str">"IMAGE"</span>, <span class="str">"bigportraits/my_character.tex"</span>),                <span class="cm">-- ★書き換え</span>
+    <span class="fn">Asset</span>(<span class="str">"ATLAS"</span>, <span class="str">"bigportraits/my_character.xml"</span>),                <span class="cm">-- ★書き換え</span>
+
+    <span class="cm">-- アバター</span>
+    <span class="fn">Asset</span>(<span class="str">"IMAGE"</span>, <span class="str">"images/avatars/avatar_my_character.tex"</span>),       <span class="cm">-- ★書き換え</span>
+    <span class="fn">Asset</span>(<span class="str">"ATLAS"</span>, <span class="str">"images/avatars/avatar_my_character.xml"</span>),       <span class="cm">-- ★書き換え</span>
+    <span class="fn">Asset</span>(<span class="str">"IMAGE"</span>, <span class="str">"images/avatars/avatar_ghost_my_character.tex"</span>), <span class="cm">-- ★書き換え</span>
+    <span class="fn">Asset</span>(<span class="str">"ATLAS"</span>, <span class="str">"images/avatars/avatar_ghost_my_character.xml"</span>), <span class="cm">-- ★書き換え</span>
+
+    <span class="cm">-- マップアイコン</span>
+    <span class="fn">Asset</span>(<span class="str">"IMAGE"</span>, <span class="str">"images/map_icons/my_character.tex"</span>),            <span class="cm">-- ★書き換え</span>
+    <span class="fn">Asset</span>(<span class="str">"ATLAS"</span>, <span class="str">"images/map_icons/my_character.xml"</span>),            <span class="cm">-- ★書き換え</span>
+}
+
+<span class="cm">-- ========================================</span>
+<span class="cm">-- キャラクター情報の設定</span>
+<span class="cm">-- ========================================</span>
+<span class="kw">local</span> STRINGS = GLOBAL.STRINGS
+
+STRINGS.CHARACTER_TITLES.<span class="fn">my_character</span> = <span class="str">"The Custom Character"</span>           <span class="cm">-- ★書き換え（称号）</span>
+STRINGS.CHARACTER_NAMES.<span class="fn">my_character</span> = <span class="str">"My Character"</span>                    <span class="cm">-- ★書き換え（表示名）</span>
+STRINGS.CHARACTER_DESCRIPTIONS.<span class="fn">my_character</span> = <span class="str">"*Has custom appearance\n*Based on Wilson"</span>  <span class="cm">-- ★書き換え</span>
+STRINGS.CHARACTER_QUOTES.<span class="fn">my_character</span> = <span class="str">"\"Hello, world!\""</span>              <span class="cm">-- ★書き換え</span>
+STRINGS.CHARACTER_ABOUTME.<span class="fn">my_character</span> = <span class="str">"A custom character."</span>           <span class="cm">-- ★書き換え</span>
+
+<span class="cm">-- セリフデータの読み込み</span>
+STRINGS.CHARACTERS.<span class="fn">MY_CHARACTER</span> = <span class="kw">require</span> <span class="str">"speech_my_character"</span>          <span class="cm">-- ★大文字・小文字の両方を書き換え</span>
+
+<span class="cm">-- キャラクター名</span>
+STRINGS.NAMES.<span class="fn">MY_CHARACTER</span> = <span class="str">"My Character"</span>                              <span class="cm">-- ★大文字で書き換え</span>
+
+<span class="cm">-- スキン名</span>
+STRINGS.SKIN_NAMES.<span class="fn">my_character_none</span> = <span class="str">"My Character"</span>                    <span class="cm">-- ★書き換え</span>
+
+<span class="cm">-- ========================================</span>
+<span class="cm">-- キャラクターを登録する</span>
+<span class="cm">-- ========================================</span>
+<span class="fn">AddModCharacter</span>(<span class="str">"my_character"</span>, <span class="str">"MALE"</span>)  <span class="cm">-- ★書き換え（"MALE" or "FEMALE"）</span></code></pre>
+        </div>
+      </div>
+
+      <div class="callout danger">
+        <span class="callout-label">重要: 大文字・小文字の使い分け</span>
+        <p><strong>小文字</strong>（<code>my_character</code>）: ファイル名、prefab 名、フォルダ名</p>
+        <p><strong>大文字</strong>（<code>MY_CHARACTER</code>）: STRINGS テーブルのキー、キャラクター内部定数</p>
+        <p>この対応を間違えるとゲームがクラッシュします。</p>
+      </div>
+    </section>
+
+    <!-- Step 4 -->
+    <section class="section">
+      <div class="section-label">Step 4</div>
+      <h2>キャラクター prefab ファイルを作成する</h2>
+
+      <div class="panel">
+        <div class="panel-label">prefab（プレハブ）とは？</div>
+        <div class="panel-content">
+          <p>DST の世界に存在するすべてのもの（キャラクター、アイテム、モンスター、木、石など）は「prefab」として定義されています。prefab は「設計図」のようなもので、見た目・能力・ステータスをひとまとめにした定義です。</p>
+        </div>
+      </div>
+
+      <p><code>scripts/prefabs/my_character.lua</code> として保存してください（ファイル名も書き換え）。</p>
+
+      <div class="acc open" onclick="this.classList.toggle('open')">
+        <div class="acc-head">prefab ファイルの全コード</div>
+        <div class="acc-body">
+<pre><code><span class="kw">local</span> MakePlayerCharacter = <span class="kw">require</span>(<span class="str">"prefabs/player_common"</span>)
+
+<span class="kw">local</span> assets = {
+    <span class="fn">Asset</span>(<span class="str">"ANIM"</span>, <span class="str">"anim/my_character.zip"</span>),             <span class="cm">-- ★書き換え</span>
+    <span class="fn">Asset</span>(<span class="str">"ANIM"</span>, <span class="str">"anim/ghost_my_character_build.zip"</span>), <span class="cm">-- ★書き換え</span>
+}
+
+<span class="cm">-- 初期所持アイテム（空 = デフォルト）</span>
+<span class="kw">local</span> start_inv = {}  <span class="cm">-- ★変更任意: 例 {"flint", "twigs"}</span>
+
+<span class="cm">-- サーバー・クライアント両方で実行される処理</span>
+<span class="kw">local</span> common_postinit = <span class="kw">function</span>(inst)
+    inst.MiniMapEntity:<span class="fn">SetIcon</span>(<span class="str">"my_character.tex"</span>)  <span class="cm">-- ★書き換え</span>
+<span class="kw">end</span>
+
+<span class="cm">-- サーバーのみで実行される処理</span>
+<span class="kw">local</span> master_postinit = <span class="kw">function</span>(inst)
+    inst.components.health:<span class="fn">SetMaxHealth</span>(<span class="str">150</span>)   <span class="cm">-- ★変更任意: 体力</span>
+    inst.components.hunger:<span class="fn">SetMax</span>(<span class="str">150</span>)         <span class="cm">-- ★変更任意: 空腹</span>
+    inst.components.sanity:<span class="fn">SetMax</span>(<span class="str">200</span>)         <span class="cm">-- ★変更任意: 正気度</span>
+
+    inst.components.locomotor.<span class="fn">walkspeed</span> = <span class="str">4</span>   <span class="cm">-- ★変更任意: 歩行速度</span>
+    inst.components.locomotor.<span class="fn">runspeed</span> = <span class="str">6</span>    <span class="cm">-- ★変更任意: 走行速度</span>
+
+    inst.components.combat.<span class="fn">damagemultiplier</span> = <span class="str">1</span>  <span class="cm">-- ★変更任意: 攻撃力倍率</span>
+
+    inst.<span class="fn">soundsname</span> = <span class="str">"wilson"</span>  <span class="cm">-- ★変更任意: "willow","wendy" など</span>
+<span class="kw">end</span>
+
+<span class="kw">return</span> <span class="fn">MakePlayerCharacter</span>(<span class="str">"my_character"</span>, prefabs, assets, common_postinit, master_postinit, start_inv)  <span class="cm">-- ★書き換え</span></code></pre>
+        </div>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-label">カスタマイズのヒント</span>
+        <p><code>SetMaxHealth(150)</code> の数値を変えると体力が変わります（ウィルソン = 150、ウィグフリッド = 200）。</p>
+        <p><code>soundsname = "wilson"</code> を <code>"willow"</code> や <code>"wendy"</code> に変えると、既存キャラのボイスを使えます。</p>
+        <p><code>start_inv</code> にアイテムを追加すると初期所持アイテムを設定できます（例: <code>{"flint", "flint", "twigs"}</code>）。</p>
+      </div>
+    </section>
+
+    <!-- Step 5 -->
+    <section class="section">
+      <div class="section-label">Step 5</div>
+      <h2>セリフファイルを作成する</h2>
+      <p><code>scripts/speech_my_character.lua</code> として保存してください。</p>
+
+<pre><code><span class="cm">-- ウィルソンのセリフをベースにした最小セリフファイル</span>
+<span class="cm">-- 詳細なセリフを追加したい場合は、ウィルソンの speech ファイルをコピーして</span>
+<span class="cm">-- 各セリフを自分のキャラクターに合った内容に書き換えてください。</span>
+<span class="cm">--</span>
+<span class="cm">-- ウィルソンの speech ファイルの場所:</span>
+<span class="cm">-- C:\Program Files (x86)\Steam\steamapps\common\Don't Starve Together\data\databundles\scripts.zip</span>
+<span class="cm">-- ↑この ZIP を展開すると scripts\speech_wilson.lua が見つかります</span>
+
+<span class="kw">return</span> <span class="kw">require</span>(<span class="str">"speech_wilson"</span>)</code></pre>
+
+      <div class="callout info">
+        <span class="callout-label">解説</span>
+        <p><code>require("speech_wilson")</code> はウィルソンのセリフデータをそのまま使うという意味です。オリジナルのセリフに変更したい場合は、ウィルソンの speech ファイルの内容をコピーして各行を書き換えてください。</p>
+      </div>
+    </section>
+
+    <!-- Step 6 -->
+    <section class="section">
+      <div class="section-label">Step 6</div>
+      <h2>キャラクター画像を用意する</h2>
+      <p>ウィルソンのパーツ画像を自分のキャラクターに差し替えます。</p>
+
+      <h3>sample_build とは</h3>
+      <p>DST Mod Tools には、ウィルソンの身体パーツが分かれた PNG 画像のテンプレートが含まれています。</p>
+      <div class="callout info">
+        <span class="callout-label">場所</span>
+        <p><code>C:\Program Files (x86)\Steam\steamapps\common\Don't Starve Mod Tools\mod_tools\sample_build\</code></p>
+      </div>
+
+      <div class="acc" onclick="this.classList.toggle('open')">
+        <div class="acc-head">sample_build のフォルダ一覧</div>
+        <div class="acc-body">
+          <table>
+            <tr><th>フォルダ</th><th>中身</th><th>説明</th></tr>
+            <tr><td><code>arm_lower/</code></td><td>arm_lower-0.png ~ 2.png</td><td>前腕（3パターン）</td></tr>
+            <tr><td><code>arm_upper/</code></td><td>arm_upper-0.png ~ 4.png</td><td>上腕（5パターン）</td></tr>
+            <tr><td><code>cheeks/</code></td><td>cheeks-0.png ~ 1.png</td><td>頬（食べるアニメーション用）</td></tr>
+            <tr><td><code>face/</code></td><td>face-0.png ~ 13.png</td><td>顔の表情（14パターン）</td></tr>
+            <tr><td><code>foot/</code></td><td>foot-0.png ~ 6.png</td><td>足（7パターン）</td></tr>
+            <tr><td><code>hair/</code></td><td>hair-0.png ~ 2.png</td><td>髪（3パターン）</td></tr>
+            <tr><td><code>hair_hat/</code></td><td>hair_hat-0.png ~ 2.png</td><td>帽子を被ったときの髪</td></tr>
+            <tr><td><code>hand/</code></td><td>hand-0.png ~ 10.png</td><td>手（11パターン）</td></tr>
+            <tr><td><code>headbase/</code></td><td>headbase-0.png ~ 2.png</td><td>頭の輪郭（3パターン）</td></tr>
+            <tr><td><code>headbase_hat/</code></td><td>headbase_hat-0.png ~ 2.png</td><td>帽子を被ったときの頭</td></tr>
+            <tr><td><code>leg/</code></td><td>leg-0.png ~ 8.png</td><td>脚（9パターン）</td></tr>
+            <tr><td><code>torso/</code></td><td>torso-0.png ~ 9.png</td><td>胴体（10パターン）</td></tr>
+          </table>
+          <div class="callout tip">
+            <span class="callout-label">番号の意味</span>
+            <p>同じパーツでも正面・横向き・後ろ向きなどで画像が異なります。例: <code>face-0.png</code> は正面の普通の表情、<code>face-4.png</code> は横向きの表情です。</p>
+          </div>
+        </div>
+      </div>
+
+      <h3>画像を差し替える手順</h3>
+      <ol class="steps">
+        <li><code>sample_build</code> フォルダを丸ごとコピーして <code>my_character_build</code> という名前で配置（この名前が Build 名になります）</li>
+        <li>コピーした <code>build.scml</code> を Spriter で開いて、パーツ画像の配置を確認</li>
+        <li>フォルダ内の PNG を同じファイル名・同じサイズで自分の画像に差し替え</li>
+        <li>差し替えが終わったら <code>build.scml</code> を Spriter で開いて見た目を確認</li>
+      </ol>
+
+      <div class="acc" onclick="this.classList.toggle('open')">
+        <div class="acc-head">Spriter の基本操作</div>
+        <div class="acc-body">
+          <ol class="steps">
+            <li><code>mod_tools\Spriter\Spriter.exe</code> をダブルクリックして起動</li>
+            <li>File → Open Project で <code>my_character_build\build.scml</code> を開く</li>
+            <li>画面中央にキャラクターが表示される</li>
+            <li>下部の ▶ ボタンでアニメーション再生、ドロップダウンでアニメーション切り替え</li>
+          </ol>
+          <div class="callout tip">
+            <span class="callout-label">ヒント</span>
+            <p>このガイドでは Spriter はプレビュー確認のためだけに使います。画像の差し替えはエクスプローラーで PNG を上書きするだけで OK です。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout danger">
+        <span class="callout-label">差し替えのルール</span>
+        <p>ファイル名は絶対に変えない。画像サイズは元画像と同じにする。透過 PNG（RGBA 32bit）で保存する。</p>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-label">初心者向けアドバイス</span>
+        <p>最初は全パーツを差し替える必要はありません。まずは <code>face/</code> フォルダの画像だけ差し替えて、顔だけ変えたキャラクターから始めるのがおすすめです。</p>
+      </div>
+    </section>
+
+    <!-- Step 7 -->
+    <section class="section">
+      <div class="section-label">Step 7</div>
+      <h2>アニメーションをビルドする</h2>
+      <p>差し替えた画像を DST が読み込める ZIP 形式に変換します。</p>
+
+      <div class="acc open" onclick="this.classList.toggle('open')">
+        <div class="acc-head">方法 A: autocompiler を使う（推奨）</div>
+        <div class="acc-body">
+          <ol class="steps">
+            <li><code>my_character_build</code> フォルダを <code>mod_tools\exported\</code> の中に移動（<code>exported</code> フォルダが無い場合は作成）</li>
+            <li><code>mod_tools\autocompiler.exe</code> を実行（黒い画面が出る。処理完了まで待つ）</li>
+            <li>ビルド成功で <code>mod_tools\anim\my_character_build.zip</code> が生成される</li>
+            <li>この ZIP を MOD フォルダの <code>anim/my_character.zip</code> としてコピー</li>
+          </ol>
+          <div class="callout warn">
+            <span class="callout-label">ファイル名の注意</span>
+            <p>ZIP のファイル名（拡張子を除いた部分）が Build 名になります。prefab で <code>AnimState:SetBuild("my_character")</code> と指定する場合、ZIP は <code>my_character.zip</code> である必要があります。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc" onclick="this.classList.toggle('open')">
+        <div class="acc-head">ゴーストアニメーション</div>
+        <div class="acc-body">
+          <p>キャラクターが死亡するとゴースト（幽霊）になります。最も簡単な方法は DST 既存のゴーストアニメーションを使うことです。</p>
+<pre><code><span class="cm">コピー元:</span>
+C:\Program Files (x86)\Steam\steamapps\common\Don't Starve Together\data\anim\ghost_wilson_build.zip
+
+<span class="cm">コピー先:</span>
+my_character\anim\ghost_my_character_build.zip</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Step 8 -->
+    <section class="section">
+      <div class="section-label">Step 8</div>
+      <h2>ポートレート画像を TEX に変換する</h2>
+      <p>DST では PNG 画像をそのまま使えません。<strong>TEX 形式</strong>に変換する必要があります。</p>
+
+      <h3>必要な画像一覧</h3>
+      <table>
+        <tr><th>画像</th><th>サイズ</th><th>配置先フォルダ</th><th>説明</th></tr>
+        <tr><td>modicon</td><td>128 x 128</td><td>MOD フォルダ直下</td><td>MOD 一覧のアイコン</td></tr>
+        <tr><td>selectscreen portrait</td><td>256 x 512</td><td><code>images/selectscreen_portraits/</code></td><td>キャラ選択画面の一覧</td></tr>
+        <tr><td>saveslot portrait</td><td>128 x 128</td><td><code>images/saveslot_portraits/</code></td><td>セーブスロットのアイコン</td></tr>
+        <tr><td>bigportrait</td><td>512 x 512 以上</td><td><code>bigportraits/</code></td><td>キャラ選択画面の大きな立ち絵</td></tr>
+        <tr><td>avatar</td><td>64 x 64</td><td><code>images/avatars/</code></td><td>チャットアイコン</td></tr>
+        <tr><td>avatar (ghost)</td><td>64 x 64</td><td><code>images/avatars/</code></td><td>ゴースト時のチャットアイコン</td></tr>
+        <tr><td>map icon</td><td>64 x 64</td><td><code>images/map_icons/</code></td><td>ミニマップアイコン</td></tr>
+      </table>
+
+      <div class="callout danger">
+        <span class="callout-label">画像サイズの重要ルール</span>
+        <p>すべての画像サイズは <strong>2 の累乗</strong>（64, 128, 256, 512...）でなければなりません。それ以外のサイズはゲームがクラッシュします。</p>
+      </div>
+
+      <h3>TEX への変換手順</h3>
+      <ol class="steps">
+        <li>作業用フォルダに PNG を置く</li>
+        <li>フォルダ内で右クリック →「Open Git Bash here」</li>
+        <li>以下のコマンドで PNG を TEX に変換（ファイル名を変えて各画像で実行）</li>
+      </ol>
+
+<pre><code><span class="str">"/c/Program Files (x86)/Steam/steamapps/common/Don't Starve Mod Tools/mod_tools/tools/bin/TextureConverter.exe"</span> \
+  -i <span class="fn">ファイル名.png</span> -o <span class="fn">ファイル名.tex</span> -f bc3 -p opengl --mipmap --premultiply</code></pre>
+
+      <div class="acc" onclick="this.classList.toggle('open')">
+        <div class="acc-head">コマンドオプションの解説</div>
+        <div class="acc-body">
+          <table>
+            <tr><th>オプション</th><th>意味</th></tr>
+            <tr><td><code>-i</code></td><td>入力ファイル（PNG）</td></tr>
+            <tr><td><code>-o</code></td><td>出力ファイル（TEX）</td></tr>
+            <tr><td><code>-f bc3</code></td><td>圧縮形式（BC3 = DXT5、透過あり）</td></tr>
+            <tr><td><code>-p opengl</code></td><td>プラットフォーム</td></tr>
+            <tr><td><code>--mipmap</code></td><td>ミップマップ生成（必須）</td></tr>
+            <tr><td><code>--premultiply</code></td><td>アルファ値の事前乗算（必須）</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <h3>XML アトラスファイルの作成</h3>
+
+      <div class="panel">
+        <div class="panel-label">XML アトラスファイルとは？</div>
+        <div class="panel-content">
+          <p>TEX ファイル（画像データ）だけでは、ゲームはその画像をどう読み込めばいいかわかりません。XML アトラスファイルは「この TEX の中にどんな画像がどの位置にあるか」を記述した設定ファイルです。TEX と XML は常にセットで必要です。</p>
+        </div>
+      </div>
+
+      <p>合計 <strong>7 個</strong>の XML ファイルを作成します。</p>
+
+      <table>
+        <tr><th>#</th><th>ファイル名</th><th>中に書く TEX ファイル名</th><th>配置先フォルダ</th></tr>
+        <tr><td>1</td><td><code>modicon.xml</code></td><td><code>modicon.tex</code></td><td>MOD フォルダ直下</td></tr>
+        <tr><td>2</td><td><code>my_character.xml</code></td><td><code>my_character.tex</code></td><td><code>bigportraits/</code></td></tr>
+        <tr><td>3</td><td><code>avatar_my_character.xml</code></td><td><code>avatar_my_character.tex</code></td><td><code>images/avatars/</code></td></tr>
+        <tr><td>4</td><td><code>avatar_ghost_my_character.xml</code></td><td><code>avatar_ghost_my_character.tex</code></td><td><code>images/avatars/</code></td></tr>
+        <tr><td>5</td><td><code>my_character.xml</code></td><td><code>my_character.tex</code></td><td><code>images/map_icons/</code></td></tr>
+        <tr><td>6</td><td><code>my_character.xml</code></td><td><code>my_character.tex</code></td><td><code>images/saveslot_portraits/</code></td></tr>
+        <tr><td>7</td><td><code>my_character.xml</code></td><td><code>my_character.tex</code></td><td><code>images/selectscreen_portraits/</code></td></tr>
+      </table>
+
+      <div class="acc open" onclick="this.classList.toggle('open')">
+        <div class="acc-head">XML ファイルの作り方（メモ帳を使用）</div>
+        <div class="acc-body">
+          <ol class="steps">
+            <li>Windows のメモ帳を開く（スタートメニューで「メモ帳」と検索）</li>
+            <li>以下のテンプレートをコピペ</li>
+            <li><code>★ここにTEXファイル名★</code> の 2 箇所を上の表の「中に書く TEX ファイル名」に書き換え</li>
+            <li>「ファイル → 名前を付けて保存」で上の表のファイル名で保存</li>
+          </ol>
+<pre><code>&lt;Atlas&gt;&lt;Texture filename=<span class="str">"★ここにTEXファイル名★"</span> /&gt;&lt;Elements&gt;&lt;Element name=<span class="str">"★ここにTEXファイル名★"</span> u1=<span class="str">"0"</span> u2=<span class="str">"1"</span> v1=<span class="str">"0"</span> v2=<span class="str">"1"</span> /&gt;&lt;/Elements&gt;&lt;/Atlas&gt;</code></pre>
+
+          <div class="callout danger">
+            <span class="callout-label">保存時の注意</span>
+            <p>メモ帳の「名前を付けて保存」でファイルの種類を<strong>「すべてのファイル (*.*)」</strong>に変更してから保存してください。そうしないと <code>.txt</code> が余計に付きます。</p>
+          </div>
+
+          <h4>例: modicon.xml の場合</h4>
+          <p>テンプレートの <code>★ここにTEXファイル名★</code> を <code>modicon.tex</code> に書き換え、ファイル名を <code>modicon.xml</code> として保存:</p>
+<pre><code>&lt;Atlas&gt;&lt;Texture filename=<span class="str">"modicon.tex"</span> /&gt;&lt;Elements&gt;&lt;Element name=<span class="str">"modicon.tex"</span> u1=<span class="str">"0"</span> u2=<span class="str">"1"</span> v1=<span class="str">"0"</span> v2=<span class="str">"1"</span> /&gt;&lt;/Elements&gt;&lt;/Atlas&gt;</code></pre>
+          <p>この手順を 7 回繰り返して、すべての XML ファイルを作成してください。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Step 9 -->
+    <section class="section">
+      <div class="section-label">Step 9</div>
+      <h2>ファイルの最終確認</h2>
+      <p>すべてのファイルが揃っているか確認しましょう。</p>
+
+      <div class="file-tree">
+        my_character/<br>
+        ├── modinfo.lua <span class="comment">← Step 2</span><br>
+        ├── modmain.lua <span class="comment">← Step 3</span><br>
+        ├── modicon.tex <span class="comment">← Step 8</span><br>
+        ├── modicon.xml <span class="comment">← Step 8</span><br>
+        │<br>
+        ├── anim/<br>
+        │&nbsp;&nbsp;&nbsp;├── my_character.zip <span class="comment">← Step 7</span><br>
+        │&nbsp;&nbsp;&nbsp;└── ghost_my_character_build.zip <span class="comment">← Step 7</span><br>
+        │<br>
+        ├── bigportraits/<br>
+        │&nbsp;&nbsp;&nbsp;├── my_character.tex <span class="comment">← Step 8</span><br>
+        │&nbsp;&nbsp;&nbsp;└── my_character.xml <span class="comment">← Step 8</span><br>
+        │<br>
+        ├── images/<br>
+        │&nbsp;&nbsp;&nbsp;├── avatars/<br>
+        │&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── avatar_my_character.tex / .xml<br>
+        │&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── avatar_ghost_my_character.tex / .xml<br>
+        │&nbsp;&nbsp;&nbsp;├── map_icons/<br>
+        │&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── my_character.tex / .xml<br>
+        │&nbsp;&nbsp;&nbsp;├── saveslot_portraits/<br>
+        │&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── my_character.tex / .xml<br>
+        │&nbsp;&nbsp;&nbsp;└── selectscreen_portraits/<br>
+        │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── my_character.tex / .xml<br>
+        │<br>
+        ├── scripts/<br>
+        │&nbsp;&nbsp;&nbsp;├── prefabs/<br>
+        │&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── my_character.lua <span class="comment">← Step 4</span><br>
+        │&nbsp;&nbsp;&nbsp;└── speech_my_character.lua <span class="comment">← Step 5</span><br>
+        │<br>
+        └── sound/ <span class="comment">← 今回は空で OK</span>
+      </div>
+
+      <div class="callout danger">
+        <span class="callout-label">重要</span>
+        <p>ファイルが 1 つでも足りないとクラッシュします。<code>modmain.lua</code> の <code>Assets</code> に記載したファイルがすべて存在するか確認してください。</p>
+      </div>
+    </section>
+
+    <!-- Step 10 -->
+    <section class="section">
+      <div class="section-label">Step 10</div>
+      <h2>ゲーム内でテストする</h2>
+
+      <h3>MOD フォルダをゲームに配置する</h3>
+      <ol class="steps">
+        <li>完成した <code>my_character</code> フォルダを DST の <code>mods</code> フォルダにコピー（Steam → Don't Starve Together を右クリック → <strong>管理 → ローカルファイルを閲覧</strong> → <code>mods</code> フォルダ）</li>
+        <li><code>mods</code> フォルダ内の <code>dedicated_server_mods_setup.lua</code> は触らない</li>
+      </ol>
+
+      <h3>MOD を有効にしてテストする</h3>
+      <ol class="steps">
+        <li>DST を起動する</li>
+        <li>メインメニューから「ゲームをホスト」を選択</li>
+        <li>「新しい世界を作成する」をクリック</li>
+        <li>上部の「MOD」タブを開く</li>
+        <li>自分の作った MOD のチェックボックスをチェックして有効にする</li>
+        <li>「ワールドを作成」をクリック</li>
+        <li>キャラクター選択画面で自分の MOD キャラクターを選択</li>
+        <li>ゲームが開始され、キャラクターが正常に動けることを確認できれば成功</li>
+      </ol>
+
+      <div class="acc" onclick="this.classList.toggle('open')">
+        <div class="acc-head">エラーが出たら: ログファイルの確認</div>
+        <div class="acc-body">
+          <p>ログファイルをメモ帳で開き、末尾付近にエラーメッセージが出ていないか確認してください。</p>
+          <div class="callout info">
+            <span class="callout-label">ログファイルの場所</span>
+            <p><code>C:\Users\&lt;ユーザー名&gt;\Documents\Klei\DoNotStarveTogether\client_log.txt</code></p>
+            <p>エクスプローラーのアドレスバーに <code>%USERPROFILE%\Documents\Klei\DoNotStarveTogether</code> と入力すると直接開けます。</p>
+          </div>
+          <h4>よくあるエラーの例</h4>
+          <table>
+            <tr><th>エラーメッセージ</th><th>原因</th></tr>
+            <tr><td><code>PANIC: Error loading module 'speech_my_character'</code></td><td><code>scripts/speech_my_character.lua</code> が見つからないかファイル名が間違っている</td></tr>
+            <tr><td><code>Could not find anim [anim/my_character.zip]</code></td><td><code>anim/my_character.zip</code> が存在しないかビルドに失敗している</td></tr>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 各ツール詳細ガイド -->
+    <section class="section">
+      <div class="section-label">Tool Guides</div>
+      <h2>各ツール詳細ガイド</h2>
+      <p>MOD 開発の各工程に特化した詳細ガイドが含まれています。</p>
+
+      <div class="card-grid">
+        <div class="card">
+          <h4>DST-Spriter</h4>
+          <div class="desc">アニメーション作成（キャラ・武器・エフェクト）</div>
+          <a href="DST-Spriter/README.md">ガイドを開く →</a>
+        </div>
+        <div class="card">
+          <h4>DST-TextureConverter</h4>
+          <div class="desc">PNG → TEX 画像変換の詳細手順</div>
+          <a href="DST-TextureConverter/README.md">ガイドを開く →</a>
+        </div>
+        <div class="card">
+          <h4>DST-FMOD-Designer</h4>
+          <div class="desc">キャラクターボイス・サウンド作成</div>
+          <a href="DST-FMOD-Designer/README.md">ガイドを開く →</a>
+        </div>
+        <div class="card">
+          <h4>DST-Chatterbox</h4>
+          <div class="desc">AI 音声合成によるボイス生成</div>
+          <a href="DST-Chatterbox/README.md">ガイドを開く →</a>
+        </div>
+      </div>
+
+      <h3>おすすめの学習順序</h3>
+      <ol class="steps">
+        <li>まずこのガイドで見た目だけ変更したキャラクターを作る</li>
+        <li>DST-Spriter ガイドでオリジナルアニメーションの作り方を学ぶ</li>
+        <li>DST-TextureConverter ガイドで画像変換の詳細を理解する</li>
+        <li>DST-FMOD-Designer ガイドでキャラクターボイスを追加する</li>
+        <li>DST-Chatterbox ガイドで AI 音声を作成する</li>
+      </ol>
+    </section>
+
+    <!-- よくあるトラブル -->
+    <section class="section">
+      <div class="section-label">Troubleshooting</div>
+      <h2>よくあるトラブルと解決法</h2>
+
+      <div class="acc open" onclick="this.classList.toggle('open')">
+        <div class="acc-head">ゲームが起動しない / クラッシュする</div>
+        <div class="acc-body">
+          <table>
+            <tr><th>症状</th><th>原因</th><th>解決法</th></tr>
+            <tr><td>MOD を有効にするとクラッシュ</td><td>Assets に登録したファイルが存在しない</td><td>全ファイルの存在を確認</td></tr>
+            <tr><td>キャラ選択でクラッシュ</td><td>画像サイズが 2 の累乗でない</td><td>画像を 64, 128, 256, 512 にリサイズ</td></tr>
+            <tr><td>ゲーム開始時にクラッシュ</td><td>prefab ファイルの文法エラー</td><td><code>client_log.txt</code> を確認して修正</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="acc" onclick="this.classList.toggle('open')">
+        <div class="acc-head">MOD が一覧に表示されない</div>
+        <div class="acc-body">
+          <p><code>modinfo.lua</code> が MOD フォルダの直下にあるか確認してください。文法エラー（カンマ抜け、引用符の閉じ忘れ）がないか確認してください。<code>dst_compatible = true</code> が設定されているかも確認してください。</p>
+        </div>
+      </div>
+
+      <div class="acc" onclick="this.classList.toggle('open')">
+        <div class="acc-head">キャラクターが透明 / 真っ黒になる</div>
+        <div class="acc-body">
+          <p><code>anim/my_character.zip</code> が正しくビルドされているか確認してください。prefab の <code>AnimState:SetBuild()</code> と ZIP のファイル名（拡張子なし）が一致しているか、<code>AnimState:SetBank("wilson")</code> が正しく設定されているかも確認してください。</p>
+        </div>
+      </div>
+
+      <div class="acc" onclick="this.classList.toggle('open')">
+        <div class="acc-head">autocompiler が動かない</div>
+        <div class="acc-body">
+          <p><code>exported</code> フォルダに Spriter プロジェクト（<code>.scml</code> + PNG フォルダ）を配置しているか確認してください。管理者権限で実行してみてください。パスに日本語が含まれていないかも確認してください。</p>
+        </div>
+      </div>
+
+      <div class="acc" onclick="this.classList.toggle('open')">
+        <div class="acc-head">パスに日本語が含まれている</div>
+        <div class="acc-body">
+          <p>Windows のユーザー名が日本語の場合、一部のツールが正常に動作しないことがあります。Steam のインストール先を <code>D:\Steam\</code> など日本語を含まないパスに変更するか、ゲームのインストール先だけを移動してください（Steam → ゲームを右クリック → プロパティ → インストールフォルダの移動）。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- デバッグガイド -->
+    <section class="section">
+      <div class="section-label">Debug</div>
+      <h2>付録: デバッグガイド</h2>
+
+      <div class="acc" onclick="this.classList.toggle('open')">
+        <div class="acc-head">ログファイルの確認</div>
+        <div class="acc-body">
+          <table>
+            <tr><th>ログ</th><th>パス</th></tr>
+            <tr><td>クライアントログ</td><td><code>Documents\Klei\DoNotStarveTogether\&lt;クラスタID&gt;\client_log.txt</code></td></tr>
+            <tr><td>サーバーログ</td><td><code>Documents\Klei\DoNotStarveTogether\&lt;クラスタID&gt;\Master\server_log.txt</code></td></tr>
+          </table>
+          <div class="callout tip">
+            <span class="callout-label">ヒント</span>
+            <p>ゲームを起動するたびにログは上書きされます。エラーが出たらすぐに確認してください。末尾付近にエラーメッセージが出ていることが多いです。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc" onclick="this.classList.toggle('open')">
+        <div class="acc-head">ゲーム内コンソールコマンド</div>
+        <div class="acc-body">
+          <p>ゲーム中に <code>~</code>（チルダ）キーを押すとコンソールが開きます。</p>
+          <table>
+            <tr><th>コマンド</th><th>説明</th></tr>
+            <tr><td><code>c_spawn("prefab名")</code></td><td>指定した prefab を足元にスポーン</td></tr>
+            <tr><td><code>c_give("prefab名", 数量)</code></td><td>アイテムをインベントリに追加</td></tr>
+            <tr><td><code>c_godmode()</code></td><td>無敵モード切り替え</td></tr>
+            <tr><td><code>c_supergodmode()</code></td><td>無敵＋空腹・正気度が減らない</td></tr>
+            <tr><td><code>c_speed(倍率)</code></td><td>移動速度を変更</td></tr>
+            <tr><td><code>c_reset()</code></td><td>ワールドをリセット</td></tr>
+            <tr><td><code>c_save()</code></td><td>ワールドを保存</td></tr>
+            <tr><td><code>c_rollback(日数)</code></td><td>指定日数分ロールバック</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="acc" onclick="this.classList.toggle('open')">
+        <div class="acc-head">よくあるエラーメッセージと対処法</div>
+        <div class="acc-body">
+          <h4>PANIC: Error loading module '...'</h4>
+          <p>指定された Lua ファイルが見つからない、または文法エラーがある。ファイルが <code>scripts/</code> フォルダ内の正しい場所にあるか、ファイル名の大文字・小文字が一致しているか確認してください。</p>
+
+          <h4>Could not find anim [...]</h4>
+          <p>アニメーション ZIP が見つからない。<code>anim/</code> フォルダに ZIP があるか、<code>modmain.lua</code> の Assets のパスと一致しているか確認してください。</p>
+
+          <h4>attempt to index a nil value</h4>
+          <p>存在しない変数やテーブルにアクセスしようとしている。エラーメッセージのファイル名と行番号を確認し、コンポーネントの追加順序が正しいか確認してください。</p>
+        </div>
+      </div>
+
+      <div class="acc" onclick="this.classList.toggle('open')">
+        <div class="acc-head">デバッグ用 print 文</div>
+        <div class="acc-body">
+          <p>Lua コード内に <code>print()</code> を挿入すると、ログファイルに出力されます。</p>
+<pre><code><span class="fn">print</span>(<span class="str">"=== my_character: master_postinit called ==="</span>)
+<span class="fn">print</span>(<span class="str">"Health:"</span>, inst.components.health.maxhealth)</code></pre>
+          <p>ログファイルで <code>===</code> を検索すれば、自分の出力を素早く見つけられます。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tips・参考情報 -->
+    <section class="section">
+      <div class="section-label">Tips</div>
+      <h2>Tips・参考情報</h2>
+
+      <div class="acc" onclick="this.classList.toggle('open')">
+        <div class="acc-head">Steam Workshop への公開</div>
+        <div class="acc-body">
+          <ol class="steps">
+            <li>Steam で Don't Starve Mod Tools を起動</li>
+            <li>Mod Uploader を選択</li>
+            <li>MOD フォルダを指定して、タイトル・説明・タグ・プレビュー画像を設定</li>
+            <li>Upload をクリック</li>
+          </ol>
+          <div class="callout tip">
+            <span class="callout-label">ヒント</span>
+            <p><code>modinfo.lua</code> の <code>name</code> と <code>description</code> が英語で書かれていると、海外のプレイヤーにも見つけてもらいやすくなります。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc" onclick="this.classList.toggle('open')">
+        <div class="acc-head">DST のゲームファイルを参照する</div>
+        <div class="acc-body">
+          <p>DST のスクリプトは以下の ZIP にバンドルされています。</p>
+<pre><code>C:\Program Files (x86)\Steam\steamapps\common\Don't Starve Together\data\databundles\scripts.zip</code></pre>
+          <p>展開すると以下のような構成が得られます。</p>
+          <div class="file-tree" style="margin: 12px 0;">
+            scripts\<br>
+            ├── prefabs/ <span class="comment">← キャラクター・アイテムの定義</span><br>
+            ├── components/ <span class="comment">← コンポーネント（機能の部品）</span><br>
+            ├── speech_wilson.lua <span class="comment">← ウィルソンのセリフ</span><br>
+            └── speech_willow.lua <span class="comment">← ウィロウのセリフ</span>
+          </div>
+          <p>アニメーションファイルは以下にあります。</p>
+<pre><code>C:\Program Files (x86)\Steam\steamapps\common\Don't Starve Together\data\anim\</code></pre>
+        </div>
+      </div>
+
+      <h3>参考リンク</h3>
+      <div class="ref-list">
+        <a href="https://dontstarve.wiki.gg/wiki/Modding" class="ref-item" target="_blank">
+          <div>
+            <div class="ref-source">Don't Starve Wiki — Modding</div>
+            <div class="ref-url">公式 Wiki の MOD セクション</div>
+          </div>
+        </a>
+        <a href="https://forums.kleientertainment.com/forums/forum/79-modding-tools-tutorials/" class="ref-item" target="_blank">
+          <div>
+            <div class="ref-source">Klei Forums — Mods and Tools</div>
+            <div class="ref-url">公式フォーラムの MOD ツール・チュートリアル</div>
+          </div>
+        </a>
+        <a href="https://forums.kleientertainment.com/forums/topic/27583-documentation-for-modders/" class="ref-item" target="_blank">
+          <div>
+            <div class="ref-source">DST API ドキュメント</div>
+            <div class="ref-url">MOD 開発者向けドキュメント</div>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- ライセンス -->
+    <section class="section">
+      <div class="conclusion">
+        <h3>ライセンス</h3>
+        <p>このガイドおよびリポジトリ内のテンプレートは、学習目的で自由に使用できます。</p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    DST MOD 開発ガイド — はじめてのキャラクター MOD を作ろう
+  </footer>
+
+</body>
+</html>
