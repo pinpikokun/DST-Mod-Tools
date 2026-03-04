@@ -1,8 +1,0 @@
-# FMOD Designer ビルドキャッシュ（自動生成。削除しても次回ビルド時に再生成される）
-.fsbcache/
-
-# FMOD Designer バックアップファイル（不要）
-*.bak
-
-# FMOD Designer 自動保存ファイル
-*.autosave
