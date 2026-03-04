@@ -575,6 +575,11 @@
           <a href="DST-TextureConverter/README.md">ガイドを開く →</a>
         </div>
         <div class="card">
+          <h4>DST-ktools</h4>
+          <div class="desc">ゲームアセットのデコンパイル・TEX ↔ PNG 変換</div>
+          <a href="DST-ktools/README.md">ガイドを開く →</a>
+        </div>
+        <div class="card">
           <h4>DST-Spriter</h4>
           <div class="desc">アニメーションの作成詳細</div>
           <a href="DST-Spriter/README.md">ガイドを開く →</a>
@@ -800,6 +805,11 @@
       <div class="section-label">Step 2</div>
       <h2>modinfo.lua を作成する</h2>
       <p>MOD の基本情報を定義するファイルです。以下のコードをコピペして、<span class="star">★</span>マークの部分を自分のキャラクター名に書き換えてください。</p>
+
+      <div class="callout tip">
+        <span class="callout-label">VSCode でのファイル作成方法</span>
+        <p>VSCode で <code>my_character</code> フォルダを開き（File → Open Folder）、サイドバーの「新しいファイル」アイコンをクリックして <code>modinfo.lua</code> と入力します。<code>.lua</code> 拡張子を付けることで、VSCode が Lua ファイルとして認識し色分け表示されます。以降のファイルも同じ手順で作成してください。</p>
+      </div>
 
 <pre><code><span class="cm">-- MOD の基本情報</span>
 <span class="fn">name</span> = <span class="str">"My Character"</span>                    <span class="cm">-- ★書き換え: MOD の名前</span>
@@ -1027,8 +1037,8 @@ STRINGS.SKIN_NAMES.<span class="fn">my_character_none</span> = <span class="str"
 
       <h3>画像を差し替える手順</h3>
       <ol class="steps">
-        <li><code>sample_build</code> フォルダを丸ごとコピーして <code>my_character_build</code> という名前で配置（この名前が Build 名になります）</li>
-        <li>コピーした <code>build.scml</code> を Spriter で開いて、パーツ画像の配置を確認</li>
+        <li><code>sample_build</code> フォルダを丸ごとコピーして <code>exported\my_character_build</code> という名前で <code>mod_tools\exported\</code> の中に配置（<code>exported</code> フォルダが無い場合は作成。この名前が Build 名になります）</li>
+        <li>コピーした <code>exported\my_character_build\build.scml</code> を Spriter で開いて、パーツ画像の配置を確認</li>
         <li>フォルダ内の PNG を同じファイル名・同じサイズで自分の画像に差し替え</li>
         <li>差し替えが終わったら <code>build.scml</code> を Spriter で開いて見た目を確認</li>
       </ol>
@@ -1038,7 +1048,7 @@ STRINGS.SKIN_NAMES.<span class="fn">my_character_none</span> = <span class="str"
         <div class="acc-body">
           <ol class="steps">
             <li><code>mod_tools\Spriter\Spriter.exe</code> をダブルクリックして起動</li>
-            <li>File → Open Project で <code>my_character_build\build.scml</code> を開く</li>
+            <li>File → Open Project で <code>exported\my_character_build\build.scml</code> を開く</li>
             <li>画面中央にキャラクターが表示される</li>
             <li>下部の ▶ ボタンでアニメーション再生、ドロップダウンでアニメーション切り替え</li>
           </ol>
@@ -1070,8 +1080,8 @@ STRINGS.SKIN_NAMES.<span class="fn">my_character_none</span> = <span class="str"
         <div class="acc-head">方法 A: autocompiler を使う（推奨）</div>
         <div class="acc-body">
           <ol class="steps">
-            <li><code>my_character_build</code> フォルダを <code>mod_tools\exported\</code> の中に移動（<code>exported</code> フォルダが無い場合は作成）</li>
-            <li><code>mod_tools\autocompiler.exe</code> を実行（黒い画面が出る。処理完了まで待つ）</li>
+            <li>Step 6 で <code>exported/my_character_build/</code> に画像を配置済みであることを確認します。</li>
+            <li><code>mod_tools\autocompiler.exe</code> を実行（黒い画面が出る。ビルド処理のログが流れた後、ウィンドウが自動的に閉じるか、「Press any key to continue...」のようなメッセージが表示されたら完了です。エラーが出ていないか、閉じる前にログの最後を確認してください。）</li>
             <li>ビルド成功で <code>mod_tools\anim\my_character_build.zip</code> が生成される</li>
             <li>この ZIP を MOD フォルダの <code>anim/my_character.zip</code> としてコピー</li>
           </ol>
@@ -1115,7 +1125,14 @@ my_character\anim\ghost_my_character_build.zip</code></pre>
 
       <div class="callout danger">
         <span class="callout-label">画像サイズの重要ルール</span>
-        <p>すべての画像サイズは <strong>2 の累乗</strong>（64, 128, 256, 512...）でなければなりません。それ以外のサイズはゲームがクラッシュします。</p>
+        <p>すべての画像は <strong>各辺が 2 の累乗</strong>（64, 128, 256, 512...）でなければなりません。それ以外のサイズはゲームがクラッシュします。</p>
+        <p>正方形でなくても構いませんが、各辺はそれぞれ 2 の累乗にしてください（例: 256 × 512 は OK）。</p>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-label">PNG 画像の作成について</span>
+        <p>PNG 画像は Windows 標準の「ペイント」でも作成できますが、透過 PNG を扱う場合は <strong>GIMP</strong>（無料）や <strong>Photoshop</strong> を使用してください。ペイントは透過をサポートしていません。</p>
+        <p>画像サイズの確認方法: エクスプローラーでファイルを右クリック → プロパティ → 詳細タブで「幅」と「高さ」を確認できます。</p>
       </div>
 
       <h3>TEX への変換手順</h3>
@@ -1128,19 +1145,9 @@ my_character\anim\ghost_my_character_build.zip</code></pre>
 <pre><code><span class="str">"/c/Program Files (x86)/Steam/steamapps/common/Don't Starve Mod Tools/mod_tools/tools/bin/TextureConverter.exe"</span> \
   -i <span class="fn">ファイル名.png</span> -o <span class="fn">ファイル名.tex</span> -f bc3 -p opengl --mipmap --premultiply</code></pre>
 
-      <div class="acc" onclick="this.classList.toggle('open')">
-        <div class="acc-head">コマンドオプションの解説</div>
-        <div class="acc-body">
-          <table>
-            <tr><th>オプション</th><th>意味</th></tr>
-            <tr><td><code>-i</code></td><td>入力ファイル（PNG）</td></tr>
-            <tr><td><code>-o</code></td><td>出力ファイル（TEX）</td></tr>
-            <tr><td><code>-f bc3</code></td><td>圧縮形式（BC3 = DXT5、透過あり）</td></tr>
-            <tr><td><code>-p opengl</code></td><td>プラットフォーム</td></tr>
-            <tr><td><code>--mipmap</code></td><td>ミップマップ生成（必須）</td></tr>
-            <tr><td><code>--premultiply</code></td><td>アルファ値の事前乗算（必須）</td></tr>
-          </table>
-        </div>
+      <div class="callout info">
+        <span class="callout-label">コマンドオプションについて</span>
+        <p><code>-f bc3 -p opengl --mipmap --premultiply</code> の部分はおまじないとして常にこの通り入力してください。詳細は <a class="anchor" href="DST-TextureConverter/README.md">DST-TextureConverter ガイド</a> を参照してください。</p>
       </div>
 
       <h3>XML アトラスファイルの作成</h3>
@@ -1295,6 +1302,11 @@ my_character\anim\ghost_my_character_build.zip</code></pre>
           <a href="DST-TextureConverter/README.md">ガイドを開く →</a>
         </div>
         <div class="card">
+          <h4>DST-ktools</h4>
+          <div class="desc">ゲームアセットのデコンパイル・TEX ↔ PNG 変換</div>
+          <a href="DST-ktools/README.md">ガイドを開く →</a>
+        </div>
+        <div class="card">
           <h4>DST-FMOD-Designer</h4>
           <div class="desc">キャラクターボイス・サウンド作成</div>
           <a href="DST-FMOD-Designer/README.md">ガイドを開く →</a>
@@ -1311,6 +1323,7 @@ my_character\anim\ghost_my_character_build.zip</code></pre>
         <li>まずこのガイドで見た目だけ変更したキャラクターを作る</li>
         <li>DST-Spriter ガイドでオリジナルアニメーションの作り方を学ぶ</li>
         <li>DST-TextureConverter ガイドで画像変換の詳細を理解する</li>
+        <li>DST-ktools ガイドで既存アセットのデコンパイルを学ぶ</li>
         <li>DST-FMOD-Designer ガイドでキャラクターボイスを追加する</li>
         <li>DST-Chatterbox ガイドで AI 音声を作成する</li>
       </ol>
@@ -1327,7 +1340,7 @@ my_character\anim\ghost_my_character_build.zip</code></pre>
           <table>
             <tr><th>症状</th><th>原因</th><th>解決法</th></tr>
             <tr><td>MOD を有効にするとクラッシュ</td><td>Assets に登録したファイルが存在しない</td><td>全ファイルの存在を確認</td></tr>
-            <tr><td>キャラ選択でクラッシュ</td><td>画像サイズが 2 の累乗でない</td><td>画像を 64, 128, 256, 512 にリサイズ</td></tr>
+            <tr><td>キャラ選択でクラッシュ</td><td>画像の各辺が 2 の累乗でない</td><td>画像の各辺を 64, 128, 256, 512 にリサイズ</td></tr>
             <tr><td>ゲーム開始時にクラッシュ</td><td>prefab ファイルの文法エラー</td><td><code>client_log.txt</code> を確認して修正</td></tr>
           </table>
         </div>
@@ -1487,18 +1500,11 @@ my_character\anim\ghost_my_character_build.zip</code></pre>
       </div>
     </section>
 
-    <!-- ライセンス -->
-    <section class="section">
-      <div class="conclusion">
-        <h3>ライセンス</h3>
-        <p>このガイドおよびリポジトリ内のテンプレートは、学習目的で自由に使用できます。</p>
-      </div>
-    </section>
-
   </main>
 
   <footer class="footer">
-    DST MOD 開発ガイド — はじめてのキャラクター MOD を作ろう
+    DST MOD 開発ガイド &#8212; このドキュメントは自由に利用・改変・再配布できます。DST MOD 制作にお役立てください。
+    <br><span style="display:inline-block;margin-top:8px"><a href="https://steamcommunity.com/profiles/76561198076111536/" style="color:inherit;text-decoration:none">Author: pinpikokun</a></span><br><span style="display:inline-flex;gap:6px;margin-top:6px"><a href="https://github.com/pinpikokun/DST-teemo"><img src="https://img.shields.io/badge/GitHub-Repository-black?logo=github" alt="GitHub"></a> <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=390684095"><img src="https://img.shields.io/badge/Steam%20Workshop-Subscribe-blue?logo=steam" alt="Steam Workshop"></a></span>
   </footer>
 
 </body>

@@ -374,3 +374,8 @@ dontstarve/characters/<MOD名>/<イベント名>
 ## ライセンス
 
 このドキュメントは自由に利用・改変・再配布できます。DST MOD 制作にお役立てください。
+
+---
+
+<sub>Author: [pinpikokun](https://steamcommunity.com/profiles/76561198076111536/)</sub><br>
+<sub>[![GitHub](https://img.shields.io/badge/GitHub-Repository-black?logo=github)](https://github.com/pinpikokun/DST-teemo) [![Steam Workshop](https://img.shields.io/badge/Steam%20Workshop-Subscribe-blue?logo=steam)](https://steamcommunity.com/sharedfiles/filedetails/?id=390684095)</sub>

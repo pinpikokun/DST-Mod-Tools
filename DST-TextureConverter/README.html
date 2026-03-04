@@ -878,7 +878,8 @@
         </thead>
         <tbody>
           <tr><td>インベントリアイコン</td><td><strong>64×64</strong></td><td>DST 公式アイコンと同じサイズ。十分鮮明</td></tr>
-          <tr><td>マップアイコン</td><td>64×64</td><td>ミニマップに表示するアイコン</td></tr>
+          <tr><td>マップアイコン（キャラクター）</td><td>64×64</td><td>images/map_icons/ に配置</td></tr>
+          <tr><td>マップアイコン（建造物等）</td><td>64×64</td><td>images/minimap/ に配置</td></tr>
           <tr><td>キャラクター選択画面</td><td>256×256 〜 512×512</td><td>大きいほどファイルサイズ・VRAM消費が増える</td></tr>
           <tr><td>HUD / UI 要素</td><td>用途に応じて</td><td>2のべき乗正方形であれば自由</td></tr>
         </tbody>
@@ -1198,11 +1199,12 @@
         </thead>
         <tbody>
           <tr><td><code>images/inventoryimages/</code></td><td>インベントリアイコン</td><td>持ち物欄・クラフト画面に表示される小さいアイコン</td><td>64×64</td></tr>
-          <tr><td><code>images/minimap/</code></td><td>ミニマップアイコン</td><td>マップ上に表示されるアイコン（建造物・拠点など）</td><td>64×64</td></tr>
+          <tr><td><code>images/minimap/</code></td><td>ミニマップアイコン（建造物等）</td><td>マップ上に表示されるアイコン。AddMinimapAtlas で登録する</td><td>64×64</td></tr>
+          <tr><td><code>images/map_icons/</code></td><td>マップアイコン（キャラクター）</td><td>キャラクター MOD のミニマップアイコン</td><td>64×64</td></tr>
           <tr><td><code>images/saveslot_portraits/</code></td><td>セーブスロットのポートレート</td><td>セーブ選択画面に表示されるキャラクターの顔</td><td>128×128</td></tr>
-          <tr><td><code>images/selectscreen_portraits/</code></td><td>キャラクター選択画面ポートレート</td><td>キャラクター選択時に表示される立ち絵</td><td>256×256 〜 512×512</td></tr>
-          <tr><td><code>images/avatars/</code></td><td>ロビーアバター</td><td>サーバーロビーでプレイヤー横に表示されるアイコン</td><td>128×128</td></tr>
-          <tr><td><code>bigportraits/</code></td><td>大きいポートレート</td><td>キャラクター選択画面の背景に表示される大きな立ち絵</td><td>512×512</td></tr>
+          <tr><td><code>images/selectscreen_portraits/</code></td><td>キャラクター選択画面ポートレート</td><td>キャラクター選択時に表示される立ち絵</td><td>256×512</td></tr>
+          <tr><td><code>images/avatars/</code></td><td>アバター</td><td>チャット送信時にメッセージ横に表示されるアイコン</td><td>64×64</td></tr>
+          <tr><td><code>bigportraits/</code></td><td>大きいポートレート</td><td>キャラクター選択画面の背景に表示される大きな立ち絵</td><td>512×512 以上</td></tr>
           <tr><td><code>images/colour_cubes/</code></td><td>カラーキューブ</td><td>画面全体の色調補正フィルター（上級者向け）</td><td>―</td></tr>
           <tr><td><code>images/</code></td><td>その他の UI 画像</td><td>HUD・ボタン・背景など汎用的な画像</td><td>用途による</td></tr>
         </tbody>
@@ -1574,7 +1576,8 @@
   </main>
 
   <footer class="footer">
-    DST TextureConverter Guide — このドキュメントは自由に利用・改変・再配布できます。
+    DST-TextureConverter Guide &#8212; このドキュメントは自由に利用・改変・再配布できます。DST MOD 制作にお役立てください。
+    <br><span style="display:inline-block;margin-top:8px"><a href="https://steamcommunity.com/profiles/76561198076111536/" style="color:inherit;text-decoration:none">Author: pinpikokun</a></span><br><span style="display:inline-flex;gap:6px;margin-top:6px"><a href="https://github.com/pinpikokun/DST-teemo"><img src="https://img.shields.io/badge/GitHub-Repository-black?logo=github" alt="GitHub"></a> <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=390684095"><img src="https://img.shields.io/badge/Steam%20Workshop-Subscribe-blue?logo=steam" alt="Steam Workshop"></a></span>
   </footer>
 
 </body>

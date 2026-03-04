@@ -1113,3 +1113,8 @@ print("Health:", inst.components.health.maxhealth)
 ```
 
 ログファイルで `===` を検索すれば、自分の出力を素早く見つけられます。
+
+---
+
+<sub>Author: [pinpikokun](https://steamcommunity.com/profiles/76561198076111536/)</sub><br>
+<sub>[![GitHub](https://img.shields.io/badge/GitHub-Repository-black?logo=github)](https://github.com/pinpikokun/DST-teemo) [![Steam Workshop](https://img.shields.io/badge/Steam%20Workshop-Subscribe-blue?logo=steam)](https://steamcommunity.com/sharedfiles/filedetails/?id=390684095)</sub>

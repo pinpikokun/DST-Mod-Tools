@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DST-ktools ガイド — ゲームアセットのデコンパイル・変換マニュアル（krane / ktech）</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Noto+Sans+JP:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-primary: #faf9f7;
+    --bg-card: #ffffff;
+    --bg-warm: #f5f0eb;
+    --bg-dark: #191919;
+    --text-primary: #1a1a1a;
+    --text-secondary: #6b6560;
+    --text-light: #9a938d;
+    --accent-warm: #c4704b;
+    --accent-green: #2d7a5f;
+    --accent-red: #b85450;
+    --border: #e8e2db;
+    --border-light: #f0ece7;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.8;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Hero */
+  .hero {
+    background: var(--bg-dark);
+    color: #fff;
+    padding: 100px 0 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(196,112,75,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-inner {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 0 40px;
+    position: relative;
+  }
+  .hero-label {
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent-warm);
+    margin-bottom: 24px;
+    font-weight: 500;
+  }
+  .hero h1 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 38px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 20px;
+    letter-spacing: -0.5px;
+  }
+  .hero-sub {
+    font-size: 16px;
+    color: rgba(255,255,255,0.6);
+    font-weight: 300;
+    line-height: 1.8;
+  }
+
+  /* Main */
+  .content {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  /* Section */
+  .section {
+    padding: 72px 0;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .section:last-child { border-bottom: none; }
+
+  .section-label {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .section h2 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+  .section h3 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin-top: 40px;
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
+  .section h4 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 28px;
+    margin-bottom: 10px;
+  }
+  .section p {
+    font-size: 16px;
+    color: var(--text-secondary);
+    line-height: 2;
+    font-weight: 300;
+  }
+  .section p + p {
+    margin-top: 12px;
+  }
+
+  /* Diagram */
+  .diagram {
+    margin: 40px 0;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 48px 40px;
+  }
+  .diagram-title {
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 32px;
+    text-align: center;
+    font-weight: 500;
+  }
+
+  /* Flow Diagram */
+  .flow-diagram {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    flex-wrap: wrap;
+  }
+  .flow-box {
+    padding: 16px 24px;
+    border-radius: 12px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+    min-width: 120px;
+  }
+  .flow-box.source { background: #e8f0ea; color: var(--accent-green); }
+  .flow-box.tool { background: #fef3ef; color: var(--accent-warm); border: 1px solid var(--accent-warm); }
+  .flow-box.output { background: #f0ece7; color: var(--text-primary); }
+  .flow-box.result { background: linear-gradient(135deg, #e8f0ea 0%, #dceade 100%); color: var(--accent-green); border: 2px solid #c8ddd0; }
+  .flow-connector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 12px;
+    color: var(--text-light);
+  }
+  .flow-connector .arrow {
+    font-size: 20px;
+    line-height: 1;
+  }
+  .flow-connector .label {
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  /* Vertical Flow */
+  .flow-vertical {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+  .flow-vertical .flow-connector {
+    flex-direction: row;
+    padding: 8px 0;
+  }
+  .flow-vertical .flow-connector .arrow {
+    transform: rotate(90deg);
+  }
+
+  /* Overview Grid */
+  .overview-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin: 40px 0;
+  }
+  .overview-grid.three-col {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+  .overview-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px 28px;
+    position: relative;
+  }
+  .overview-card.highlight {
+    background: linear-gradient(135deg, #f7faf8 0%, #eef5f1 100%);
+    border: 1px solid #c8ddd0;
+  }
+  .overview-card.warm {
+    background: linear-gradient(135deg, #fef8f0 0%, #fdf0e6 100%);
+    border: 1px solid #e8d5c4;
+  }
+  .card-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 100px;
+    margin-bottom: 16px;
+  }
+  .card-badge.good { background: #edf7f1; color: var(--accent-green); }
+  .card-badge.warn { background: #fef3ef; color: var(--accent-red); }
+  .card-badge.info { background: #f0ece7; color: var(--accent-warm); }
+  .card-badge.neutral { background: #f0f0f0; color: var(--text-secondary); }
+  .card-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .card-desc {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.8;
+    font-weight: 300;
+  }
+
+  /* Callout */
+  .callout {
+    margin: 32px 0;
+    padding: 24px 28px;
+    border-radius: 12px;
+    font-size: 15px;
+    line-height: 1.9;
+  }
+  .callout.note {
+    background: #fef8f0;
+    border-left: 3px solid var(--accent-warm);
+    color: var(--text-primary);
+  }
+  .callout.tip {
+    background: #f0f8f3;
+    border-left: 3px solid var(--accent-green);
+    color: var(--text-primary);
+  }
+  .callout.warning {
+    background: #fef3ef;
+    border-left: 3px solid var(--accent-red);
+    color: var(--text-primary);
+  }
+  .callout strong {
+    font-weight: 600;
+  }
+
+  /* Code Block */
+  .code-block {
+    margin: 24px 0;
+    background: #1e1e2e;
+    border-radius: 12px;
+    padding: 28px 32px;
+    overflow-x: auto;
+    position: relative;
+  }
+  .code-block code {
+    font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #cdd6f4;
+    white-space: pre;
+  }
+  .code-block .lang-label {
+    position: absolute;
+    top: 10px;
+    right: 16px;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+  .code-block .comment { color: #6c7086; }
+  .code-block .string { color: #a6e3a1; }
+  .code-block .keyword { color: #cba6f7; }
+  .code-block .flag { color: #f9e2af; }
+  .code-block .var { color: #89b4fa; }
+  .code-block .tag { color: #f38ba8; }
+  .code-block .attr { color: #fab387; }
+
+  /* Inline code */
+  code.inline {
+    font-family: 'Cascadia Code', 'Fira Code', monospace;
+    font-size: 13px;
+    background: #f0ece7;
+    padding: 2px 8px;
+    border-radius: 4px;
+    color: var(--accent-warm);
+  }
+
+  /* Table */
+  .styled-table {
+    width: 100%;
+    margin: 24px 0;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    font-size: 14px;
+  }
+  .styled-table thead {
+    background: var(--bg-warm);
+  }
+  .styled-table th {
+    padding: 14px 20px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border);
+  }
+  .styled-table td {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border-light);
+    color: var(--text-secondary);
+    font-weight: 300;
+    vertical-align: top;
+  }
+  .styled-table tr:last-child td {
+    border-bottom: none;
+  }
+  .styled-table td code {
+    font-family: 'Cascadia Code', 'Fira Code', monospace;
+    font-size: 12px;
+    background: #f0ece7;
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: var(--accent-warm);
+  }
+
+  /* Steps */
+  .steps {
+    margin: 32px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .step {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+  .step-num {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    border-radius: 50%;
+    background: var(--accent-warm);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 14px;
+    margin-top: 2px;
+  }
+  .step-content {
+    flex: 1;
+  }
+  .step-content h4 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .step-content p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    font-weight: 300;
+    line-height: 1.8;
+  }
+
+  /* ASCII Diagram */
+  .ascii-diagram {
+    margin: 24px 0;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 32px;
+    overflow-x: auto;
+  }
+  .ascii-diagram pre {
+    font-family: 'Cascadia Code', 'Fira Code', monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--text-secondary);
+  }
+  .ascii-diagram .highlight-line {
+    color: var(--accent-warm);
+    font-weight: 600;
+  }
+
+  /* Folder Tree */
+  .folder-tree {
+    margin: 24px 0;
+    background: #1e1e2e;
+    border-radius: 12px;
+    padding: 28px 32px;
+    overflow-x: auto;
+  }
+  .folder-tree pre {
+    font-family: 'Cascadia Code', 'Fira Code', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #cdd6f4;
+  }
+  .folder-tree .folder { color: #89b4fa; }
+  .folder-tree .file-tex { color: #a6e3a1; }
+  .folder-tree .file-xml { color: #f9e2af; }
+  .folder-tree .file-png { color: #f38ba8; }
+  .folder-tree .file-lua { color: #cba6f7; }
+  .folder-tree .file-bin { color: #fab387; }
+  .folder-tree .file-scml { color: #94e2d5; }
+  .folder-tree .file-dll { color: #74c7ec; }
+  .folder-tree .file-exe { color: #a6e3a1; }
+  .folder-tree .annotation { color: #6c7086; }
+
+  /* Conclusion */
+  .conclusion {
+    background: var(--bg-dark);
+    color: #fff;
+    border-radius: 20px;
+    padding: 48px;
+    margin: 40px 0;
+  }
+  .conclusion h3 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 22px;
+    margin-bottom: 16px;
+    font-weight: 700;
+  }
+  .conclusion p {
+    color: rgba(255,255,255,0.7);
+    font-size: 15px;
+    line-height: 2;
+    font-weight: 300;
+  }
+  .conclusion .action {
+    margin-top: 24px;
+    padding: 16px 24px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 12px;
+    color: rgba(255,255,255,0.9);
+    font-size: 14px;
+    font-weight: 400;
+  }
+  .conclusion .action-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent-warm);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+
+  /* Error Table Card */
+  .error-card {
+    margin: 24px 0;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .error-card-header {
+    padding: 16px 28px;
+    background: #fef3ef;
+    border-bottom: 1px solid #e8d5c4;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--accent-red);
+  }
+  .error-card-body {
+    padding: 0;
+  }
+  .error-row {
+    display: flex;
+    border-bottom: 1px solid var(--border-light);
+    padding: 16px 28px;
+    gap: 20px;
+  }
+  .error-row:last-child { border-bottom: none; }
+  .error-cause {
+    flex: 1;
+    font-size: 14px;
+    color: var(--text-secondary);
+    font-weight: 400;
+  }
+  .error-fix {
+    flex: 1;
+    font-size: 14px;
+    color: var(--accent-green);
+    font-weight: 400;
+  }
+
+  /* Bullet List */
+  .bullet-list {
+    margin: 16px 0;
+    padding-left: 24px;
+    list-style: disc;
+  }
+  .bullet-list li {
+    font-size: 15px;
+    color: var(--text-secondary);
+    line-height: 2;
+    font-weight: 300;
+  }
+  .bullet-list li strong {
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  /* References */
+  .ref-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 24px;
+  }
+  .ref-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 16px 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: border-color 0.2s;
+  }
+  .ref-item:hover { border-color: var(--accent-warm); }
+  .ref-item .ref-source {
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .ref-item .ref-url {
+    font-size: 12px;
+    color: var(--text-light);
+    word-break: break-all;
+    margin-top: 4px;
+    font-weight: 300;
+  }
+
+  /* TOC */
+  .toc {
+    margin: 40px 0;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 36px 40px;
+  }
+  .toc-title {
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 20px;
+    font-weight: 500;
+  }
+  .toc-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .toc-list a {
+    text-decoration: none;
+    font-size: 15px;
+    color: var(--text-secondary);
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 0;
+    transition: color 0.2s;
+  }
+  .toc-list a:hover {
+    color: var(--accent-warm);
+  }
+  .toc-num {
+    font-size: 12px;
+    color: var(--text-light);
+    font-weight: 500;
+    min-width: 28px;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 48px 0;
+    font-size: 12px;
+    color: var(--text-light);
+    font-weight: 300;
+  }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .hero h1 { font-size: 26px; }
+    .hero { padding: 72px 0 56px; }
+    .overview-grid { grid-template-columns: 1fr; }
+    .overview-grid.three-col { grid-template-columns: 1fr; }
+    .content { padding: 0 24px; }
+    .hero-inner { padding: 0 24px; }
+    .diagram { padding: 32px 20px; }
+    .conclusion { padding: 32px 24px; }
+    .flow-diagram { flex-direction: column; gap: 8px; }
+    .flow-connector { flex-direction: row; padding: 4px 0; }
+    .flow-connector .arrow { transform: rotate(90deg); }
+    .code-block { padding: 20px; }
+    .toc { padding: 24px; }
+    .section h2 { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="hero-label">DST Mod Development Guide</div>
+      <h1>ゲームアセットのデコンパイル・変換マニュアル</h1>
+      <p class="hero-sub">Don't Starve Together のアニメーションアセット（.zip）を、<br>編集可能な Spriter プロジェクト（.scml）+ PNG 画像にデコンパイルする手順を、<br>初心者向けにまとめたガイドです。</p>
+    </div>
+  </header>
+
+  <main class="content">
+
+    <!-- 目次 -->
+    <section class="section">
+      <div class="toc">
+        <div class="toc-title">Table of Contents</div>
+        <ol class="toc-list">
+          <li><a href="#intro"><span class="toc-num">01</span>はじめに &#8212; ktools とは？</a></li>
+          <li><a href="#install"><span class="toc-num">02</span>ktools のダウンロードと配置</a></li>
+          <li><a href="#krane"><span class="toc-num">03</span>krane &#8212; アニメーション ZIP のデコンパイル</a></li>
+          <li><a href="#ktech"><span class="toc-num">04</span>ktech &#8212; TEX &#8596; PNG 画像変換</a></li>
+          <li><a href="#practice"><span class="toc-num">05</span>実践例: 既存アニメーションを参考にオリジナルを作る</a></li>
+          <li><a href="#reference"><span class="toc-num">06</span>コマンドリファレンス</a></li>
+          <li><a href="#errors"><span class="toc-num">07</span>よくあるエラーと対処法</a></li>
+          <li><a href="#tips"><span class="toc-num">08</span>Tips</a></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- 1. はじめに -->
+    <section class="section" id="intro">
+      <div class="section-label">01 &#8212; Introduction</div>
+      <h2>はじめに &#8212; ktools とは？</h2>
+      <p>DST のゲームアセット（キャラクター・アイテム・エフェクトのアニメーション）は、<code class="inline">.zip</code> ファイルに圧縮された <strong>独自のバイナリ形式</strong> で格納されています。</p>
+
+      <div class="folder-tree"><pre><span class="folder">blow_dart.zip</span>（ゲームのアニメーション）
+├── <span class="file-bin">anim.bin</span>      <span class="annotation">&larr; アニメーション定義（バイナリ）</span>
+├── <span class="file-bin">build.bin</span>     <span class="annotation">&larr; ビルド情報（バイナリ）</span>
+└── <span class="file-tex">atlas-0.tex</span>   <span class="annotation">&larr; スプライトシート（TEX 形式）</span></pre></div>
+
+      <p>これらのファイルはそのままでは中身を見ることも編集することもできません。<strong>ktools</strong> は、このバイナリ形式を <strong>Spriter プロジェクト + 個別の PNG 画像</strong> にデコンパイルしてくれるツールです。</p>
+
+      <div class="diagram">
+        <div class="diagram-title">デコンパイルフロー</div>
+        <div class="flow-diagram">
+          <div class="flow-box source">anim.zip</div>
+          <div class="flow-connector">
+            <span class="label">入力</span>
+            <span class="arrow">&rarr;</span>
+          </div>
+          <div class="flow-box tool">krane</div>
+          <div class="flow-connector">
+            <span class="label">デコンパイル</span>
+            <span class="arrow">&rarr;</span>
+          </div>
+          <div class="flow-box result">.scml + PNG</div>
+        </div>
+      </div>
+
+      <div class="folder-tree"><pre><span class="folder">blow_dart_decompiled/</span>
+├── <span class="file-scml">blow_dart.scml</span>     <span class="annotation">&larr; Spriter プロジェクト（アニメーション編集可能）</span>
+├── <span class="folder">dart/</span>
+│   ├── <span class="file-png">dart-0.png</span>     <span class="annotation">&larr; 個別スプライト画像</span>
+│   ├── <span class="file-png">dart-1.png</span>
+│   └── ...
+├── <span class="folder">flametail/</span>
+│   ├── <span class="file-png">flametail-0.png</span>
+│   └── ...
+└── ...</pre></div>
+
+      <h3>なぜデコンパイルが必要？</h3>
+      <ul class="bullet-list">
+        <li><strong>既存アニメーションの構造を理解する</strong> &#8212; 公式キャラクターやアイテムの作りを参考にできる</li>
+        <li><strong>スプライト画像を確認する</strong> &#8212; パーツの大きさ・向き・枚数を把握できる</li>
+        <li><strong>カスタムアニメーションのベースにする</strong> &#8212; 既存アセットをコピーして改造できる</li>
+      </ul>
+
+      <div class="callout warning">
+        <strong>注意:</strong> デコンパイルしたアセットを <strong>そのまま再配布</strong> することは、ゲームの利用規約に反する場合があります。あくまで <strong>自分の MOD 開発の参考</strong> として使用してください。
+      </div>
+
+      <h3>ktools に含まれるツール</h3>
+      <table class="styled-table">
+        <thead>
+          <tr><th>ツール</th><th>用途</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>krane</strong></td><td>アニメーション ZIP をデコンパイル &rarr; Spriter プロジェクト + PNG 画像</td></tr>
+          <tr><td><strong>ktech</strong></td><td>TEX &harr; PNG の相互変換</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout note">
+        <strong>ktech と TextureConverter の違い:</strong><br>
+        &#8226; <strong>TextureConverter</strong>（Don't Starve Mod Tools 同梱）は <strong>PNG &rarr; TEX 変換</strong> に特化しており、MOD 制作時に画像を TEX に変換するために使います<br>
+        &#8226; <strong>ktech</strong> は <strong>TEX &rarr; PNG の逆変換</strong> にも対応しており、ゲーム内の TEX ファイルを PNG に戻して中身を確認できます<br>
+        &#8226; どちらも PNG &rarr; TEX 変換ができますが、MOD 制作時の PNG &rarr; TEX 変換には公式の TextureConverter を使うのが無難です
+      </div>
+    </section>
+
+    <!-- 2. ダウンロードと配置 -->
+    <section class="section" id="install">
+      <div class="section-label">02 &#8212; Setup</div>
+      <h2>ktools のダウンロードと配置</h2>
+
+      <h3>ダウンロード</h3>
+      <p>ktools は GitHub で公開されています。</p>
+      <div class="code-block">
+        <span class="lang-label">URL</span>
+        <code>https://github.com/nsimplex/ktools/releases</code>
+      </div>
+      <p>上記ページから <strong>最新バージョンの Windows 用バイナリ</strong>（<code class="inline">ktools-*-win32.zip</code>）をダウンロードしてください。</p>
+
+      <h3>配置</h3>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <h4>ZIP を展開する</h4>
+            <p>ダウンロードした ZIP を <strong>任意の場所</strong> に展開します。</p>
+            <p>おすすめの配置先:</p>
+            <div class="code-block">
+              <span class="lang-label">PATH</span>
+              <code>C:\Users\&lt;ユーザー名&gt;\Desktop\DST-ktools\ktools-4.4.4\</code>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <h4>展開内容を確認する</h4>
+            <p>展開すると以下のファイルが含まれています:</p>
+            <div class="folder-tree"><pre><span class="folder">ktools-4.4.4/</span>
+├── <span class="file-exe">ktech.exe</span>          <span class="annotation">&larr; TEX &harr; PNG 変換ツール</span>
+├── <span class="file-exe">krane.exe</span>          <span class="annotation">&larr; アニメーション ZIP デコンパイラ</span>
+├── <span class="file-xml">coder.xml</span>          <span class="annotation">&larr; ImageMagick 設定ファイル</span>
+├── <span class="file-xml">colors.xml</span>         <span class="annotation">&larr; 色設定ファイル</span>
+└── <span class="file-dll">*.dll</span>              <span class="annotation">&larr; 動作に必要なライブラリ（すべて必要）</span></pre></div>
+            <div class="callout warning">
+              <strong>重要:</strong> <code class="inline">.exe</code> ファイルだけを別の場所にコピーしても動きません。<code class="inline">.dll</code> ファイルと <code class="inline">.xml</code> ファイルが同じフォルダに必要です。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h3>動作確認</h3>
+      <p>Git Bash を開いて以下のコマンドを実行します:</p>
+      <div class="code-block">
+        <span class="lang-label">BASH</span>
+        <code><span class="string">"/c/Users/&lt;ユーザー名&gt;/Desktop/DST-ktools/ktools-4.4.4/krane.exe"</span> <span class="flag">--version</span></code>
+      </div>
+      <p>バージョン番号が表示されれば OK です。</p>
+
+      <div class="callout tip">
+        <strong>初心者向け Tip:</strong> パスは自分の配置場所に合わせて変更してください。以降のガイドでは、パスを変数に保存して使う方法を説明します。
+      </div>
+    </section>
+
+    <!-- 3. krane -->
+    <section class="section" id="krane">
+      <div class="section-label">03 &#8212; Decompile</div>
+      <h2>krane &#8212; アニメーション ZIP のデコンパイル</h2>
+      <p>krane は DST のアニメーション ZIP ファイルを <strong>Spriter プロジェクト（.scml）+ 個別 PNG 画像</strong> にデコンパイルするツールです。</p>
+
+      <h3>デコンパイルの手順</h3>
+      <p>ここでは、DST 本体に含まれる <code class="inline">blow_dart.zip</code>（吹き矢のアニメーション）をデコンパイルする例で説明します。</p>
+
+      <h4>ステップ 1: アニメーション ZIP を用意する</h4>
+      <p>DST のアニメーションファイルは以下の場所にあります:</p>
+      <div class="code-block">
+        <span class="lang-label">PATH</span>
+        <code>C:\Program Files (x86)\Steam\steamapps\common\Don't Starve Together\data\anim\</code>
+      </div>
+
+      <div class="callout tip">
+        <strong>初心者向け Tip:</strong> このフォルダには大量の ZIP ファイルがあります。エクスプローラーの検索バーにファイル名を入力すると素早く見つけられます。
+      </div>
+
+      <p>デコンパイルしたい ZIP ファイルを <strong>作業フォルダにコピー</strong> してください。</p>
+
+      <div class="folder-tree"><pre><span class="annotation">作業フォルダの例:</span>
+<span class="folder">C:\Users\&lt;ユーザー名&gt;\Desktop\DST-ktools\</span>
+└── <span class="folder">blow_dart.zip</span>   <span class="annotation">&larr; ここにコピー</span></pre></div>
+
+      <div class="callout warning">
+        <strong>注意:</strong> ゲーム本体のフォルダ内で直接作業しないでください。誤って元ファイルを壊すとゲームが起動しなくなる可能性があります。
+      </div>
+
+      <h4>ステップ 2: ZIP を展開する</h4>
+      <p>コピーした ZIP ファイルを <strong>通常の ZIP として展開</strong> します（右クリック &rarr;「すべて展開」）。</p>
+
+      <div class="folder-tree"><pre><span class="folder">DST-ktools/</span>
+├── <span class="folder">blow_dart.zip</span>
+└── <span class="folder">blow_dart/</span>           <span class="annotation">&larr; 展開されたフォルダ</span>
+    ├── <span class="file-bin">anim.bin</span>         <span class="annotation">&larr; アニメーション定義</span>
+    ├── <span class="file-bin">build.bin</span>        <span class="annotation">&larr; ビルド情報</span>
+    └── <span class="file-tex">atlas-0.tex</span>      <span class="annotation">&larr; スプライトシート画像</span></pre></div>
+
+      <div class="callout tip">
+        <strong>初心者向け Tip:</strong> ZIP を展開すると中に <code class="inline">.bin</code> と <code class="inline">.tex</code> ファイルが入っています。これらは DST 独自のバイナリ形式で、テキストエディタでは開けません。
+      </div>
+
+      <h4>ステップ 3: krane でデコンパイルする</h4>
+      <p>展開したフォルダがある場所で <strong>Git Bash</strong> を開き、以下のコマンドを実行します:</p>
+
+      <div class="code-block">
+        <span class="lang-label">BASH</span>
+        <code><span class="comment"># krane.exe のパスを変数に保存（自分の配置場所に合わせて変更）</span>
+<span class="var">KRANE</span>=<span class="string">"/c/Users/&lt;ユーザー名&gt;/Desktop/DST-ktools/ktools-4.4.4/krane.exe"</span>
+
+<span class="comment"># デコンパイル実行</span>
+<span class="string">"$KRANE"</span> blow_dart blow_dart_decompiled</code>
+      </div>
+
+      <ul class="bullet-list">
+        <li>第 1 引数: 展開した ZIP の中身があるフォルダ（<code class="inline">anim.bin</code> と <code class="inline">build.bin</code> が入っているフォルダ）</li>
+        <li>第 2 引数: 出力先フォルダ名（自動的に作成される）</li>
+      </ul>
+
+      <h4>ステップ 4: 結果を確認する</h4>
+      <p>デコンパイルが成功すると、出力先フォルダに Spriter プロジェクトと個別の PNG 画像が生成されます:</p>
+
+      <div class="folder-tree"><pre><span class="folder">blow_dart_decompiled/</span>
+├── <span class="file-scml">blow_dart.scml</span>              <span class="annotation">&larr; Spriter プロジェクトファイル</span>
+├── <span class="folder">dart/</span>                       <span class="annotation">&larr; ダート（矢）のスプライト</span>
+│   ├── <span class="file-png">dart-0.png</span>
+│   ├── <span class="file-png">dart-1.png</span>
+│   └── ...（9 枚）
+├── <span class="folder">flametail/</span>                  <span class="annotation">&larr; 炎の尾エフェクト</span>
+│   ├── <span class="file-png">flametail-0.png</span>
+│   └── ...（5 枚）
+├── <span class="folder">grass/</span>                      <span class="annotation">&larr; 筒の装飾</span>
+│   └── <span class="file-png">grass-0.png</span>
+├── <span class="folder">gun/</span>                        <span class="annotation">&larr; 筒本体</span>
+│   ├── <span class="file-png">gun-0.png</span>
+│   └── <span class="file-png">gun-1.png</span>
+├── <span class="folder">pipe/</span>                       <span class="annotation">&larr; パイプ</span>
+│   └── <span class="file-png">pipe-0.png</span>
+└── <span class="folder">swap_blowdart_pipe/</span>         <span class="annotation">&larr; 手持ち差し替え用</span>
+    ├── <span class="file-png">swap_blowdart_pipe-0.png</span>
+    └── <span class="file-png">swap_blowdart_pipe-2.png</span></pre></div>
+
+      <p>生成された <code class="inline">.scml</code> ファイルを <strong>Spriter</strong> で開くと、アニメーションの構造（タイムライン、キーフレーム、各パーツの位置・回転・スケール）を確認できます。</p>
+
+      <div class="callout note">
+        <strong>Spriter の場所:</strong>
+        <div class="code-block" style="margin-top:12px;margin-bottom:0;">
+          <span class="lang-label">PATH</span>
+          <code>C:\Program Files (x86)\Steam\steamapps\common\Don't Starve Mod Tools\mod_tools\Spriter\Spriter.exe</code>
+        </div>
+      </div>
+
+      <h3>Bank 名と Build 名を確認する</h3>
+      <p>デコンパイル時に <code class="inline">-v</code>（verbose）オプションを付けると、Bank 名と Build 名が表示されます:</p>
+
+      <div class="code-block">
+        <span class="lang-label">BASH</span>
+        <code><span class="string">"$KRANE"</span> <span class="flag">-v</span> blow_dart blow_dart_decompiled</code>
+      </div>
+
+      <div class="callout note">
+        <strong>Bank と Build とは？</strong><br>
+        &#8226; <strong>Bank</strong>: アニメーションの定義名。どのアニメーション（idle、attack など）が使えるかを決める<br>
+        &#8226; <strong>Build</strong>: 見た目の定義名。どのスプライト画像を使うかを決める<br><br>
+        Lua コードでは <code class="inline">AnimState:SetBank("bank名")</code> と <code class="inline">AnimState:SetBuild("build名")</code> で指定します。既存アセットの Bank/Build 名を確認することで、自分の MOD で正しい値を設定できます。
+      </div>
+
+      <h3>Bank と Build の名前を変更する</h3>
+      <p>デコンパイル時に Bank 名や Build 名を変更することもできます:</p>
+
+      <div class="code-block">
+        <span class="lang-label">BASH</span>
+        <code><span class="comment"># Build 名を変更してデコンパイル</span>
+<span class="string">"$KRANE"</span> <span class="flag">--rename-build</span> my_custom_dart blow_dart blow_dart_decompiled
+
+<span class="comment"># Bank 名を変更してデコンパイル</span>
+<span class="string">"$KRANE"</span> <span class="flag">--rename-bank</span> my_custom_dart blow_dart blow_dart_decompiled</code>
+      </div>
+    </section>
+
+    <!-- 4. ktech -->
+    <section class="section" id="ktech">
+      <div class="section-label">04 &#8212; Conversion</div>
+      <h2>ktech &#8212; TEX &#8596; PNG 画像変換</h2>
+      <p>ktech は DST の TEX 形式と PNG の相互変換を行うツールです。</p>
+
+      <h3>TEX &rarr; PNG 変換（ゲーム内画像の確認）</h3>
+      <p>ゲーム内の TEX ファイルを PNG に変換して中身を確認できます。</p>
+
+      <div class="code-block">
+        <span class="lang-label">BASH</span>
+        <code><span class="comment"># ktech.exe のパスを変数に保存</span>
+<span class="var">KTECH</span>=<span class="string">"/c/Users/&lt;ユーザー名&gt;/Desktop/DST-ktools/ktools-4.4.4/ktech.exe"</span>
+
+<span class="comment"># TEX → PNG 変換</span>
+<span class="string">"$KTECH"</span> atlas-0.tex atlas-0.png</code>
+      </div>
+
+      <div class="callout tip">
+        <strong>どんなときに使う？</strong><br>
+        &#8226; ゲーム内のスプライトシート（<code class="inline">atlas-0.tex</code>）の中身を目視で確認したいとき<br>
+        &#8226; 既存 MOD の TEX ファイルがどんな画像か確認したいとき<br>
+        &#8226; デコンパイル前に、アトラス画像の全体像を見たいとき
+      </div>
+
+      <h3>PNG &rarr; TEX 変換</h3>
+      <div class="code-block">
+        <span class="lang-label">BASH</span>
+        <code><span class="string">"$KTECH"</span> my_image.png my_image.tex</code>
+      </div>
+
+      <div class="callout note">
+        <strong>注意:</strong> MOD 制作で使う PNG &rarr; TEX 変換は、公式の <strong>TextureConverter</strong> を使うのが推奨です（<a href="../DST-TextureConverter/README.html" style="color:var(--accent-warm);">DST-TextureConverter ガイド</a> を参照）。ktech による変換はデバッグや確認用途に向いています。
+      </div>
+
+      <h3>TEX ファイルの情報を表示する</h3>
+      <div class="code-block">
+        <span class="lang-label">BASH</span>
+        <code><span class="string">"$KTECH"</span> <span class="flag">-i</span> atlas-0.tex</code>
+      </div>
+      <p>TEX ファイルのサイズ、圧縮形式、ミップマップ情報などが表示されます。変換せずにファイルの仕様だけ確認したいときに便利です。</p>
+    </section>
+
+    <!-- 5. 実践例 -->
+    <section class="section" id="practice">
+      <div class="section-label">05 &#8212; Practice</div>
+      <h2>実践例: 既存アニメーションを参考にオリジナルを作る</h2>
+      <p>ここでは、<strong>既存の吹き矢アニメーションをデコンパイルして、オリジナルの飛翔体アニメーションを作る</strong> という実践的なワークフローを紹介します。</p>
+
+      <h3>全体の流れ</h3>
+
+      <div class="diagram">
+        <div class="diagram-title">ワークフロー</div>
+        <div class="flow-vertical">
+          <div class="flow-box source">1. ゲームから参考アセットをコピー</div>
+          <div class="flow-connector"><span class="arrow">&rarr;</span></div>
+          <div class="flow-box tool">2. krane でデコンパイル</div>
+          <div class="flow-connector"><span class="arrow">&rarr;</span></div>
+          <div class="flow-box output">3. Spriter でアニメーション構造を確認</div>
+          <div class="flow-connector"><span class="arrow">&rarr;</span></div>
+          <div class="flow-box output">4. スプライト画像のサイズ・枚数・配置を把握</div>
+          <div class="flow-connector"><span class="arrow">&rarr;</span></div>
+          <div class="flow-box output">5. オリジナルのスプライト画像を描く</div>
+          <div class="flow-connector"><span class="arrow">&rarr;</span></div>
+          <div class="flow-box output">6. Spriter で新しい .scml プロジェクトを作成</div>
+          <div class="flow-connector"><span class="arrow">&rarr;</span></div>
+          <div class="flow-box tool">7. autocompiler でビルド &rarr; anim/*.zip</div>
+          <div class="flow-connector"><span class="arrow">&rarr;</span></div>
+          <div class="flow-box result">8. MOD に組み込んでテスト</div>
+        </div>
+      </div>
+
+      <h3>ステップ 1: 参考アセットをデコンパイルする</h3>
+      <div class="code-block">
+        <span class="lang-label">BASH</span>
+        <code><span class="var">KRANE</span>=<span class="string">"/c/Users/&lt;ユーザー名&gt;/Desktop/DST-ktools/ktools-4.4.4/krane.exe"</span>
+
+<span class="comment"># 吹き矢の ZIP を展開済みのフォルダに対してデコンパイル</span>
+<span class="string">"$KRANE"</span> blow_dart blow_dart_decompiled</code>
+      </div>
+
+      <h3>ステップ 2: Spriter で構造を確認する</h3>
+      <p><code class="inline">blow_dart_decompiled/blow_dart.scml</code> を Spriter で開きます。</p>
+      <p>確認するポイント:</p>
+      <ul class="bullet-list">
+        <li><strong>アニメーション名</strong>: タイムラインのドロップダウンからアニメーション一覧を確認（例: <code class="inline">idle</code>、<code class="inline">dart_pipe</code>）</li>
+        <li><strong>パーツ構成</strong>: どのフォルダにどんなスプライトがあるか</li>
+        <li><strong>キーフレーム</strong>: 各スプライトがどのタイミングで切り替わるか</li>
+        <li><strong>位置・回転・スケール</strong>: 各パーツのオフセットやサイズ変更</li>
+      </ul>
+
+      <h3>ステップ 3: スプライト画像の仕様を把握する</h3>
+      <p>デコンパイルされた PNG を画像エディタで開いて確認します:</p>
+      <table class="styled-table">
+        <thead>
+          <tr><th>確認項目</th><th>例（blow_dart の場合）</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>画像サイズ</td><td>dart: 66x146 px、flametail: 約 110-141x55-65 px</td></tr>
+          <tr><td>枚数</td><td>dart: 9 枚、flametail: 5 枚</td></tr>
+          <tr><td>向き</td><td>右向き</td></tr>
+          <tr><td>背景</td><td>透過 PNG</td></tr>
+        </tbody>
+      </table>
+
+      <h3>ステップ 4: オリジナル画像を描く</h3>
+      <p>参考アセットと <strong>同じようなサイズ・向き</strong> でオリジナルのスプライト画像を描きます。</p>
+      <div class="callout tip">
+        <strong>ポイント:</strong> 既存アセットと同じフレーム数・同じファイル命名規則にすると、Spriter プロジェクトの修正が最小限で済みます。
+      </div>
+
+      <h3>ステップ 5: Spriter で新しいプロジェクトを作成</h3>
+      <p>デコンパイルした <code class="inline">.scml</code> をコピーして、スプライト画像を差し替えることで効率的に新しいプロジェクトを作れます。</p>
+
+      <h3>ステップ 6: autocompiler でビルド</h3>
+      <p>完成した Spriter プロジェクトを <code class="inline">exported</code> フォルダに配置して autocompiler でビルドします（詳しくは <a href="../README.html" style="color:var(--accent-warm);">メインガイドの Step 7</a> を参照）。</p>
+    </section>
+
+    <!-- 6. コマンドリファレンス -->
+    <section class="section" id="reference">
+      <div class="section-label">06 &#8212; Reference</div>
+      <h2>コマンドリファレンス</h2>
+
+      <h3>krane</h3>
+      <div class="code-block">
+        <span class="lang-label">BASH</span>
+        <code>krane [オプション] &lt;入力パス&gt; &lt;出力ディレクトリ&gt;</code>
+      </div>
+
+      <table class="styled-table">
+        <thead>
+          <tr><th>オプション</th><th>説明</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>--build &lt;name&gt;</code></td><td>指定した Build 名のみを選択してデコンパイル</td></tr>
+          <tr><td><code>--bank &lt;name&gt;</code></td><td>指定した Bank 名のアニメーションのみを選択（複数指定可）</td></tr>
+          <tr><td><code>--rename-build &lt;name&gt;</code></td><td>Build 名を変更してデコンパイル</td></tr>
+          <tr><td><code>--rename-bank &lt;name&gt;</code></td><td>Bank 名を変更してデコンパイル</td></tr>
+          <tr><td><code>--mark-atlases</code></td><td>アトラス画像をクリップ領域付きで PNG 保存（デバッグ用）</td></tr>
+          <tr><td><code>--check-animation-fidelity</code></td><td>Spriter 表現の忠実度をチェック</td></tr>
+          <tr><td><code>-v</code></td><td>詳細な出力を表示（Bank/Build 名の確認に便利）</td></tr>
+          <tr><td><code>-q</code></td><td>出力を抑制</td></tr>
+          <tr><td><code>--version</code></td><td>バージョン表示</td></tr>
+          <tr><td><code>-h</code>, <code>--help</code></td><td>ヘルプ表示</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout note">
+        <strong>入力パスについて:</strong> 入力パスがフォルダの場合、その中の <code class="inline">build.bin</code> と <code class="inline">anim.bin</code> が自動的に使用されます。アトラス画像（<code class="inline">atlas-*.tex</code>）の場所も build ファイルから自動判定されるため、引数に指定する必要はありません。
+      </div>
+
+      <h3>ktech</h3>
+      <div class="code-block">
+        <span class="lang-label">BASH</span>
+        <code>ktech [オプション] &lt;入力ファイル&gt; &lt;出力先&gt;</code>
+      </div>
+
+      <h4>TEX &rarr; PNG 変換時のオプション</h4>
+      <table class="styled-table">
+        <thead>
+          <tr><th>オプション</th><th>説明</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>-Q &lt;0-100&gt;</code></td><td>出力画像の品質。デフォルト: 100</td></tr>
+          <tr><td><code>-i</code>, <code>--info</code></td><td>変換せずに TEX ファイルの情報を表示</td></tr>
+        </tbody>
+      </table>
+
+      <h4>PNG &rarr; TEX 変換時のオプション</h4>
+      <table class="styled-table">
+        <thead>
+          <tr><th>オプション</th><th>説明</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>--atlas &lt;path&gt;</code></td><td>生成するアトラス（XML）のパス</td></tr>
+          <tr><td><code>-c &lt;形式&gt;</code></td><td>圧縮形式: <code>dxt1</code>, <code>dxt3</code>, <code>dxt5</code>, <code>rgb</code>, <code>rgba</code>。デフォルト: <code>dxt5</code></td></tr>
+          <tr><td><code>-f &lt;フィルター&gt;</code></td><td>ミップマップ生成フィルター: <code>lanczos</code>, <code>mitchell</code>, <code>bicubic</code>, <code>catrom</code>, <code>cubic</code>, <code>box</code>。デフォルト: <code>lanczos</code></td></tr>
+          <tr><td><code>-t &lt;type&gt;</code></td><td>テクスチャタイプ: <code>1d</code>, <code>2d</code>, <code>3d</code>, <code>cube</code>。デフォルト: <code>2d</code></td></tr>
+          <tr><td><code>--no-premultiply</code></td><td>アルファ事前乗算を行わない</td></tr>
+          <tr><td><code>--no-mipmaps</code></td><td>ミップマップを生成しない</td></tr>
+        </tbody>
+      </table>
+
+      <h4>共通オプション</h4>
+      <table class="styled-table">
+        <thead>
+          <tr><th>オプション</th><th>説明</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>--width &lt;px&gt;</code></td><td>出力の幅を固定（高さ未指定ならアスペクト比維持）</td></tr>
+          <tr><td><code>--height &lt;px&gt;</code></td><td>出力の高さを固定（幅未指定ならアスペクト比維持）</td></tr>
+          <tr><td><code>--pow2</code></td><td>幅と高さを 2 のべき乗に切り上げ</td></tr>
+          <tr><td><code>--square</code></td><td>正方形に変換（幅と高さの大きい方に合わせる）</td></tr>
+          <tr><td><code>--extend</code></td><td>リサイズではなく余白を追加して拡張</td></tr>
+          <tr><td><code>--extend-left</code></td><td>余白を左側に追加（<code>--extend</code> を含む）</td></tr>
+          <tr><td><code>-v</code></td><td>詳細な出力を表示</td></tr>
+          <tr><td><code>-q</code></td><td>出力を抑制</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 7. よくあるエラーと対処法 -->
+    <section class="section" id="errors">
+      <div class="section-label">07 &#8212; Troubleshooting</div>
+      <h2>よくあるエラーと対処法</h2>
+
+      <div class="error-card">
+        <div class="error-card-header">krane 実行時のエラー</div>
+        <div class="error-card-body">
+          <div class="error-row">
+            <div class="error-cause"><code class="inline">Could not find build.bin</code> &#8212; 入力フォルダに build.bin がない</div>
+            <div class="error-fix">&rarr; ZIP をきちんと展開したか確認。展開後のフォルダを指定する</div>
+          </div>
+          <div class="error-row">
+            <div class="error-cause"><code class="inline">Could not find anim.bin</code> &#8212; 入力フォルダに anim.bin がない</div>
+            <div class="error-fix">&rarr; 同上</div>
+          </div>
+          <div class="error-row">
+            <div class="error-cause">出力フォルダに何も生成されない &#8212; DLL ファイルが見つからない</div>
+            <div class="error-fix">&rarr; krane.exe と同じフォルダにすべての .dll があるか確認</div>
+          </div>
+          <div class="error-row">
+            <div class="error-cause">文字化けしたエラーメッセージ &#8212; パスに日本語が含まれている</div>
+            <div class="error-fix">&rarr; 日本語を含まないパスに配置する</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="error-card">
+        <div class="error-card-header">ktech 実行時のエラー</div>
+        <div class="error-card-body">
+          <div class="error-row">
+            <div class="error-cause">変換後の PNG が真っ黒 &#8212; TEX ファイルが壊れている</div>
+            <div class="error-fix">&rarr; 別の TEX ファイルで試す</div>
+          </div>
+          <div class="error-row">
+            <div class="error-cause"><code class="inline">Not a TEX file</code> &#8212; 入力ファイルが TEX 形式ではない</div>
+            <div class="error-fix">&rarr; ファイルの拡張子と中身を確認</div>
+          </div>
+        </div>
+      </div>
+
+      <h3>共通の注意点</h3>
+      <ul class="bullet-list">
+        <li><strong>パスに日本語やスペースを含む場合</strong> はパスを <code class="inline">"</code> で囲んでください</li>
+        <li><strong>DLL がすべて揃っていることを確認</strong> &#8212; <code class="inline">krane.exe</code> や <code class="inline">ktech.exe</code> は単体では動作しません</li>
+        <li><strong>Git Bash で実行する場合</strong> はパスのバックスラッシュ <code class="inline">\</code> をスラッシュ <code class="inline">/</code> に変換してください</li>
+      </ul>
+    </section>
+
+    <!-- 8. Tips -->
+    <section class="section" id="tips">
+      <div class="section-label">08 &#8212; Tips</div>
+      <h2>Tips</h2>
+
+      <h3>よく使うコマンドをまとめる</h3>
+      <p>毎回パスを入力するのは面倒なので、作業開始時にまず変数を設定しておくと便利です:</p>
+
+      <div class="code-block">
+        <span class="lang-label">BASH</span>
+        <code><span class="comment"># 作業開始時にこの 2 行を実行しておく</span>
+<span class="var">KRANE</span>=<span class="string">"/c/Users/&lt;ユーザー名&gt;/Desktop/DST-ktools/ktools-4.4.4/krane.exe"</span>
+<span class="var">KTECH</span>=<span class="string">"/c/Users/&lt;ユーザー名&gt;/Desktop/DST-ktools/ktools-4.4.4/ktech.exe"</span>
+
+<span class="comment"># あとは変数で呼び出せる</span>
+<span class="string">"$KRANE"</span> input_folder output_folder
+<span class="string">"$KTECH"</span> input.tex output.png</code>
+      </div>
+
+      <h3>ゲームアセットの場所</h3>
+      <p>DST のアニメーション ZIP ファイルは以下にあります:</p>
+      <div class="code-block">
+        <span class="lang-label">PATH</span>
+        <code>C:\Program Files (x86)\Steam\steamapps\common\Don't Starve Together\data\anim\</code>
+      </div>
+
+      <p>よく参考にされるアセット:</p>
+      <table class="styled-table">
+        <thead>
+          <tr><th>ファイル名</th><th>内容</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>wilson.zip</code></td><td>ウィルソン（キャラクター）</td></tr>
+          <tr><td><code>blow_dart.zip</code></td><td>吹き矢（武器 + 飛翔体）</td></tr>
+          <tr><td><code>spear.zip</code></td><td>槍（武器）</td></tr>
+          <tr><td><code>axe.zip</code></td><td>斧（ツール）</td></tr>
+          <tr><td><code>torchfire.zip</code></td><td>たいまつの炎（エフェクト）</td></tr>
+        </tbody>
+      </table>
+
+      <h3>アトラス画像を直接確認する</h3>
+      <p>krane でフルデコンパイルする前に、アトラス画像だけを PNG で見たい場合:</p>
+
+      <div class="code-block">
+        <span class="lang-label">BASH</span>
+        <code><span class="comment"># アトラスにクリップ領域をマークした画像を出力</span>
+<span class="string">"$KRANE"</span> <span class="flag">--mark-atlases</span> blow_dart atlas_preview</code>
+      </div>
+      <p>これにより、スプライトシートのどの領域がどのパーツに対応しているかを視覚的に確認できます。</p>
+
+      <h3>TEX ファイルの情報だけ確認する</h3>
+      <p>変換せずに TEX ファイルの仕様を確認したいとき:</p>
+
+      <div class="code-block">
+        <span class="lang-label">BASH</span>
+        <code><span class="string">"$KTECH"</span> <span class="flag">-i</span> atlas-0.tex</code>
+      </div>
+    </section>
+
+    <!-- 参考リンク -->
+    <section class="section">
+      <div class="section-label">References</div>
+      <h2>参考リンク</h2>
+      <div class="ref-list">
+        <a href="https://github.com/nsimplex/ktools" class="ref-item" target="_blank">
+          <div>
+            <div class="ref-source">ktools GitHub リポジトリ</div>
+            <div class="ref-url">github.com/nsimplex/ktools</div>
+          </div>
+        </a>
+        <a href="../DST-Spriter/README.html" class="ref-item">
+          <div>
+            <div class="ref-source">DST-Spriter ガイド &#8212; アニメーション作成の詳細</div>
+            <div class="ref-url">../DST-Spriter/README.html</div>
+          </div>
+        </a>
+        <a href="../DST-TextureConverter/README.html" class="ref-item">
+          <div>
+            <div class="ref-source">DST-TextureConverter ガイド &#8212; PNG &rarr; TEX 変換（MOD 制作用）</div>
+            <div class="ref-url">../DST-TextureConverter/README.html</div>
+          </div>
+        </a>
+        <a href="../README.html" class="ref-item">
+          <div>
+            <div class="ref-source">メインガイド（はじめてのキャラクター MOD）</div>
+            <div class="ref-url">../README.html</div>
+          </div>
+        </a>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    DST-ktools Guide &#8212; このドキュメントは自由に利用・改変・再配布できます。DST MOD 制作にお役立てください。
+    <br><span style="display:inline-block;margin-top:8px"><a href="https://steamcommunity.com/profiles/76561198076111536/" style="color:inherit;text-decoration:none">Author: pinpikokun</a></span><br><span style="display:inline-flex;gap:6px;margin-top:6px"><a href="https://github.com/pinpikokun/DST-teemo"><img src="https://img.shields.io/badge/GitHub-Repository-black?logo=github" alt="GitHub"></a> <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=390684095"><img src="https://img.shields.io/badge/Steam%20Workshop-Subscribe-blue?logo=steam" alt="Steam Workshop"></a></span>
+  </footer>
+
+</body>
+</html>

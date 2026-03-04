@@ -697,6 +697,11 @@
       <h2>ビルド手順（Spriter → DST 用 ZIP）</h2>
       <p>Spriter で作ったアニメーションを、ゲームが読み込める <code>.zip</code> に変換する手順です。すべてのアニメーション種類で共通です。</p>
 
+      <div class="callout tip">
+        <span class="callout-label">ヒント</span>
+        <p><strong>autocompiler との違い:</strong> メインガイドでは <code>autocompiler.exe</code> を使う方法を紹介しています。autocompiler は内部的にここで説明する <code>scml.exe</code> + <code>buildanimation.py</code> と同じ処理を行っています。初心者は autocompiler を使うのが簡単です。ここでは Git Bash を使った手動ビルド手順を説明しており、エラー時の原因特定や細かい制御をしたい場合に役立ちます。</p>
+      </div>
+
       <div class="acc open" onclick="this.classList.toggle('open')">
         <div class="acc-head">ビルド手順（5 ステップ）</div>
         <div class="acc-body">
@@ -865,14 +870,14 @@ inst.AnimState:<span class="fn">SetOrientation</span>(ANIM_ORIENTATION.OnGround)
             <tr><td>アバター</td><td><code>images/avatars/</code></td><td>64 x 64</td><td>チャット欄のキャラアイコン</td></tr>
             <tr><td>マップアイコン</td><td><code>images/map_icons/</code></td><td>64 x 64</td><td>マップ上の表示</td></tr>
             <tr><td>HUD アイコン</td><td><code>images/hud/</code></td><td>128 x 128</td><td>クラフトタブ等</td></tr>
-            <tr><td>セーブスロット肖像画</td><td><code>images/saveslot_portraits/</code></td><td>256 x 256</td><td>セーブ画面</td></tr>
-            <tr><td>キャラ選択画面</td><td><code>images/selectscreen_portraits/</code></td><td>512 x 512</td><td>キャラ選択</td></tr>
-            <tr><td>大きい肖像画</td><td><code>bigportraits/</code></td><td>1024 x 1024</td><td>キャラ選択（詳細）</td></tr>
+            <tr><td>セーブスロットポートレート</td><td><code>images/saveslot_portraits/</code></td><td>128 x 128</td><td>セーブ画面</td></tr>
+            <tr><td>キャラ選択画面ポートレート</td><td><code>images/selectscreen_portraits/</code></td><td>256 x 512</td><td>キャラ選択</td></tr>
+            <tr><td>大きいポートレート</td><td><code>bigportraits/</code></td><td>512 x 512 以上</td><td>キャラ選択（詳細）</td></tr>
             <tr><td>MOD アイコン</td><td>ルート直下</td><td>128 x 128</td><td>Steam ワークショップ</td></tr>
           </table>
           <div class="callout danger">
             <span class="callout-label">注意</span>
-            <p>すべて正方形・2 のべき乗サイズにしてください。サイズが合わないとクラッシュします。</p>
+            <p>すべて各辺が 2 のべき乗サイズにしてください（正方形でなくても各辺が 2 のべき乗なら OK。例: 256 x 512）。サイズが合わないとクラッシュします。</p>
           </div>
         </div>
       </div>
@@ -930,18 +935,11 @@ inst.AnimState:<span class="fn">SetOrientation</span>(ANIM_ORIENTATION.OnGround)
       </div>
     </section>
 
-    <!-- ライセンス -->
-    <section class="section">
-      <div class="conclusion">
-        <h3>ライセンス</h3>
-        <p>このドキュメントは自由に利用・改変・再配布できます。DST MOD 制作にお役立てください。</p>
-      </div>
-    </section>
-
   </main>
 
   <footer class="footer">
-    DST-Spriter — Don't Starve Together MOD アニメーション作成ガイド
+    DST-Spriter Guide &#8212; このドキュメントは自由に利用・改変・再配布できます。DST MOD 制作にお役立てください。
+    <br><span style="display:inline-block;margin-top:8px"><a href="https://steamcommunity.com/profiles/76561198076111536/" style="color:inherit;text-decoration:none">Author: pinpikokun</a></span><br><span style="display:inline-flex;gap:6px;margin-top:6px"><a href="https://github.com/pinpikokun/DST-teemo"><img src="https://img.shields.io/badge/GitHub-Repository-black?logo=github" alt="GitHub"></a> <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=390684095"><img src="https://img.shields.io/badge/Steam%20Workshop-Subscribe-blue?logo=steam" alt="Steam Workshop"></a></span>
   </footer>
 
 </body>
