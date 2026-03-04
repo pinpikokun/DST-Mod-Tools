@@ -180,10 +180,8 @@
   }
   .steps li {
     counter-increment: step;
-    display: flex;
-    align-items: flex-start;
-    gap: 16px;
-    padding: 14px 0;
+    position: relative;
+    padding: 14px 0 14px 44px;
     border-bottom: 1px solid var(--border-light);
     font-size: 15px;
     color: var(--text-secondary);
@@ -193,7 +191,9 @@
   .steps li:last-child { border-bottom: none; }
   .steps li::before {
     content: counter(step);
-    flex-shrink: 0;
+    position: absolute;
+    left: 0;
+    top: 14px;
     width: 28px;
     height: 28px;
     background: var(--bg-dark);
@@ -204,7 +204,6 @@
     justify-content: center;
     font-weight: 700;
     font-size: 13px;
-    margin-top: 2px;
   }
 
   /* Tables */

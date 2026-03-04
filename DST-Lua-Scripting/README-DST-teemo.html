@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DST-Lua-Scripting 実践編 — Captain Teemo MOD を読み解く</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Noto+Sans+JP:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg-primary:#faf9f7;--bg-card:#ffffff;--bg-warm:#f5f0eb;--bg-dark:#191919;--text-primary:#1a1a1a;--text-secondary:#6b6560;--text-light:#9a938d;--accent-warm:#c4704b;--accent-green:#2d7a5f;--accent-red:#b85450;--border:#e8e2db;--border-light:#f0ece7}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans JP',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg-primary);color:var(--text-primary);line-height:1.8;font-weight:400;-webkit-font-smoothing:antialiased}
+.hero{background:var(--bg-dark);color:#fff;padding:100px 0 80px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-50%;right:-20%;width:600px;height:600px;background:radial-gradient(circle,rgba(196,112,75,0.15) 0%,transparent 70%);pointer-events:none}
+.hero-inner{max-width:820px;margin:0 auto;padding:0 40px;position:relative}
+.hero-label{font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--accent-warm);margin-bottom:24px;font-weight:500}
+.hero h1{font-family:'Noto Serif JP',serif;font-size:38px;font-weight:700;line-height:1.4;margin-bottom:20px;letter-spacing:-0.5px}
+.hero-sub{font-size:16px;color:rgba(255,255,255,0.6);font-weight:300;line-height:1.8}
+.content{max-width:820px;margin:0 auto;padding:0 40px}
+.section{padding:72px 0;border-bottom:1px solid var(--border-light)}
+.section:last-child{border-bottom:none}
+.section-label{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--text-light);margin-bottom:16px;font-weight:500}
+.section h2{font-family:'Noto Serif JP',serif;font-size:28px;font-weight:700;margin-bottom:24px;line-height:1.5}
+.section h3{font-family:'Noto Serif JP',serif;font-size:20px;font-weight:700;margin-top:40px;margin-bottom:16px;line-height:1.5}
+.section h4{font-size:17px;font-weight:600;margin-top:32px;margin-bottom:12px;line-height:1.5}
+.section p{font-size:16px;color:var(--text-secondary);line-height:2;font-weight:300}
+.section p+p{margin-top:12px}
+.callout{margin:32px 0;padding:24px 28px;border-radius:12px;font-size:15px;line-height:1.9}
+.callout.note{background:#fef8f0;border-left:3px solid var(--accent-warm);color:var(--text-primary)}
+.callout.tip{background:#f0f8f3;border-left:3px solid var(--accent-green);color:var(--text-primary)}
+.callout.warning{background:#fef3ef;border-left:3px solid var(--accent-red);color:var(--text-primary)}
+.callout strong{font-weight:600}
+.code-block{margin:24px 0;background:#1e1e2e;border-radius:12px;padding:28px 32px;overflow-x:auto;position:relative}
+.code-block code{font-family:'Cascadia Code','Fira Code','JetBrains Mono',monospace;font-size:13px;line-height:1.7;color:#cdd6f4;white-space:pre}
+.code-block .lang-label{position:absolute;top:10px;right:16px;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.3);font-family:'Noto Sans JP',sans-serif}
+.code-block .comment{color:#6c7086}
+.code-block .string{color:#a6e3a1}
+.code-block .keyword{color:#cba6f7}
+.code-block .flag{color:#f9e2af}
+.code-block .var{color:#89b4fa}
+.code-block .tag{color:#f38ba8}
+.code-block .attr{color:#fab387}
+code.inline{font-family:'Cascadia Code','Fira Code',monospace;font-size:13px;background:#f0ece7;padding:2px 8px;border-radius:4px;color:var(--accent-warm)}
+.styled-table{width:100%;margin:24px 0;border-collapse:separate;border-spacing:0;border:1px solid var(--border);border-radius:12px;overflow:hidden;font-size:14px}
+.styled-table thead{background:var(--bg-warm)}
+.styled-table th{padding:14px 20px;text-align:left;font-weight:600;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--text-secondary);border-bottom:1px solid var(--border)}
+.styled-table td{padding:14px 20px;border-bottom:1px solid var(--border-light);color:var(--text-secondary);font-weight:300;vertical-align:top}
+.styled-table tr:last-child td{border-bottom:none}
+.styled-table td code{font-family:'Cascadia Code','Fira Code',monospace;font-size:12px;background:#f0ece7;padding:2px 6px;border-radius:3px;color:var(--accent-warm)}
+.folder-tree{margin:24px 0;background:#1e1e2e;border-radius:12px;padding:28px 32px;overflow-x:auto}
+.folder-tree pre{font-family:'Cascadia Code','Fira Code',monospace;font-size:13px;line-height:1.7;color:#cdd6f4}
+.folder-tree .folder{color:#89b4fa}
+.folder-tree .file-tex{color:#a6e3a1}
+.folder-tree .file-xml{color:#f9e2af}
+.folder-tree .file-png{color:#f38ba8}
+.folder-tree .file-lua{color:#cba6f7}
+.folder-tree .annotation{color:#6c7086}
+.toc{margin:40px 0;background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:36px 40px}
+.toc-title{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--text-light);margin-bottom:20px;font-weight:500}
+.toc-list{list-style:none;display:flex;flex-direction:column;gap:8px}
+.toc-list a{text-decoration:none;font-size:15px;color:var(--text-secondary);font-weight:400;display:flex;align-items:center;gap:12px;padding:6px 0;transition:color 0.2s}
+.toc-list a:hover{color:var(--accent-warm)}
+.toc-num{font-size:12px;color:var(--text-light);font-weight:500;min-width:28px}
+.ascii-diagram{margin:24px 0;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:28px 32px;overflow-x:auto}
+.ascii-diagram pre{font-family:'Cascadia Code','Fira Code',monospace;font-size:13px;line-height:1.5;color:var(--text-secondary)}
+.ascii-diagram .highlight-line{color:var(--accent-warm);font-weight:600}
+.ref-list{display:flex;flex-direction:column;gap:16px;margin-top:24px}
+.ref-item{display:flex;align-items:flex-start;gap:16px;padding:16px 20px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;text-decoration:none;color:var(--text-primary);transition:border-color 0.2s}
+.ref-item:hover{border-color:var(--accent-warm)}
+.ref-item .ref-source{font-size:14px;font-weight:500}
+.ref-item .ref-url{font-size:12px;color:var(--text-light);word-break:break-all;margin-top:4px;font-weight:300}
+.footer{text-align:center;padding:48px 0;font-size:12px;color:var(--text-light);font-weight:300}
+@media(max-width:640px){.hero h1{font-size:26px}.hero{padding:72px 0 56px}.content{padding:0 24px}.hero-inner{padding:0 24px}.code-block{padding:20px}.toc{padding:24px}.section h2{font-size:22px}}
+</style>
+</head>
+<body>
+<header class="hero">
+<div class="hero-inner">
+<div class="hero-label">DST Mod Development Guide &mdash; Practical</div>
+<h1>Captain Teemo MOD を読み解く</h1>
+<p class="hero-sub">実際の MOD ソースコードを題材に、DST Lua スクリプティングの<br>実践的な実装パターンを学ぶガイドです。</p>
+</div>
+</header>
+<main class="content">
+<section class="section">
+<div class="toc">
+<div class="toc-title">Table of Contents</div>
+<ol class="toc-list">
+<li><a href="#overview"><span class="toc-num">01</span>Captain Teemo MOD の概要</a></li>
+<li><a href="#structure"><span class="toc-num">02</span>ファイル構成</a></li>
+<li><a href="#modinfo"><span class="toc-num">03</span>modinfo.lua の実装</a></li>
+<li><a href="#modmain"><span class="toc-num">04</span>modmain.lua の実装</a></li>
+<li><a href="#prefab"><span class="toc-num">05</span>キャラクター prefab &mdash; teemo.lua</a></li>
+<li><a href="#items"><span class="toc-num">06</span>カスタムアイテムの実装</a></li>
+<li><a href="#components"><span class="toc-num">07</span>カスタムコンポーネントの実装</a></li>
+<li><a href="#util"><span class="toc-num">08</span>ユーティリティ &mdash; teemo_poison_util.lua</a></li>
+<li><a href="#network"><span class="toc-num">09</span>ネットワーク同期の実装</a></li>
+<li><a href="#widgets"><span class="toc-num">10</span>UI ウィジェットの実装</a></li>
+<li><a href="#saveload"><span class="toc-num">11</span>セーブ・ロードの実装</a></li>
+<li><a href="#abilities"><span class="toc-num">12</span>能力一覧まとめ</a></li>
+<li><a href="#references"><span class="toc-num">13</span>参考リンク</a></li>
+</ol>
+</div>
+</section>
+<section class="section" id="overview">
+<div class="section-label">01 &mdash; Overview</div>
+<h2>Captain Teemo MOD の概要</h2>
+<p>Captain Teemo MOD は、League of Legends のキャラクター「テーモ」を DST に再現した MOD です。ステルス、毒吹き矢、キノコ罠、サモナースペルなど、多彩な機能を実装しています。</p>
+<p>本ガイドでは、この MOD の実際のソースコードを読み解きながら、<a href="README.html" style="color:var(--accent-warm);">Lua スクリプティングガイド</a>で学んだ概念がどのように実装されるかを実践的に解説します。</p>
+<table class="styled-table">
+<thead><tr><th>能力</th><th>種類</th><th>概要</th></tr></thead>
+<tbody>
+<tr><td>カモフラージュ</td><td>パッシブ</td><td>3 秒間静止すると透明化。敵の攻撃を無効化</td></tr>
+<tr><td>Blind Dart</td><td>武器</td><td>右クリックで毒吹き矢を発射。命中時にブラインド + 毒 DOT</td></tr>
+<tr><td>Noxious Trap</td><td>設置型</td><td>毒キノコ罠。敵が近づくと爆発し範囲ダメージ + 移動速度低下</td></tr>
+<tr><td>Flash</td><td>サモナースペル</td><td>瞬間移動（壁抜け対応）</td></tr>
+<tr><td>Ignite</td><td>サモナースペル</td><td>対象にトゥルーダメージ DOT</td></tr>
+<tr><td>キノコの達人</td><td>パッシブ</td><td>キノコのマイナス効果を無効化</td></tr>
+<tr><td>毒による食料腐敗</td><td>パッシブ</td><td>毒で倒した敵のドロップ食料が腐敗</td></tr>
+</tbody>
+</table>
+<div class="callout note"><strong>ポイント:</strong> この MOD は DST の多くの仕組み（カスタムアクション、Net Variables、RPC、UI ウィジェット、コンポーネント、ステートグラフ等）を活用しており、実践的な学習素材として最適です。</div>
+</section>
+
+<section class="section" id="structure">
+<div class="section-label">02 &mdash; File Structure</div>
+<h2>ファイル構成</h2>
+<div class="folder-tree"><pre><span class="folder">DST-teemo/</span>
+&#9500;&#9472;&#9472; <span class="file-lua">modinfo.lua</span>                          <span class="annotation">&larr; MOD 設定（20 個の設定オプション）</span>
+&#9500;&#9472;&#9472; <span class="file-lua">modmain.lua</span>                          <span class="annotation">&larr; エントリポイント（設定読込・キャラクター登録・アクション定義・RPC）</span>
+&#9500;&#9472;&#9472; <span class="file-xml">modicon.xml</span> / <span class="file-tex">.tex</span>                   <span class="annotation">&larr; MOD アイコン</span>
+&#9500;&#9472;&#9472; <span class="folder">anim/</span>                                <span class="annotation">&larr; アニメーションファイル</span>
+&#9500;&#9472;&#9472; <span class="folder">bigportraits/</span>                        <span class="annotation">&larr; 大ポートレート（512 x 512 以上）</span>
+&#9474;   &#9500;&#9472;&#9472; <span class="file-tex">teemo.tex</span> / <span class="file-xml">.xml</span>
+&#9474;   &#9492;&#9472;&#9472; <span class="file-tex">teemo_none.tex</span> / <span class="file-xml">.xml</span>
+&#9500;&#9472;&#9472; <span class="folder">images/</span>
+&#9474;   &#9500;&#9472;&#9472; <span class="folder">avatars/</span>                         <span class="annotation">&larr; アバター画像（64 x 64）</span>
+&#9474;   &#9500;&#9472;&#9472; <span class="folder">hud/</span>                             <span class="annotation">&larr; HUD 用画像（クラフトタブアイコン）</span>
+&#9474;   &#9500;&#9472;&#9472; <span class="folder">inventoryimages/</span>                 <span class="annotation">&larr; インベントリアイテム画像</span>
+&#9474;   &#9500;&#9472;&#9472; <span class="folder">map_icons/</span>                       <span class="annotation">&larr; マップアイコン（64 x 64）</span>
+&#9474;   &#9500;&#9472;&#9472; <span class="folder">saveslot_portraits/</span>              <span class="annotation">&larr; セーブスロット画像（128 x 128）</span>
+&#9474;   &#9492;&#9472;&#9472; <span class="folder">selectscreen_portraits/</span>          <span class="annotation">&larr; キャラクター選択画面（256 x 512）</span>
+&#9500;&#9472;&#9472; <span class="folder">scripts/</span>
+&#9474;   &#9500;&#9472;&#9472; <span class="folder">prefabs/</span>
+&#9474;   &#9474;   &#9500;&#9472;&#9472; <span class="file-lua">teemo.lua</span>                    <span class="annotation">&larr; キャラクター本体</span>
+&#9474;   &#9474;   &#9500;&#9472;&#9472; <span class="file-lua">teemo_none.lua</span>               <span class="annotation">&larr; スキン定義</span>
+&#9474;   &#9474;   &#9500;&#9472;&#9472; <span class="file-lua">blind_dart.lua</span>               <span class="annotation">&larr; Blind Dart（武器アイテム）</span>
+&#9474;   &#9474;   &#9500;&#9472;&#9472; <span class="file-lua">blind_dart_projectile.lua</span>    <span class="annotation">&larr; 吹き矢の飛翔体</span>
+&#9474;   &#9474;   &#9500;&#9472;&#9472; <span class="file-lua">noxious_trap.lua</span>             <span class="annotation">&larr; Noxious Trap（設置型罠）</span>
+&#9474;   &#9474;   &#9500;&#9472;&#9472; <span class="file-lua">explode_noxious_trap.lua</span>     <span class="annotation">&larr; 罠爆発エフェクト</span>
+&#9474;   &#9474;   &#9500;&#9472;&#9472; <span class="file-lua">toxic_effect_by_teemo.lua</span>    <span class="annotation">&larr; 毒エフェクト</span>
+&#9474;   &#9474;   &#9492;&#9472;&#9472; <span class="file-lua">blind_effect.lua</span>             <span class="annotation">&larr; ブラインドエフェクト</span>
+&#9474;   &#9500;&#9472;&#9472; <span class="folder">components/</span>
+&#9474;   &#9474;   &#9500;&#9472;&#9472; <span class="file-lua">characterspecific.lua</span>        <span class="annotation">&larr; キャラクター専用アイテム制限</span>
+&#9474;   &#9474;   &#9492;&#9472;&#9472; <span class="file-lua">explosive_noxious_trap.lua</span>   <span class="annotation">&larr; 罠爆発ダメージロジック</span>
+&#9474;   &#9500;&#9472;&#9472; <span class="folder">widgets/</span>
+&#9474;   &#9474;   &#9500;&#9472;&#9472; <span class="file-lua">noxioustrap_slot.lua</span>         <span class="annotation">&larr; トラップスタック UI</span>
+&#9474;   &#9474;   &#9500;&#9472;&#9472; <span class="file-lua">summoner_spell_slot.lua</span>      <span class="annotation">&larr; Flash/Ignite UI</span>
+&#9474;   &#9474;   &#9492;&#9472;&#9472; <span class="file-lua">teemo_popupnumber.lua</span>        <span class="annotation">&larr; フローティングダメージ数字</span>
+&#9474;   &#9500;&#9472;&#9472; <span class="file-lua">speech_teemo.lua</span>                 <span class="annotation">&larr; キャラクターセリフ</span>
+&#9474;   &#9492;&#9472;&#9472; <span class="file-lua">teemo_poison_util.lua</span>            <span class="annotation">&larr; 毒ユーティリティ</span>
+&#9492;&#9472;&#9472; <span class="folder">sound/</span>                               <span class="annotation">&larr; サウンドファイル</span></pre>
+</div>
+</section>
+
+<section class="section" id="modinfo">
+<div class="section-label">03 &mdash; modinfo.lua</div>
+<h2>modinfo.lua の実装</h2>
+<p>teemo の modinfo.lua は <strong>20 個の設定オプション</strong>を持つ、高度にカスタマイズ可能な設計です。</p>
+
+<h3>セクション区切りの活用</h3>
+<p>設定項目が多い MOD では、<code class="inline">name</code> を空文字にしたエントリでカテゴリを区切っています。</p>
+<div class="code-block"><span class="lang-label">LUA</span>
+<code><span class="comment">-- セクション見出し（設定画面にラベルとして表示される）</span>
+{<span class="var">name</span> = <span class="string">""</span>, <span class="var">label</span> = <span class="string">"Character Stats"</span>, <span class="var">hover</span> = <span class="string">""</span>, <span class="var">options</span> = {{<span class="var">description</span> = <span class="string">""</span>, <span class="var">data</span> = <span class="flag">0</span>}}, <span class="var">default</span> = <span class="flag">0</span>},
+{<span class="var">name</span> = <span class="string">""</span>, <span class="var">label</span> = <span class="string">"Blind Dart"</span>, <span class="var">hover</span> = <span class="string">""</span>, <span class="var">options</span> = {{<span class="var">description</span> = <span class="string">""</span>, <span class="var">data</span> = <span class="flag">0</span>}}, <span class="var">default</span> = <span class="flag">0</span>},
+{<span class="var">name</span> = <span class="string">""</span>, <span class="var">label</span> = <span class="string">"Noxious Trap"</span>, <span class="var">hover</span> = <span class="string">""</span>, <span class="var">options</span> = {{<span class="var">description</span> = <span class="string">""</span>, <span class="var">data</span> = <span class="flag">0</span>}}, <span class="var">default</span> = <span class="flag">0</span>},
+{<span class="var">name</span> = <span class="string">""</span>, <span class="var">label</span> = <span class="string">"Summoner Spells"</span>, <span class="var">hover</span> = <span class="string">""</span>, <span class="var">options</span> = {{<span class="var">description</span> = <span class="string">""</span>, <span class="var">data</span> = <span class="flag">0</span>}}, <span class="var">default</span> = <span class="flag">0</span>},
+{<span class="var">name</span> = <span class="string">""</span>, <span class="var">label</span> = <span class="string">"Other"</span>, <span class="var">hover</span> = <span class="string">""</span>, <span class="var">options</span> = {{<span class="var">description</span> = <span class="string">""</span>, <span class="var">data</span> = <span class="flag">0</span>}}, <span class="var">default</span> = <span class="flag">0</span>},</code>
+</div>
+
+<h3>設定カテゴリ一覧</h3>
+<table class="styled-table">
+<thead><tr><th>カテゴリ</th><th>設定項目</th></tr></thead>
+<tbody>
+<tr><td>Character Stats</td><td>Health, Hunger, Sanity, Move Speed, Damage Multiplier, Defense</td></tr>
+<tr><td>Blind Dart</td><td>Hit Damage, DOT Damage, Durability, Range Indicator</td></tr>
+<tr><td>Noxious Trap</td><td>Hit Damage, DOT Damage</td></tr>
+<tr><td>Summoner Spells</td><td>Flash Range, Flash Cooldown, Ignite Damage, Ignite Cooldown</td></tr>
+<tr><td>Other</td><td>Poison Food Spoilage, Mushroom Immunity, Damage Numbers</td></tr>
+</tbody>
+</table>
+
+<h3>数値型とブーリアン型の混在</h3>
+<div class="code-block"><span class="lang-label">LUA</span>
+<code><span class="comment">-- 数値型: options の data に数値を設定</span>
+{
+    <span class="var">name</span> = <span class="string">"health"</span>,
+    <span class="var">label</span> = <span class="string">"Health"</span>,
+    <span class="var">options</span> = {
+        {<span class="var">description</span> = <span class="string">"50"</span>,  <span class="var">data</span> = <span class="flag">50</span>},
+        {<span class="var">description</span> = <span class="string">"100"</span>, <span class="var">data</span> = <span class="flag">100</span>},   <span class="comment">-- そのまま</span>
+        {<span class="var">description</span> = <span class="string">"200"</span>, <span class="var">data</span> = <span class="flag">200</span>},
+    },
+    <span class="var">default</span> = <span class="flag">100</span>,
+},
+
+<span class="comment">-- ブーリアン型: On/Off の切り替え</span>
+{
+    <span class="var">name</span> = <span class="string">"mushroom_immunity"</span>,
+    <span class="var">label</span> = <span class="string">"Mushroom Immunity"</span>,
+    <span class="var">options</span> = {
+        {<span class="var">description</span> = <span class="string">"On"</span>,  <span class="var">data</span> = <span class="keyword">true</span>},
+        {<span class="var">description</span> = <span class="string">"Off"</span>, <span class="var">data</span> = <span class="keyword">false</span>},
+    },
+    <span class="var">default</span> = <span class="keyword">true</span>,
+},</code>
+</div>
+</section>
+<section class="section" id="modmain">
+<div class="section-label">04 &mdash; modmain.lua</div>
+<h2>modmain.lua の実装</h2>
+<p>teemo の modmain.lua は約 800 行あり、以下の機能を担当しています。</p>
+
+<h3>1. 設定値の読み込み</h3>
+<div class="code-block"><span class="lang-label">LUA</span>
+<code><span class="comment">-- 数値型は or でデフォルト値を設定</span>
+GLOBAL.<span class="var">TEEMO_HEALTH</span> = <span class="var">GetModConfigData</span>(<span class="string">"health"</span>) <span class="keyword">or</span> <span class="flag">100</span>
+GLOBAL.<span class="var">TEEMO_DAMAGE_MULT</span> = <span class="var">GetModConfigData</span>(<span class="string">"damage_multiplier"</span>) <span class="keyword">or</span> <span class="flag">1.0</span>
+
+<span class="comment">-- boolean 型は nil チェックが必要（false or true は true になってしまう）</span>
+GLOBAL.<span class="var">TEEMO_MUSHROOM_IMMUNITY</span> = <span class="var">GetModConfigData</span>(<span class="string">"mushroom_immunity"</span>)
+<span class="keyword">if</span> GLOBAL.<span class="var">TEEMO_MUSHROOM_IMMUNITY</span> == <span class="keyword">nil</span> <span class="keyword">then</span> GLOBAL.<span class="var">TEEMO_MUSHROOM_IMMUNITY</span> = <span class="keyword">true</span> <span class="keyword">end</span></code>
+</div>
+<div class="callout note"><strong>なぜ GLOBAL に格納するのか？:</strong> modmain.lua のローカル変数は prefab ファイル（teemo.lua 等）からアクセスできません。<code class="inline">GLOBAL</code> に格納することで、全スクリプトから参照可能になります。</div>
+
+<h3>2. ダメージ数字表示のヘルパー関数</h3>
+<p>サーバーから範囲内の全クライアントにダメージ数字を表示させるヘルパーです。</p>
+<div class="code-block"><span class="lang-label">LUA</span>
+<code><span class="keyword">local</span> <span class="keyword">function</span> <span class="var">TeemoShowDamageNumber</span>(<span class="var">target</span>, <span class="var">damage</span>, <span class="var">colour_type</span>)
+    <span class="keyword">if</span> <span class="keyword">not</span> GLOBAL.<span class="var">TEEMO_SHOW_DAMAGE_NUMBERS</span> <span class="keyword">then</span> <span class="keyword">return</span> <span class="keyword">end</span>
+    <span class="keyword">if</span> <span class="keyword">not</span> GLOBAL.TheWorld.ismastersim <span class="keyword">then</span> <span class="keyword">return</span> <span class="keyword">end</span>
+    <span class="keyword">if</span> <span class="var">target</span> == <span class="keyword">nil</span> <span class="keyword">or</span> <span class="keyword">not</span> <span class="var">target</span>:IsValid() <span class="keyword">then</span> <span class="keyword">return</span> <span class="keyword">end</span>
+
+    <span class="keyword">local</span> <span class="var">x</span>, <span class="var">y</span>, <span class="var">z</span> = <span class="var">target</span>.Transform:GetWorldPosition()
+    <span class="keyword">local</span> <span class="var">players</span> = GLOBAL.<span class="var">FindPlayersInRange</span>(<span class="var">x</span>, <span class="var">y</span>, <span class="var">z</span>, <span class="flag">40</span>)
+    <span class="keyword">for</span> _, <span class="var">player</span> <span class="keyword">in</span> pairs(<span class="var">players</span>) <span class="keyword">do</span>
+        GLOBAL.<span class="var">SendModRPCToClient</span>(
+            GLOBAL.CLIENT_MOD_RPC[<span class="string">"teemo"</span>][<span class="string">"show_damage_number"</span>],
+            <span class="var">player</span>.userid, <span class="var">x</span>, <span class="var">y</span>, <span class="var">z</span>, math.abs(<span class="var">damage</span>), <span class="var">colour_type</span>
+        )
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+GLOBAL.<span class="var">TeemoShowDamageNumber</span> = <span class="var">TeemoShowDamageNumber</span></code>
+</div>
+<div class="callout note"><strong>ポイント:</strong> <code class="inline">FindPlayersInRange</code> で 40 タイルの範囲内のプレイヤーにのみ送信しています。全プレイヤーに送ると帯域を無駄に消費するため、見える範囲のプレイヤーに限定しています。</div>
+
+<h3>3. キャラクター登録</h3>
+<div class="code-block"><span class="lang-label">LUA</span>
+<code><span class="comment">-- TUNING テーブルに登録（キャラクター選択画面で表示される）</span>
+GLOBAL.TUNING.<span class="var">TEEMO_HEALTH</span> = GLOBAL.<span class="var">TEEMO_HEALTH</span>
+GLOBAL.TUNING.<span class="var">TEEMO_HUNGER</span> = GLOBAL.<span class="var">TEEMO_HUNGER</span>
+GLOBAL.TUNING.<span class="var">TEEMO_SANITY</span> = GLOBAL.<span class="var">TEEMO_SANITY</span>
+
+<span class="comment">-- 初期所持アイテム</span>
+GLOBAL.TUNING.GAMEMODE_STARTING_ITEMS.DEFAULT.TEEMO = {<span class="string">"blind_dart"</span>, <span class="string">"noxious_trap"</span>}
+
+<span class="comment">-- キャラクター表示テキスト</span>
+STRINGS.CHARACTER_TITLES.teemo = <span class="string">"Captain Teemo"</span>
+STRINGS.CHARACTER_NAMES.teemo = <span class="string">"Captain Teemo"</span>
+STRINGS.CHARACTER_DESCRIPTIONS.teemo =
+    <span class="string">"*Goes invisible when standing still\n*Has a poison blowdart\n..."</span>
+STRINGS.CHARACTER_QUOTES.teemo = <span class="string">"\"on duty !! \""</span>
+
+<span class="comment">-- セリフファイル</span>
+STRINGS.CHARACTERS.TEEMO = GLOBAL.<span class="keyword">require</span> <span class="string">"speech_teemo"</span>
+
+<span class="comment">-- 登録</span>
+<span class="var">AddModCharacter</span>(<span class="string">"teemo"</span>, <span class="string">"MALE"</span>, <span class="var">skin_modes</span>)
+<span class="var">AddMinimapAtlas</span>(<span class="string">"images/map_icons/teemo.xml"</span>)
+GLOBAL.PREFAB_SKINS[<span class="string">"teemo"</span>] = { <span class="string">"teemo_none"</span> }</code>
+</div>
+
+<h3>4. カスタムアクション &mdash; 右クリック発射</h3>
+<p>Blind Dart の右クリック発射システムは、DST の MOD でカスタムアクションを作る典型的な実装例です。</p>
+<div class="code-block"><span class="lang-label">LUA</span>
+<code><span class="comment">-- アクション定義: 右クリックで Blind Dart 発射</span>
+<span class="var">AddAction</span>(<span class="string">"TEEMO_SHOOT_DART"</span>, <span class="string">"Auto Attack"</span>, <span class="keyword">function</span>(<span class="var">act</span>)
+    <span class="keyword">local</span> <span class="var">weapon</span> = <span class="var">act</span>.invobject   <span class="comment">-- 使用武器</span>
+    <span class="keyword">local</span> <span class="var">doer</span> = <span class="var">act</span>.doer          <span class="comment">-- プレイヤー</span>
+    <span class="keyword">local</span> <span class="var">target</span> = <span class="var">act</span>.target      <span class="comment">-- 右クリック対象（いれば）</span>
+    <span class="keyword">local</span> <span class="var">target_pos</span> = <span class="var">act</span>:GetActionPoint()  <span class="comment">-- クリック座標</span>
+
+    <span class="comment">-- 飛翔体をスポーン</span>
+    <span class="keyword">local</span> <span class="var">proj</span> = GLOBAL.<span class="var">SpawnPrefab</span>(<span class="string">"blind_dart_projectile"</span>)
+    <span class="var">proj</span>._teemo_weapon = <span class="var">weapon</span>
+    <span class="var">proj</span>._teemo_attacker = <span class="var">doer</span>
+
+    <span class="keyword">if</span> <span class="var">target</span> ~= <span class="keyword">nil</span> <span class="keyword">and</span> <span class="var">target</span>:IsValid() <span class="keyword">and</span> <span class="var">target</span>.components.combat <span class="keyword">then</span>
+        <span class="comment">-- エンティティを右クリック → 追尾発射</span>
+        <span class="var">proj</span>.components.projectile:Throw(<span class="var">weapon</span>, <span class="var">target</span>, <span class="var">doer</span>)
+    <span class="keyword">else</span>
+        <span class="comment">-- 地面を右クリック → クリック地点近くの敵を自動検索</span>
+        <span class="keyword">local</span> <span class="var">px</span>, <span class="var">py</span>, <span class="var">pz</span> = <span class="var">target_pos</span>:Get()
+        <span class="keyword">local</span> <span class="var">ents</span> = GLOBAL.TheSim:FindEntities(<span class="var">px</span>, <span class="var">py</span>, <span class="var">pz</span>, <span class="flag">3</span>, {<span class="string">"_combat"</span>}, {<span class="string">"player"</span>, <span class="string">"INLIMBO"</span>})
+        <span class="comment">-- 最も近い敵を探して発射...</span>
+    <span class="keyword">end</span>
+    <span class="keyword">return</span> <span class="keyword">true</span>
+<span class="keyword">end</span>)
+
+<span class="comment">-- アクションのプロパティ</span>
+GLOBAL.ACTIONS.TEEMO_SHOOT_DART.rmb = <span class="keyword">true</span>       <span class="comment">-- 右クリック</span>
+GLOBAL.ACTIONS.TEEMO_SHOOT_DART.priority = -<span class="flag">1</span>    <span class="comment">-- 低優先度</span>
+GLOBAL.ACTIONS.TEEMO_SHOOT_DART.distance = <span class="flag">5</span>     <span class="comment">-- 射程</span></code>
+</div>
+
+<h3>5. ComponentAction &mdash; 発動条件</h3>
+<div class="code-block"><span class="lang-label">LUA</span>
+<code><span class="comment">-- 地面を右クリック（POINT）</span>
+<span class="var">AddComponentAction</span>(<span class="string">"POINT"</span>, <span class="string">"weapon"</span>, <span class="keyword">function</span>(<span class="var">inst</span>, <span class="var">doer</span>, <span class="var">pos</span>, <span class="var">actions</span>, <span class="var">right</span>, <span class="var">target</span>)
+    <span class="keyword">if</span> <span class="var">right</span> <span class="keyword">and</span> <span class="var">inst</span>:HasTag(<span class="string">"blowdart"</span>) <span class="keyword">and</span> <span class="var">doer</span>:HasTag(<span class="string">"teemo"</span>)
+        <span class="keyword">and</span> <span class="keyword">not</span> (<span class="var">doer</span>.replica.rider <span class="keyword">and</span> <span class="var">doer</span>.replica.rider:IsRiding()) <span class="keyword">then</span>
+        table.insert(<span class="var">actions</span>, GLOBAL.ACTIONS.TEEMO_SHOOT_DART)
+    <span class="keyword">end</span>
+<span class="keyword">end</span>)
+
+<span class="comment">-- エンティティを右クリック（EQUIPPED）</span>
+<span class="var">AddComponentAction</span>(<span class="string">"EQUIPPED"</span>, <span class="string">"weapon"</span>, <span class="keyword">function</span>(<span class="var">inst</span>, <span class="var">doer</span>, <span class="var">target</span>, <span class="var">actions</span>, <span class="var">right</span>)
+    <span class="keyword">if</span> <span class="var">right</span> <span class="keyword">and</span> <span class="var">inst</span>:HasTag(<span class="string">"blowdart"</span>) <span class="keyword">and</span> <span class="var">doer</span>:HasTag(<span class="string">"teemo"</span>)
+        <span class="keyword">and</span> <span class="keyword">not</span> (<span class="var">doer</span>.replica.rider <span class="keyword">and</span> <span class="var">doer</span>.replica.rider:IsRiding())
+        <span class="keyword">and</span> <span class="var">target</span> <span class="keyword">and</span> <span class="var">target</span> ~= <span class="var">doer</span> <span class="keyword">and</span> <span class="var">target</span>:HasTag(<span class="string">"_combat"</span>) <span class="keyword">then</span>
+        table.insert(<span class="var">actions</span>, GLOBAL.ACTIONS.TEEMO_SHOOT_DART)
+    <span class="keyword">end</span>
+<span class="keyword">end</span>)</code>
+</div>
+<div class="callout note"><strong>ポイント:</strong> <code class="inline">doer.replica.rider</code> で騎乗チェックしています。<code class="inline">replica</code> はクライアント側でアクセス可能なプロキシオブジェクトです。ComponentAction はクライアント側で実行されるため、<code class="inline">components.rider</code> ではなく <code class="inline">replica.rider</code> を使います。</div>
+<h3>6. ステートグラフ &mdash; 攻撃アニメーション</h3>
+<div class="code-block"><span class="lang-label">LUA</span>
+<code><span class="comment">-- サーバー側ステート</span>
+<span class="var">AddStategraphState</span>(<span class="string">"wilson"</span>, GLOBAL.State {
+    <span class="var">name</span> = <span class="string">"teemo_shoot_dart"</span>,
+    <span class="var">tags</span> = { <span class="string">"attack"</span>, <span class="string">"abouttoattack"</span>, <span class="string">"notalking"</span>, <span class="string">"autopredict"</span> },
+
+    <span class="var">onenter</span> = <span class="keyword">function</span>(<span class="var">inst</span>)
+        <span class="keyword">if</span> <span class="var">inst</span>.components.combat:InCooldown() <span class="keyword">then</span>
+            <span class="var">inst</span>:ClearBufferedAction()
+            <span class="var">inst</span>.sg:GoToState(<span class="string">"idle"</span>, <span class="keyword">true</span>)
+            <span class="keyword">return</span>
+        <span class="keyword">end</span>
+        <span class="var">inst</span>.components.combat:StartAttack()
+        <span class="var">inst</span>.components.locomotor:Stop()
+        <span class="var">inst</span>.AnimState:PlayAnimation(<span class="string">"dart"</span>)
+        <span class="var">inst</span>.sg:SetTimeout(<span class="var">inst</span>.components.combat.min_attack_period)
+    <span class="keyword">end</span>,
+
+    <span class="var">timeline</span> = {
+        <span class="comment">-- 6 フレーム目でアクション実行（矢を発射）</span>
+        GLOBAL.TimeEvent(<span class="flag">6</span> * GLOBAL.FRAMES, <span class="keyword">function</span>(<span class="var">inst</span>)
+            <span class="var">inst</span>.sg:RemoveStateTag(<span class="string">"abouttoattack"</span>)
+            <span class="var">inst</span>.bufferedaction = <span class="var">inst</span>.sg.statemem.action
+            <span class="var">inst</span>:PerformBufferedAction()
+            <span class="var">inst</span>.SoundEmitter:PlaySound(<span class="string">"dontstarve/wilson/blowdart_shoot"</span>)
+        <span class="keyword">end</span>),
+    },
+
+    <span class="var">events</span> = {
+        GLOBAL.EventHandler(<span class="string">"animqueueover"</span>, <span class="keyword">function</span>(<span class="var">inst</span>)
+            <span class="keyword">if</span> <span class="var">inst</span>.AnimState:AnimDone() <span class="keyword">then</span> <span class="var">inst</span>.sg:GoToState(<span class="string">"idle"</span>) <span class="keyword">end</span>
+        <span class="keyword">end</span>),
+    },
+})</code>
+</div>
+<div class="callout note"><strong>なぜ <code class="inline">abouttoattack</code> タグがあるのか？:</strong> このタグは「まさに攻撃しようとしている」状態を示します。6 フレーム目で実際にアクションが実行された時に <code class="inline">RemoveStateTag</code> で外し、<code class="inline">onexit</code> で残っていれば <code class="inline">CancelAttack()</code> します。これにより、攻撃中断時の整合性が保たれます。</div>
+
+<h3>7. RPC &mdash; サモナースペル</h3>
+<h4>Flash（テレポート）</h4>
+<div class="code-block"><span class="lang-label">LUA</span>
+<code><span class="var">AddModRPCHandler</span>(<span class="string">"teemo"</span>, <span class="string">"use_flash"</span>, <span class="keyword">function</span>(<span class="var">player</span>, <span class="var">x</span>, <span class="var">z</span>)
+    <span class="comment">-- バリデーション</span>
+    <span class="keyword">if</span> <span class="keyword">not</span> <span class="var">player</span>:HasTag(<span class="string">"teemo"</span>) <span class="keyword">then</span> <span class="keyword">return</span> <span class="keyword">end</span>
+    <span class="keyword">if</span> <span class="var">player</span>:HasTag(<span class="string">"playerghost"</span>) <span class="keyword">then</span> <span class="keyword">return</span> <span class="keyword">end</span>
+    <span class="keyword">if</span> <span class="var">player</span>._flashCooldown == <span class="keyword">nil</span> <span class="keyword">or</span> <span class="var">player</span>._flashCooldown:value() &gt; <span class="flag">0</span> <span class="keyword">then</span> <span class="keyword">return</span> <span class="keyword">end</span>
+
+    <span class="comment">-- 範囲チェック（最大距離にクランプ）</span>
+    <span class="keyword">local</span> <span class="var">px</span>, <span class="var">py</span>, <span class="var">pz</span> = <span class="var">player</span>.Transform:GetWorldPosition()
+    <span class="keyword">local</span> <span class="var">dx</span>, <span class="var">dz</span> = <span class="var">x</span> - <span class="var">px</span>, <span class="var">z</span> - <span class="var">pz</span>
+    <span class="keyword">local</span> <span class="var">dist</span> = math.sqrt(<span class="var">dx</span> * <span class="var">dx</span> + <span class="var">dz</span> * <span class="var">dz</span>)
+    <span class="keyword">local</span> <span class="var">maxRange</span> = GLOBAL.<span class="var">TEEMO_FLASH_RANGE</span>
+    <span class="keyword">if</span> <span class="var">dist</span> &gt; <span class="var">maxRange</span> <span class="keyword">then</span>
+        <span class="keyword">local</span> <span class="var">ratio</span> = <span class="var">maxRange</span> / <span class="var">dist</span>
+        <span class="var">x</span> = <span class="var">px</span> + <span class="var">dx</span> * <span class="var">ratio</span>
+        <span class="var">z</span> = <span class="var">pz</span> + <span class="var">dz</span> * <span class="var">ratio</span>
+    <span class="keyword">end</span>
+
+    <span class="comment">-- 壁抜け判定（LoL 準拠）</span>
+    <span class="keyword">if</span> <span class="keyword">not</span> GLOBAL.TheWorld.Map:IsPassableAtPoint(<span class="var">x</span>, <span class="flag">0</span>, <span class="var">z</span>) <span class="keyword">then</span>
+        <span class="comment">-- 1. 目標地点の先に歩行可能地点があるか探す</span>
+        <span class="comment">-- 2. なければ手前にフォールバック</span>
+        <span class="comment">-- ...</span>
+    <span class="keyword">end</span>
+
+    <span class="comment">-- クールダウン開始</span>
+    <span class="var">player</span>._flashCooldown:set(GLOBAL.<span class="var">TEEMO_FLASH_COOLDOWN</span>)
+
+    <span class="comment">-- テレポート実行</span>
+    <span class="var">player</span>.Physics:Teleport(<span class="var">x</span>, <span class="flag">0</span>, <span class="var">z</span>)
+<span class="keyword">end</span>)</code>
+</div>
+<div class="callout note"><strong>ポイント:</strong> 壁抜け判定が実装されています。テレポート先が壁の中の場合、同じ方向にさらに 3 ユニット先まで歩行可能地点を探し、見つからなければ手前にフォールバックします。LoL の Flash と同じ挙動を再現しています。</div>
+
+<h4>Ignite（炎上 DOT）</h4>
+<div class="code-block"><span class="lang-label">LUA</span>
+<code><span class="var">AddModRPCHandler</span>(<span class="string">"teemo"</span>, <span class="string">"use_ignite"</span>, <span class="keyword">function</span>(<span class="var">player</span>)
+    <span class="comment">-- バリデーション（省略）</span>
+
+    <span class="comment">-- 最も近い敵対エンティティを単体選択</span>
+    <span class="keyword">local</span> <span class="var">target</span> = <span class="keyword">nil</span>
+    <span class="keyword">local</span> <span class="var">closestDist</span> = math.huge
+    <span class="keyword">local</span> <span class="var">ents</span> = GLOBAL.TheSim:FindEntities(<span class="var">x</span>, <span class="var">y</span>, <span class="var">z</span>, <span class="var">range</span>, {<span class="string">"_combat"</span>})
+    <span class="keyword">for</span> _, <span class="var">v</span> <span class="keyword">in</span> pairs(<span class="var">ents</span>) <span class="keyword">do</span>
+        <span class="keyword">if</span> <span class="var">v</span> ~= <span class="var">player</span> <span class="keyword">and</span> <span class="var">v</span>.components.combat
+            <span class="keyword">and</span> <span class="keyword">not</span> <span class="var">v</span>:HasTag(<span class="var">nonTarget</span>) <span class="keyword">and</span> <span class="keyword">not</span> <span class="var">v</span>:HasTag(<span class="string">"companion"</span>)
+            <span class="keyword">and</span> (<span class="var">v</span>:HasTag(<span class="string">"hostile"</span>) <span class="keyword">or</span> <span class="var">v</span>.components.combat.target == <span class="var">player</span>) <span class="keyword">then</span>
+            <span class="comment">-- 距離比較で最も近い敵を選択</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+
+    <span class="comment">-- 敵がいなければ発動しない（CD を消費しない）</span>
+    <span class="keyword">if</span> <span class="var">target</span> == <span class="keyword">nil</span> <span class="keyword">then</span> <span class="keyword">return</span> <span class="keyword">end</span>
+
+    <span class="comment">-- クールダウン開始</span>
+    <span class="var">player</span>._igniteCooldown:set(GLOBAL.<span class="var">TEEMO_IGNITE_COOLDOWN</span>)
+
+    <span class="comment">-- トゥルーダメージ DOT（DoDelta で防御無視）</span>
+    <span class="keyword">local</span> <span class="var">dmg</span> = GLOBAL.<span class="var">TEEMO_IGNITE_DAMAGE</span>
+    <span class="keyword">if</span> <span class="var">v</span>:HasTag(<span class="string">"player"</span>) <span class="keyword">then</span> <span class="var">dmg</span> = <span class="var">dmg</span> * <span class="flag">0.3</span> <span class="keyword">end</span>  <span class="comment">-- 対人ダメージ 30%</span>
+
+    <span class="var">v</span>._igniteDotTask = <span class="var">v</span>:DoPeriodicTask(<span class="flag">1.0</span>, <span class="keyword">function</span>()
+        <span class="var">v</span>.components.health:DoDelta(-<span class="var">dmg</span>, <span class="keyword">nil</span>, <span class="string">"ignite"</span>)
+        <span class="var">TeemoShowDamageNumber</span>(<span class="var">v</span>, <span class="var">dmg</span>, <span class="var">TEEMO_DMG_COLOUR_TRUE</span>)
+    <span class="keyword">end</span>)
+
+    <span class="comment">-- 5 秒後に DOT 停止</span>
+    <span class="var">v</span>._igniteDotEndTask = <span class="var">v</span>:DoTaskInTime(<span class="flag">5.05</span>, <span class="keyword">function</span>()
+        <span class="keyword">if</span> <span class="var">v</span>._igniteDotTask ~= <span class="keyword">nil</span> <span class="keyword">then</span>
+            <span class="var">v</span>._igniteDotTask:Cancel()
+            <span class="var">v</span>._igniteDotTask = <span class="keyword">nil</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>)
+<span class="keyword">end</span>)</code>
+</div>
+<div class="callout note"><strong>なぜ <code class="inline">5.05</code> 秒なのか？:</strong> <code class="inline">DoPeriodicTask(1.0, ...)</code> は 1 秒ごとにダメージを与えます。5 秒だと 5 回目のティックと停止が同時になり、実行順序が不確定になります。0.05 秒の余裕を持たせることで、5 回目のダメージが確実に適用されてから停止します。</div>
+
+<h3>8. AddPrefabPostInit &mdash; 月キノコの免疫</h3>
+<div class="code-block"><span class="lang-label">LUA</span>
+<code><span class="keyword">if</span> GLOBAL.<span class="var">TEEMO_MUSHROOM_IMMUNITY</span> <span class="keyword">then</span>
+    <span class="var">AddPrefabPostInit</span>(<span class="string">"moon_cap"</span>, <span class="keyword">function</span>(<span class="var">inst</span>)
+        <span class="keyword">if</span> <span class="keyword">not</span> GLOBAL.TheWorld.ismastersim <span class="keyword">then</span> <span class="keyword">return</span> <span class="keyword">end</span>
+        <span class="keyword">local</span> <span class="var">_oneaten</span> = <span class="var">inst</span>.components.edible.oneaten  <span class="comment">-- 元の関数を保存</span>
+        <span class="var">inst</span>.components.edible:SetOnEatenFn(<span class="keyword">function</span>(<span class="var">inst</span>, <span class="var">eater</span>)
+            <span class="keyword">if</span> <span class="var">eater</span>:HasTag(<span class="string">"teemo"</span>) <span class="keyword">then</span> <span class="keyword">return</span> <span class="keyword">end</span>     <span class="comment">-- teemo なら効果をスキップ</span>
+            <span class="keyword">if</span> <span class="var">_oneaten</span> ~= <span class="keyword">nil</span> <span class="keyword">then</span> <span class="var">_oneaten</span>(<span class="var">inst</span>, <span class="var">eater</span>) <span class="keyword">end</span>  <span class="comment">-- それ以外は元の処理</span>
+        <span class="keyword">end</span>)
+    <span class="keyword">end</span>)
+<span class="keyword">end</span></code>
+</div>
+
+<h3>9. クラフトタブとレシピ</h3>
+<div class="code-block"><span class="lang-label">LUA</span>
+<code><span class="comment">-- テーモ専用クラフトタブ（"teemo" タグを持つキャラクターのみ表示）</span>
+<span class="keyword">local</span> <span class="var">teemoTab</span> = <span class="var">AddRecipeTab</span>(
+    <span class="string">"Teemo Items"</span>, <span class="flag">998</span>,
+    GLOBAL.<span class="var">resolvefilepath</span>(<span class="string">"images/hud/teemotab.xml"</span>), <span class="string">"teemotab.tex"</span>,
+    <span class="string">"teemo"</span>
+)
+
+<span class="comment">-- Blind Dart のレシピ</span>
+<span class="var">AddRecipe2</span>(<span class="string">"blind_dart"</span>, {
+    GLOBAL.Ingredient(<span class="string">"boards"</span>, <span class="flag">1</span>),
+    GLOBAL.Ingredient(<span class="string">"green_cap"</span>, <span class="flag">1</span>),
+    GLOBAL.Ingredient(<span class="string">"silk"</span>, <span class="flag">1</span>),
+    GLOBAL.Ingredient(<span class="string">"stinger"</span>, <span class="flag">1</span>),
+    GLOBAL.Ingredient(<span class="string">"rope"</span>, <span class="flag">1</span>),
+}, GLOBAL.TECH.NONE, {
+    <span class="var">atlas</span> = GLOBAL.<span class="var">resolvefilepath</span>(<span class="string">"images/inventoryimages/blind_dart.xml"</span>),
+    <span class="var">image</span> = <span class="string">"blind_dart.tex"</span>,
+    <span class="var">builder_tag</span> = <span class="string">"teemo"</span>,   <span class="comment">-- teemo のみクラフト可能</span>
+    <span class="var">tab</span> = <span class="var">teemoTab</span>,
+}, {<span class="string">"CHARACTER"</span>})</code>
+</div>
+
+<h3>10. インベントリバーのカスタマイズ</h3>
+<p>最後の 3 スロットを専用 UI（トラップ・フラッシュ・イグナイト）に置き換えています。</p>
+<div class="code-block"><span class="lang-label">LUA</span>
+<code><span class="var">AddClassPostConstruct</span>(<span class="string">"widgets/inventorybar"</span>, <span class="keyword">function</span>(<span class="var">self</span>)
+    <span class="keyword">if</span> <span class="keyword">not</span> <span class="var">self</span>.owner:HasTag(<span class="string">"teemo"</span>) <span class="keyword">then</span> <span class="keyword">return</span> <span class="keyword">end</span>
+
+    <span class="keyword">local</span> <span class="var">NoxiousTrapSlot</span> = <span class="keyword">require</span>(<span class="string">"widgets/noxioustrap_slot"</span>)
+    <span class="keyword">local</span> <span class="var">SummonerSpellSlot</span> = <span class="keyword">require</span>(<span class="string">"widgets/summoner_spell_slot"</span>)
+
+    <span class="keyword">local</span> <span class="var">_Rebuild</span> = <span class="var">self</span>.Rebuild
+    <span class="var">self</span>.Rebuild = <span class="keyword">function</span>(<span class="var">self</span>, ...)
+        <span class="comment">-- 既存のカスタムスロットを破棄</span>
+        <span class="keyword">if</span> <span class="var">self</span>.noxioustrapslot ~= <span class="keyword">nil</span> <span class="keyword">then</span> <span class="var">self</span>.noxioustrapslot:Kill() <span class="keyword">end</span>
+        <span class="keyword">if</span> <span class="var">self</span>.flashslot ~= <span class="keyword">nil</span> <span class="keyword">then</span> <span class="var">self</span>.flashslot:Kill() <span class="keyword">end</span>
+        <span class="keyword">if</span> <span class="var">self</span>.igniteslot ~= <span class="keyword">nil</span> <span class="keyword">then</span> <span class="var">self</span>.igniteslot:Kill() <span class="keyword">end</span>
+
+        <span class="var">_Rebuild</span>(<span class="var">self</span>, ...)  <span class="comment">-- 元の Rebuild を実行</span>
+
+        <span class="comment">-- 最後の 3 スロットを非表示にする</span>
+        <span class="keyword">local</span> <span class="var">numSlots</span> = #<span class="var">self</span>.inv
+        <span class="keyword">for</span> <span class="var">i</span> = <span class="var">numSlots</span> - GLOBAL.<span class="var">TEEMO_RESERVED_SLOTS</span> + <span class="flag">1</span>, <span class="var">numSlots</span> <span class="keyword">do</span>
+            <span class="keyword">local</span> <span class="var">slot</span> = <span class="var">self</span>.inv[<span class="var">i</span>]
+            <span class="keyword">if</span> <span class="var">slot</span> <span class="keyword">then</span>
+                <span class="var">slot</span>:Hide()
+                <span class="var">slot</span>.OnControl = <span class="keyword">function</span>() <span class="keyword">return</span> <span class="keyword">false</span> <span class="keyword">end</span>
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+
+        <span class="comment">-- カスタムウィジェットを配置</span>
+        <span class="keyword">local</span> <span class="var">trapSlot</span> = <span class="var">self</span>.inv[<span class="var">numSlots</span> - <span class="flag">2</span>]
+        <span class="keyword">if</span> <span class="var">trapSlot</span> <span class="keyword">then</span>
+            <span class="keyword">local</span> <span class="var">pos</span> = <span class="var">trapSlot</span>:GetPosition()
+            <span class="var">self</span>.noxioustrapslot = <span class="var">self</span>.toprow:AddChild(<span class="var">NoxiousTrapSlot</span>(<span class="var">self</span>.owner))
+            <span class="var">self</span>.noxioustrapslot:SetPosition(<span class="var">pos</span>.x, <span class="var">pos</span>.y, <span class="var">pos</span>.z)
+        <span class="keyword">end</span>
+        <span class="comment">-- Flash, Ignite も同様に配置...</span>
+    <span class="keyword">end</span>
+
+    <span class="var">self</span>.rebuild_pending = <span class="keyword">true</span>
+<span class="keyword">end</span>)</code>
+</div>
+<div class="callout note"><strong>なぜ <code class="inline">rebuild_pending</code> を設定するのか？:</strong> <code class="inline">Rebuild</code> メソッドをオーバーライドしただけでは、既に構築済みのインベントリバーには反映されません。<code class="inline">rebuild_pending = true</code> を設定することで、次フレームで再構築が実行されます。</div>
+</section>
+<section class="section" id="prefab">
+<div class="section-label">05 &mdash; Character Prefab</div>
+<h2>キャラクター prefab &mdash; teemo.lua</h2>
+<p>teemo.lua はキャラクターの中核ファイルで、パッシブ能力「カモフラージュ」やステータス設定を実装しています。</p>
+
+<h3>パッシブ能力: カモフラージュ（透明化）</h3>
+<p>3 秒間静止するとステルス状態になる能力です。</p>
+
+<h4>ステルス発動</h4>
+<div class="code-block"><span class="lang-label">LUA</span>
+<code><span class="keyword">local</span> <span class="keyword">function</span> <span class="var">doCamouflage</span>(<span class="var">inst</span>)
+    <span class="keyword">if</span> <span class="keyword">not</span> <span class="var">inst</span>.isCamouflage <span class="keyword">then</span>
+        <span class="var">inst</span>.isCamouflage = <span class="keyword">true</span>
+        <span class="comment">-- 半透明化</span>
+        <span class="var">inst</span>.AnimState:SetMultColour(.<span class="flag">5</span>, .<span class="flag">5</span>, .<span class="flag">5</span>, .<span class="flag">8</span>)
+        <span class="comment">-- 影を非表示</span>
+        <span class="var">inst</span>.DynamicShadow:Enable(<span class="keyword">false</span>)
+
+        <span class="comment">-- 砂煙エフェクト</span>
+        <span class="keyword">local</span> <span class="var">puff</span> = SpawnPrefab(<span class="string">"shadow_puff"</span>)
+        <span class="keyword">if</span> <span class="var">puff</span> ~= <span class="keyword">nil</span> <span class="keyword">then</span>
+            <span class="var">puff</span>.Transform:SetPosition(<span class="var">inst</span>.Transform:GetWorldPosition())
+        <span class="keyword">end</span>
+
+        <span class="comment">-- セリフ（30% 確率）</span>
+        <span class="keyword">if</span> math.random() &lt; <span class="flag">0.3</span> <span class="keyword">and</span> <span class="var">inst</span>.components.talker <span class="keyword">then</span>
+            <span class="var">inst</span>.components.talker:Say(<span class="var">CAMOUFLAGE_QUOTES</span>[math.random(#<span class="var">CAMOUFLAGE_QUOTES</span>)])
+        <span class="keyword">end</span>
+
+        <span class="comment">-- 当たり判定を変更（敵をすり抜ける）</span>
+        <span class="var">inst</span>.Physics:ClearCollisionMask()
+        <span class="var">inst</span>.Physics:CollidesWith(COLLISION.WORLD)
+        <span class="var">inst</span>.Physics:CollidesWith(COLLISION.OBSTACLES)
+        <span class="var">inst</span>.Physics:CollidesWith(COLLISION.SMALLOBSTACLES)
+        <span class="comment">-- COLLISION.CHARACTERS と COLLISION.GIANTS を除外 → すり抜け</span>
+
+        <span class="comment">-- 敵の攻撃を無効化（0.5 秒ごと）</span>
+        <span class="var">inst</span>._blankOutTask = <span class="var">inst</span>:DoPeriodicTask(.<span class="flag">5</span>, <span class="keyword">function</span>()
+            <span class="keyword">local</span> <span class="var">x</span>, <span class="var">y</span>, <span class="var">z</span> = <span class="var">inst</span>.Transform:GetWorldPosition()
+            <span class="keyword">local</span> <span class="var">ents</span> = TheSim:FindEntities(<span class="var">x</span>, <span class="var">y</span>, <span class="var">z</span>, <span class="flag">20</span>, {<span class="string">"_combat"</span>})
+            <span class="keyword">for</span> <span class="var">k</span>, <span class="var">v</span> <span class="keyword">in</span> pairs(<span class="var">ents</span>) <span class="keyword">do</span>
+                <span class="keyword">if</span> <span class="var">v</span>.components.combat <span class="keyword">and</span> <span class="var">v</span>.components.combat.target == <span class="var">inst</span> <span class="keyword">then</span>
+                    <span class="var">v</span>.components.combat:BlankOutAttacks(<span class="flag">1</span>)
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>)
+    <span class="keyword">end</span>
+<span class="keyword">end</span></code>
+</div>
+<div class="callout note"><strong>なぜ <code class="inline">BlankOutAttacks</code> を使うのか？:</strong> 単にターゲットを外すと敵が別のプレイヤーに向かってしまいます。<code class="inline">BlankOutAttacks</code> はターゲットを維持したまま攻撃を空振りにするため、ステルス解除後に即座に戦闘が再開されます。</div>
+
+<h4>ステルス定期チェック</h4>
+<div class="code-block"><span class="lang-label">LUA</span>
+<code><span class="keyword">local</span> <span class="keyword">function</span> <span class="var">checkCamouflage</span>(<span class="var">inst</span>)
+    <span class="keyword">if</span> <span class="var">inst</span>.components.health == <span class="keyword">nil</span> <span class="keyword">then</span> <span class="keyword">return</span> <span class="keyword">end</span>
+    <span class="keyword">if</span> <span class="var">inst</span>.components.locomotor == <span class="keyword">nil</span> <span class="keyword">then</span> <span class="keyword">return</span> <span class="keyword">end</span>
+
+    <span class="comment">-- 騎乗中は無効</span>
+    <span class="keyword">if</span> <span class="var">inst</span>.components.rider ~= <span class="keyword">nil</span> <span class="keyword">and</span> <span class="var">inst</span>.components.rider:IsRiding() <span class="keyword">then</span>
+        <span class="var">disableCamouflage</span>(<span class="var">inst</span>)
+        <span class="keyword">return</span>
+    <span class="keyword">end</span>
+
+    <span class="comment">-- 被ダメージチェック</span>
+    <span class="keyword">if</span> <span class="var">inst</span>.components.health.currenthealth &lt; <span class="var">inst</span>.camouflage_h <span class="keyword">then</span>
+        <span class="var">disableCamouflage</span>(<span class="var">inst</span>)
+        <span class="keyword">return</span>
+    <span class="keyword">end</span>
+
+    <span class="comment">-- 位置チェック: 3 秒間動いていなければ発動</span>
+    <span class="keyword">local</span> <span class="var">x</span>, _, <span class="var">z</span> = <span class="var">inst</span>.Transform:GetWorldPosition()
+    <span class="keyword">if</span> <span class="var">x</span> == <span class="var">inst</span>.camouflage_x <span class="keyword">and</span> <span class="var">z</span> == <span class="var">inst</span>.camouflage_z <span class="keyword">then</span>
+        <span class="keyword">if</span> GetTime() - <span class="var">inst</span>.camouflage_t &gt; <span class="flag">3</span> <span class="keyword">then</span> <span class="var">doCamouflage</span>(<span class="var">inst</span>) <span class="keyword">end</span>
+    <span class="keyword">else</span>
+        <span class="var">disableCamouflage</span>(<span class="var">inst</span>)
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="comment">-- master_postinit 内で 0.5 秒ごとにチェック</span>
+<span class="var">inst</span>.camouflageTask = <span class="var">inst</span>:DoPeriodicTask(.<span class="flag">5</span>, <span class="var">checkCamouflage</span>)</code>
+</div>
+
+<h4>ステルス解除ボーナス</h4>
+<div class="code-block"><span class="lang-label">LUA</span>
+<code><span class="keyword">local</span> <span class="keyword">function</span> <span class="var">disableCamouflage</span>(<span class="var">inst</span>)
+    <span class="comment">-- ...（透明化解除処理）...</span>
+
+    <span class="comment">-- ステルス解除ボーナス: Blind Dart 装備時は攻撃速度 UP（5 秒間）</span>
+    <span class="keyword">if</span> <span class="var">inst</span>:HasTag(<span class="string">"blind_dart_equipped"</span>) <span class="keyword">then</span>
+        <span class="var">inst</span>.components.combat.min_attack_period = <span class="flag">0.5</span>   <span class="comment">-- 通常 1.0 → 0.5 秒</span>
+        <span class="keyword">if</span> <span class="var">inst</span>.resetAttackSpeedTask ~= <span class="keyword">nil</span> <span class="keyword">then</span>
+            <span class="var">inst</span>.resetAttackSpeedTask:Cancel()
+        <span class="keyword">end</span>
+        <span class="var">inst</span>.resetAttackSpeedTask = <span class="var">inst</span>:DoTaskInTime(<span class="flag">5.0</span>, <span class="keyword">function</span>(<span class="var">inst</span>)
+            <span class="keyword">if</span> <span class="var">inst</span>:HasTag(<span class="string">"blind_dart_equipped"</span>) <span class="keyword">then</span>
+                <span class="var">inst</span>.components.combat.min_attack_period = <span class="flag">1.0</span>
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>, <span class="var">inst</span>)
+    <span class="keyword">end</span>
+<span class="keyword">end</span></code>
+</div>
+
+<h3>ステータス設定</h3>
+<div class="code-block"><span class="lang-label">LUA</span>
+<code><span class="keyword">local</span> <span class="keyword">function</span> <span class="var">master_postinit</span>(<span class="var">inst</span>)
+    <span class="var">inst</span>.components.health:SetMaxHealth(<span class="var">TEEMO_HEALTH</span>)
+    <span class="var">inst</span>.components.hunger:SetMax(<span class="var">TEEMO_HUNGER</span>)
+    <span class="var">inst</span>.components.sanity:SetMax(<span class="var">TEEMO_SANITY</span>)
+    <span class="var">inst</span>.components.combat.damagemultiplier = <span class="var">TEEMO_DAMAGE_MULT</span>
+    <span class="var">inst</span>.components.health:SetAbsorptionAmount(<span class="var">TEEMO_ABSORPTION</span>)
+
+    <span class="comment">-- キノコのマイナス効果無効化</span>
+    <span class="keyword">if</span> <span class="var">TEEMO_MUSHROOM_IMMUNITY</span> <span class="keyword">then</span>
+        <span class="var">inst</span>.components.eater.custom_stats_mod_fn = <span class="var">mushroomStatsMod</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span></code>
+</div>
+<p><code class="inline">custom_stats_mod_fn</code> はキャラクターの食事効果を加工するコールバックです。</p>
+<div class="code-block"><span class="lang-label">LUA</span>
+<code><span class="keyword">local</span> <span class="keyword">function</span> <span class="var">mushroomStatsMod</span>(<span class="var">inst</span>, <span class="var">health_delta</span>, <span class="var">hunger_delta</span>, <span class="var">sanity_delta</span>, <span class="var">food</span>, <span class="var">feeder</span>)
+    <span class="keyword">if</span> <span class="var">food</span> ~= <span class="keyword">nil</span> <span class="keyword">and</span> <span class="var">MUSHROOM_PREFABS</span>[<span class="var">food</span>.prefab] <span class="keyword">then</span>
+        <span class="keyword">if</span> <span class="var">health_delta</span> &lt; <span class="flag">0</span> <span class="keyword">then</span> <span class="var">health_delta</span> = <span class="flag">0</span> <span class="keyword">end</span>   <span class="comment">-- マイナス HP を 0 に</span>
+        <span class="keyword">if</span> <span class="var">hunger_delta</span> &lt; <span class="flag">0</span> <span class="keyword">then</span> <span class="var">hunger_delta</span> = <span class="flag">0</span> <span class="keyword">end</span>
+        <span class="keyword">if</span> <span class="var">sanity_delta</span> &lt; <span class="flag">0</span> <span class="keyword">then</span> <span class="var">sanity_delta</span> = <span class="flag">0</span> <span class="keyword">end</span>
+    <span class="keyword">end</span>
+    <span class="keyword">return</span> <span class="var">health_delta</span>, <span class="var">hunger_delta</span>, <span class="var">sanity_delta</span>
+<span class="keyword">end</span></code>
+</div>
+
+<h3>豊富なイベントリスナー</h3>
+<p>teemo.lua では多数のイベントリスナーでカモフラージュを管理しています。</p>
+<div class="code-block"><span class="lang-label">LUA</span>
+<code><span class="comment">-- これらのイベントすべてでカモフラージュ解除</span>
+<span class="var">inst</span>:ListenForEvent(<span class="string">"buildsuccess"</span>, <span class="keyword">function</span>() <span class="var">disableCamouflage</span>(<span class="var">inst</span>) <span class="keyword">end</span>)
+<span class="var">inst</span>:ListenForEvent(<span class="string">"equipped"</span>, <span class="keyword">function</span>() <span class="var">disableCamouflage</span>(<span class="var">inst</span>) <span class="keyword">end</span>)
+<span class="var">inst</span>:ListenForEvent(<span class="string">"onpickup"</span>, <span class="keyword">function</span>() <span class="var">disableCamouflage</span>(<span class="var">inst</span>) <span class="keyword">end</span>)
+<span class="var">inst</span>:ListenForEvent(<span class="string">"ondropped"</span>, <span class="keyword">function</span>() <span class="var">disableCamouflage</span>(<span class="var">inst</span>) <span class="keyword">end</span>)
+<span class="var">inst</span>:ListenForEvent(<span class="string">"oneatsomething"</span>, <span class="keyword">function</span>() <span class="var">disableCamouflage</span>(<span class="var">inst</span>) <span class="keyword">end</span>)
+<span class="var">inst</span>:ListenForEvent(<span class="string">"oneaten"</span>, <span class="keyword">function</span>() <span class="var">disableCamouflage</span>(<span class="var">inst</span>) <span class="keyword">end</span>)
+
+<span class="comment">-- 作業時はカモフラージュ解除 + ボイス再生</span>
+<span class="var">inst</span>:ListenForEvent(<span class="string">"working"</span>, <span class="keyword">function</span>()
+    <span class="var">disableCamouflage</span>(<span class="var">inst</span>)
+    <span class="keyword">if</span> math.random() &lt; <span class="flag">0.25</span> <span class="keyword">then</span> <span class="var">inst</span>._sound_emote:push() <span class="keyword">end</span>
+<span class="keyword">end</span>)
+
+<span class="comment">-- 攻撃時はカモフラージュ解除 + 毒マーク設定</span>
+<span class="var">inst</span>:ListenForEvent(<span class="string">"onattackother"</span>, <span class="keyword">function</span>(<span class="var">inst</span>, <span class="var">data</span>)
+    <span class="var">disableCamouflage</span>(<span class="var">inst</span>)
+    <span class="keyword">if</span> <span class="var">data</span> <span class="keyword">and</span> <span class="var">data</span>.weapon <span class="keyword">and</span> <span class="var">data</span>.weapon:HasTag(<span class="string">"blowdart"</span>) <span class="keyword">and</span> <span class="var">data</span>.target <span class="keyword">then</span>
+        TeemoPoison.<span class="var">markTeemoPoisoned</span>(<span class="var">data</span>.target)
+    <span class="keyword">end</span>
+<span class="keyword">end</span>)</code>
+</div>
+
+<h3>インベントリスロット制限</h3>
+<p>最後の 3 スロットを専用スロットとして確保します。</p>
+<div class="code-block"><span class="lang-label">LUA</span>
+<code><span class="keyword">local</span> <span class="var">_CanTakeItemInSlot</span> = <span class="var">inst</span>.components.inventory.CanTakeItemInSlot
+rawset(<span class="var">inst</span>.components.inventory, <span class="string">"CanTakeItemInSlot"</span>, <span class="keyword">function</span>(<span class="var">self</span>, <span class="var">item</span>, <span class="var">slot</span>)
+    <span class="keyword">if</span> <span class="var">slot</span> &gt; <span class="var">self</span>.maxslots - <span class="var">TEEMO_RESERVED_SLOTS</span> <span class="keyword">then</span> <span class="keyword">return</span> <span class="keyword">false</span> <span class="keyword">end</span>
+    <span class="keyword">return</span> <span class="var">_CanTakeItemInSlot</span>(<span class="var">self</span>, <span class="var">item</span>, <span class="var">slot</span>)
+<span class="keyword">end</span>)</code>
+</div>
+<div class="callout note"><strong>なぜ <code class="inline">rawset</code> を使うのか？:</strong> DST の <code class="inline">inventory</code> コンポーネントはメタテーブルでメソッドを定義しています。単純に <code class="inline">self.CanTakeItemInSlot = ...</code> と書くとメタテーブルではなくインスタンスに書き込まれ、意図した動作にならない場合があります。<code class="inline">rawset</code> で確実にインスタンスレベルで上書きします。</div>
+</section>
+<section class="section" id="items">
+<div class="section-label">06 &mdash; Custom Items</div>
+<h2>カスタムアイテムの実装</h2>
+
+<h3>Blind Dart（吹き矢武器）</h3>
+<p><code class="inline">blind_dart.lua</code> は装備可能な武器アイテムです。</p>
+<div class="code-block"><span class="lang-label">LUA</span>
+<code><span class="comment">-- 左クリックのダメージは 0（右クリックの projectile で発射する設計）</span>
+<span class="var">inst</span>:AddComponent(<span class="string">"weapon"</span>)
+<span class="var">inst</span>.components.weapon:SetDamage(<span class="flag">0</span>)
+
+<span class="comment">-- 耐久力: 敵に攻撃されると減少（設定値で ON/OFF 可能）</span>
+<span class="keyword">if</span> <span class="var">TEEMO_BLIND_DART_DURABILITY</span> &gt; <span class="flag">0</span> <span class="keyword">then</span>
+    <span class="var">inst</span>:AddComponent(<span class="string">"finiteuses"</span>)
+    <span class="var">inst</span>.components.finiteuses:SetMaxUses(<span class="var">TEEMO_BLIND_DART_DURABILITY</span>)
+    <span class="var">inst</span>.components.finiteuses:SetUses(<span class="var">TEEMO_BLIND_DART_DURABILITY</span>)
+    <span class="comment">-- 攻撃時の自動消費を無効化（被ダメージ時のみ手動で減少）</span>
+    <span class="var">inst</span>.components.finiteuses:SetIgnoreCombatDurabilityLoss(<span class="keyword">true</span>)
+<span class="keyword">end</span>
+
+<span class="comment">-- teemo のみ装備可能</span>
+<span class="var">inst</span>:AddComponent(<span class="string">"characterspecific"</span>)
+<span class="var">inst</span>.components.characterspecific:SetOwner(<span class="string">"teemo"</span>)</code>
+</div>
+<p>装備コールバックでは、被攻撃時に耐久力を減らすリスナーを登録しています。</p>
+<div class="code-block"><span class="lang-label">LUA</span>
+<code><span class="keyword">local</span> <span class="keyword">function</span> <span class="var">onequip</span>(<span class="var">inst</span>, <span class="var">owner</span>)
+    <span class="var">owner</span>.AnimState:OverrideSymbol(<span class="string">"swap_object"</span>, <span class="string">"swap_blind_dart"</span>, <span class="string">"swap_blind_dart"</span>)
+    <span class="var">owner</span>.AnimState:Show(<span class="string">"ARM_carry"</span>)
+    <span class="var">owner</span>.AnimState:Hide(<span class="string">"ARM_normal"</span>)
+    <span class="var">owner</span>:AddTag(<span class="string">"blind_dart_equipped"</span>)
+
+    <span class="comment">-- 装備中に攻撃されたら耐久力を減らす</span>
+    <span class="keyword">if</span> <span class="var">inst</span>.components.finiteuses <span class="keyword">then</span>
+        <span class="var">inst</span>._onowner_attacked = <span class="keyword">function</span>(<span class="var">owner</span>, <span class="var">data</span>)
+            <span class="keyword">if</span> <span class="var">data</span> <span class="keyword">and</span> <span class="var">data</span>.attacker <span class="keyword">and</span> <span class="var">inst</span>.components.finiteuses <span class="keyword">then</span>
+                <span class="keyword">local</span> <span class="var">cur</span> = <span class="var">inst</span>.components.finiteuses:GetUses()
+                <span class="keyword">if</span> <span class="var">cur</span> &gt; <span class="flag">0</span> <span class="keyword">then</span> <span class="var">inst</span>.components.finiteuses:SetUses(<span class="var">cur</span> - <span class="flag">1</span>) <span class="keyword">end</span>
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+        <span class="var">owner</span>:ListenForEvent(<span class="string">"attacked"</span>, <span class="var">inst</span>._onowner_attacked)
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="keyword">local</span> <span class="keyword">function</span> <span class="var">onunequip</span>(<span class="var">inst</span>, <span class="var">owner</span>)
+    <span class="comment">-- リスナー解除（メモリリーク防止）</span>
+    <span class="keyword">if</span> <span class="var">inst</span>._onowner_attacked <span class="keyword">then</span>
+        <span class="var">owner</span>:RemoveEventCallback(<span class="string">"attacked"</span>, <span class="var">inst</span>._onowner_attacked)
+        <span class="var">inst</span>._onowner_attacked = <span class="keyword">nil</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span></code>
+</div>
+<div class="callout warning"><strong>重要:</strong> <code class="inline">onunequip</code> で必ずリスナーを解除しています。これを忘れると、装備を外した後もリスナーが残り、メモリリークや意図しない動作の原因になります。</div>
+
+<h3>Blind Dart Projectile（飛翔体）</h3>
+<p><code class="inline">blind_dart_projectile.lua</code> は命中時に複数の効果を適用する飛翔体です。</p>
+<div class="code-block"><span class="lang-label">LUA</span>
+<code><span class="keyword">local</span> <span class="keyword">function</span> <span class="var">onhit</span>(<span class="var">inst</span>, <span class="var">owner</span>, <span class="var">target</span>)
+    <span class="keyword">local</span> <span class="var">attacker</span> = <span class="var">inst</span>._teemo_attacker  <span class="comment">-- modmain.lua で格納したプレイヤー参照</span>
+
+    <span class="comment">-- 1. ダメージ計算（攻撃者の倍率を適用）</span>
+    <span class="keyword">local</span> <span class="var">damage</span> = <span class="var">TEEMO_BLIND_DART_DAMAGE</span>
+    <span class="keyword">if</span> <span class="var">attacker</span> <span class="keyword">and</span> <span class="var">attacker</span>.components.combat <span class="keyword">then</span>
+        <span class="var">damage</span> = <span class="var">damage</span> * (<span class="var">attacker</span>.components.combat.damagemultiplier <span class="keyword">or</span> <span class="flag">1</span>)
+        <span class="keyword">if</span> <span class="var">attacker</span>.components.combat.externaldamagemultipliers <span class="keyword">then</span>
+            <span class="var">damage</span> = <span class="var">damage</span> * <span class="var">attacker</span>.components.combat.externaldamagemultipliers:Get()
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+
+    <span class="comment">-- 2. 初撃は GetAttacked（怯みあり）、2 撃目以降は DoDelta（怯みなし）</span>
+    <span class="keyword">if</span> <span class="keyword">not</span> <span class="var">target</span>._teemo_dart_flinched <span class="keyword">then</span>
+        <span class="var">target</span>._teemo_dart_flinched = <span class="keyword">true</span>
+        <span class="var">target</span>.components.combat:GetAttacked(<span class="var">attacker</span>, <span class="var">damage</span>, <span class="var">weapon</span>)
+    <span class="keyword">else</span>
+        <span class="var">target</span>.components.health:DoDelta(-<span class="var">damage</span>, <span class="keyword">nil</span>, <span class="string">"blind_dart"</span>)
+        <span class="var">target</span>.components.combat:SetTarget(<span class="var">attacker</span>)  <span class="comment">-- アグロだけ付与</span>
+    <span class="keyword">end</span>
+
+    <span class="comment">-- 3. ブラインド効果（10 秒 CD）</span>
+    <span class="keyword">if</span> <span class="var">weapon</span>._lastBlindTime == <span class="keyword">nil</span> <span class="keyword">or</span> GetTime() - <span class="var">weapon</span>._lastBlindTime &gt;= <span class="flag">10</span> <span class="keyword">then</span>
+        <span class="var">doBlind</span>(<span class="var">target</span>)
+        <span class="var">weapon</span>._lastBlindTime = GetTime()
+    <span class="keyword">end</span>
+
+    <span class="comment">-- 4. 毒 DOT</span>
+    <span class="var">doToxicShot</span>(<span class="var">target</span>)
+
+    <span class="comment">-- 5. onattackother イベント発火</span>
+    <span class="var">attacker</span>:PushEvent(<span class="string">"onattackother"</span>, { <span class="var">target</span> = <span class="var">target</span>, <span class="var">weapon</span> = <span class="var">weapon</span> })
+
+    <span class="var">inst</span>:Remove()
+<span class="keyword">end</span></code>
+</div>
+<div class="callout note"><strong>なぜ <code class="inline">GetAttacked</code> と <code class="inline">DoDelta</code> を使い分けるのか？:</strong> <code class="inline">GetAttacked</code> はダメージ適用 + 怯みアニメーション + 防御計算を行います。連続ヒットで毎回怯むとゲーム体験が悪いため、初撃のみ <code class="inline">GetAttacked</code>、2 撃目以降は <code class="inline">DoDelta</code>（直接 HP 減算）にしています。</div>
+
+<h4>ブラインド効果の仕組み</h4>
+<div class="code-block"><span class="lang-label">LUA</span>
+<code><span class="keyword">local</span> <span class="keyword">function</span> <span class="var">doBlind</span>(<span class="var">target</span>)
+    <span class="keyword">if</span> <span class="var">target</span>.components.combat <span class="keyword">and</span> <span class="var">target</span>.components.locomotor <span class="keyword">then</span>
+        <span class="comment">-- 攻撃力を 0 に設定（空振り状態）</span>
+        <span class="var">target</span>.components.combat.externaldamagemultipliers:SetModifier(<span class="var">target</span>, <span class="flag">0</span>, <span class="string">"teemo_blind"</span>)
+
+        <span class="comment">-- 3 秒後に攻撃力を復元</span>
+        <span class="var">target</span>._teemoBlindTask = <span class="var">target</span>:DoTaskInTime(<span class="flag">3.0</span>, <span class="keyword">function</span>(<span class="var">target</span>)
+            <span class="var">target</span>.components.combat.externaldamagemultipliers:RemoveModifier(<span class="var">target</span>, <span class="string">"teemo_blind"</span>)
+        <span class="keyword">end</span>)
+    <span class="keyword">end</span>
+<span class="keyword">end</span></code>
+</div>
+<div class="callout note"><strong>ポイント:</strong> <code class="inline">externaldamagemultipliers</code> は <code class="inline">SourceModifierList</code> というデータ構造で、複数のソースから独立した乗算効果を管理できます。<code class="inline">SetModifier</code> で 0 を設定すると、他の MOD の倍率に影響を与えずにダメージを 0 にできます。</div>
+
+<h3>Noxious Trap（毒キノコ罠）</h3>
+<p><code class="inline">noxious_trap.lua</code> は設置型の罠アイテムです。</p>
+<div class="code-block"><span class="lang-label">LUA</span>
+<code><span class="keyword">local</span> <span class="keyword">function</span> <span class="var">startTrap</span>(<span class="var">inst</span>)
+    <span class="var">inst</span>.isSetTrap = <span class="keyword">true</span>
+    <span class="var">inst</span>.elapsed = <span class="flag">0</span>
+
+    <span class="comment">-- 青い光（トラップの目印）</span>
+    <span class="var">inst</span>.Light:SetColour(<span class="flag">155</span>/<span class="flag">255</span>, <span class="flag">225</span>/<span class="flag">255</span>, <span class="flag">250</span>/<span class="flag">255</span>)
+    <span class="var">inst</span>.Light:SetRadius(<span class="flag">1.5</span>)
+
+    <span class="comment">-- 1 秒後に半透明化（ステルス化）</span>
+    <span class="var">inst</span>:DoTaskInTime(<span class="flag">1.0</span>, <span class="keyword">function</span>()
+        <span class="var">inst</span>.AnimState:SetMultColour(.<span class="flag">8</span>, .<span class="flag">8</span>, .<span class="flag">8</span>, .<span class="flag">8</span>)
+    <span class="keyword">end</span>)
+
+    <span class="var">inst</span>:RemoveComponent(<span class="string">"inventoryitem"</span>)  <span class="comment">-- 拾えなくする</span>
+
+    <span class="comment">-- 0.3 秒ごとに敵を検索</span>
+    <span class="var">inst</span>.searchTask = <span class="var">inst</span>:DoPeriodicTask(.<span class="flag">3</span>, <span class="var">findTarget</span>, <span class="flag">2.0</span>)
+<span class="keyword">end</span></code>
+</div>
+<p>設置上限の管理:</p>
+<div class="code-block"><span class="lang-label">LUA</span>
+<code><span class="keyword">local</span> <span class="keyword">function</span> <span class="var">onDeploy</span>(<span class="var">inst</span>, <span class="var">pt</span>, <span class="var">deployer</span>)
+    <span class="comment">-- 設置上限（10 個）の管理</span>
+    <span class="keyword">if</span> <span class="var">deployer</span>._noxiousTraps == <span class="keyword">nil</span> <span class="keyword">then</span>
+        <span class="var">deployer</span>._noxiousTraps = {}
+    <span class="keyword">end</span>
+
+    <span class="comment">-- 無効なトラップを除去</span>
+    <span class="keyword">local</span> <span class="var">validTraps</span> = {}
+    <span class="keyword">for</span> _, <span class="var">trap</span> <span class="keyword">in</span> ipairs(<span class="var">deployer</span>._noxiousTraps) <span class="keyword">do</span>
+        <span class="keyword">if</span> <span class="var">trap</span>:IsValid() <span class="keyword">then</span> table.insert(<span class="var">validTraps</span>, <span class="var">trap</span>) <span class="keyword">end</span>
+    <span class="keyword">end</span>
+
+    <span class="comment">-- 上限超過時は最も古いトラップを削除</span>
+    <span class="keyword">while</span> #<span class="var">validTraps</span> &gt;= <span class="var">MAX_TRAPS</span> <span class="keyword">do</span>
+        <span class="keyword">local</span> <span class="var">oldest</span> = table.remove(<span class="var">validTraps</span>, <span class="flag">1</span>)
+        <span class="keyword">if</span> <span class="var">oldest</span>:IsValid() <span class="keyword">then</span> <span class="var">oldest</span>:Remove() <span class="keyword">end</span>
+    <span class="keyword">end</span>
+
+    table.insert(<span class="var">validTraps</span>, <span class="var">inst</span>)
+    <span class="var">deployer</span>._noxiousTraps = <span class="var">validTraps</span>
+<span class="keyword">end</span></code>
+</div>
+</section>
+
+<section class="section" id="components">
+<div class="section-label">07 &mdash; Custom Components</div>
+<h2>カスタムコンポーネントの実装</h2>
+
+<h3>characterspecific.lua &mdash; キャラクター専用制限</h3>
+<p>シンプルなコンポーネントで、特定のキャラクターのみがアイテムを装備できるようにします。</p>
+<div class="code-block"><span class="lang-label">LUA</span>
+<code><span class="keyword">local</span> <span class="var">CharacterSpecific</span> = <span class="keyword">Class</span>(<span class="keyword">function</span>(<span class="var">self</span>, <span class="var">inst</span>)
+    <span class="var">self</span>.inst = <span class="var">inst</span>
+    <span class="var">self</span>.character = <span class="keyword">nil</span>     <span class="comment">-- 許可されたキャラクター名</span>
+    <span class="var">self</span>.storable = <span class="keyword">false</span>    <span class="comment">-- 他キャラクターが保管できるか</span>
+    <span class="var">self</span>.comment = <span class="string">"That does not belong to me."</span>  <span class="comment">-- 装備拒否時のメッセージ</span>
+<span class="keyword">end</span>)
+
+<span class="keyword">function</span> <span class="var">CharacterSpecific</span>:SetOwner(<span class="var">name</span>) <span class="var">self</span>.character = <span class="var">name</span> <span class="keyword">end</span>
+<span class="keyword">function</span> <span class="var">CharacterSpecific</span>:IsStorable() <span class="keyword">return</span> <span class="var">self</span>.storable <span class="keyword">end</span>
+<span class="keyword">function</span> <span class="var">CharacterSpecific</span>:SetStorable(<span class="var">value</span>) <span class="var">self</span>.storable = <span class="var">value</span> <span class="keyword">end</span>
+
+<span class="keyword">return</span> <span class="var">CharacterSpecific</span></code>
+</div>
+
+<h3>explosive_noxious_trap.lua &mdash; 爆発ダメージロジック</h3>
+<p>罠の爆発処理をカプセル化したコンポーネントです。範囲ダメージ、毒 DOT、移動速度低下を適用します。</p>
+<div class="code-block"><span class="lang-label">LUA</span>
+<code><span class="keyword">local</span> <span class="var">Explosive_Noxious_Trap</span> = <span class="keyword">Class</span>(<span class="keyword">function</span>(<span class="var">self</span>, <span class="var">inst</span>)
+    <span class="var">self</span>.inst = <span class="var">inst</span>
+    <span class="var">self</span>.explosiveRange = <span class="flag">4</span>
+    <span class="var">self</span>.explosiveDamage = <span class="var">TEEMO_NOXIOUS_TRAP_DAMAGE</span>
+    <span class="var">self</span>.explosiveDotDamage = <span class="var">TEEMO_NOXIOUS_TRAP_DOT</span>
+    <span class="var">self</span>.deployer = <span class="keyword">nil</span>
+<span class="keyword">end</span>)
+
+<span class="keyword">function</span> <span class="var">Explosive_Noxious_Trap</span>:OnBurnt()
+    <span class="keyword">local</span> <span class="var">x</span>, <span class="var">y</span>, <span class="var">z</span> = <span class="var">self</span>.inst.Transform:GetWorldPosition()
+
+    <span class="keyword">local</span> <span class="var">ents</span> = TheSim:FindEntities(<span class="var">x</span>, <span class="var">y</span>, <span class="var">z</span>, <span class="var">self</span>.explosiveRange)
+    <span class="keyword">for</span> <span class="var">k</span>, <span class="var">v</span> <span class="keyword">in</span> pairs(<span class="var">ents</span>) <span class="keyword">do</span>
+        <span class="keyword">if</span> <span class="var">v</span>.components.combat <span class="keyword">and</span> <span class="var">v</span>.components.locomotor
+            <span class="keyword">and</span> <span class="keyword">not</span> <span class="var">v</span>:HasTag(<span class="var">nonTarget</span>) <span class="keyword">and</span> <span class="keyword">not</span> <span class="var">v</span>:HasTag(<span class="string">"companion"</span>) <span class="keyword">then</span>
+
+            <span class="comment">-- 初撃ダメージ</span>
+            <span class="var">v</span>.components.combat:GetAttacked(<span class="var">counterPlayer</span>, <span class="var">self</span>.explosiveDamage, <span class="keyword">nil</span>)
+
+            <span class="comment">-- 毒 DOT（毎秒、4 秒間）</span>
+            <span class="var">v</span>.noxiousTrapDamageTask = <span class="var">v</span>:DoPeriodicTask(<span class="flag">1.0</span>, <span class="keyword">function</span>()
+                <span class="keyword">local</span> <span class="var">dmg</span> = <span class="var">dotDamage</span>
+                <span class="keyword">if</span> <span class="var">v</span>:HasTag(<span class="string">"player"</span>) <span class="keyword">then</span> <span class="var">dmg</span> = <span class="var">dotDamage</span> * <span class="flag">0.3</span> <span class="keyword">end</span>
+                <span class="var">v</span>.components.health:DoDelta(-<span class="var">dmg</span>, <span class="keyword">nil</span>, <span class="string">"noxiousTrap"</span>)
+            <span class="keyword">end</span>)
+
+            <span class="comment">-- 移動速度 50% 低下</span>
+            <span class="var">doSlow</span>(<span class="var">v</span>)
+
+            <span class="comment">-- 4 秒後に全効果解除</span>
+            <span class="var">doEndTask</span>(<span class="var">v</span>)
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+    <span class="var">self</span>.inst:Remove()
+<span class="keyword">end</span></code>
+</div>
+<div class="callout note"><strong>ポイント:</strong> プレイヤーへの DOT ダメージは 30%（<code class="inline">* 0.3</code>）に減衰しています。PvP バランスの調整としてよく使われるパターンです。</div>
+</section>
+
+<section class="section" id="util">
+<div class="section-label">08 &mdash; Utility</div>
+<h2>ユーティリティ &mdash; teemo_poison_util.lua</h2>
+<p>毒で倒した敵の食料ドロップを腐敗させるシステムです。<code class="inline">require</code> で複数のファイルから共有しています。</p>
+<div class="code-block"><span class="lang-label">LUA</span>
+<code><span class="keyword">local</span> <span class="keyword">function</span> <span class="var">onLootSpawned</span>(<span class="var">inst</span>, <span class="var">data</span>)
+    <span class="keyword">if</span> <span class="var">TEEMO_POISON_SPOIL_PERCENT</span> == <span class="keyword">nil</span> <span class="keyword">or</span> <span class="var">TEEMO_POISON_SPOIL_PERCENT</span> &lt;= <span class="flag">0</span> <span class="keyword">then</span> <span class="keyword">return</span> <span class="keyword">end</span>
+    <span class="keyword">if</span> <span class="var">data</span>.loot == <span class="keyword">nil</span> <span class="keyword">then</span> <span class="keyword">return</span> <span class="keyword">end</span>
+    <span class="keyword">if</span> <span class="var">data</span>.loot.components.edible == <span class="keyword">nil</span> <span class="keyword">then</span> <span class="keyword">return</span> <span class="keyword">end</span>
+    <span class="keyword">if</span> <span class="var">data</span>.loot.components.perishable == <span class="keyword">nil</span> <span class="keyword">then</span> <span class="keyword">return</span> <span class="keyword">end</span>
+
+    <span class="comment">-- 中心値 ±15% のランダムで鮮度を決定</span>
+    <span class="keyword">local</span> <span class="var">variance</span> = (math.random() * <span class="flag">2</span> - <span class="flag">1</span>) * <span class="flag">0.15</span>
+    <span class="keyword">local</span> <span class="var">spoilPercent</span> = math.max(<span class="flag">0</span>, math.min(<span class="flag">1</span>, <span class="var">TEEMO_POISON_SPOIL_PERCENT</span> + <span class="var">variance</span>))
+
+    <span class="keyword">local</span> <span class="var">currentPercent</span> = <span class="var">data</span>.loot.components.perishable:GetPercent()
+    <span class="keyword">if</span> <span class="var">currentPercent</span> &gt; <span class="var">spoilPercent</span> <span class="keyword">then</span>
+        <span class="var">data</span>.loot.components.perishable:SetPercent(<span class="var">spoilPercent</span>)
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="keyword">local</span> <span class="keyword">function</span> <span class="var">markTeemoPoisoned</span>(<span class="var">target</span>)
+    <span class="keyword">if</span> <span class="var">target</span>._teemoPoisoned <span class="keyword">then</span> <span class="keyword">return</span> <span class="keyword">end</span>  <span class="comment">-- 重複防止</span>
+    <span class="var">target</span>._teemoPoisoned = <span class="keyword">true</span>
+    <span class="var">target</span>:ListenForEvent(<span class="string">"loot_prefab_spawned"</span>, <span class="var">onLootSpawned</span>)
+<span class="keyword">end</span>
+
+<span class="keyword">local</span> <span class="keyword">function</span> <span class="var">unmarkTeemoPoisoned</span>(<span class="var">target</span>)
+    <span class="comment">-- 他の毒 DOT が残っている場合はマークを維持</span>
+    <span class="keyword">if</span> <span class="var">target</span>.toxicShotDamageTask ~= <span class="keyword">nil</span> <span class="keyword">then</span> <span class="keyword">return</span> <span class="keyword">end</span>
+    <span class="keyword">if</span> <span class="var">target</span>.noxiousTrapDamageTask ~= <span class="keyword">nil</span> <span class="keyword">then</span> <span class="keyword">return</span> <span class="keyword">end</span>
+    <span class="var">target</span>._teemoPoisoned = <span class="keyword">nil</span>
+    <span class="var">target</span>:RemoveEventCallback(<span class="string">"loot_prefab_spawned"</span>, <span class="var">onLootSpawned</span>)
+<span class="keyword">end</span>
+
+<span class="keyword">return</span> {
+    <span class="var">markTeemoPoisoned</span> = <span class="var">markTeemoPoisoned</span>,
+    <span class="var">unmarkTeemoPoisoned</span> = <span class="var">unmarkTeemoPoisoned</span>,
+}</code>
+</div>
+<div class="callout note"><strong>なぜ <code class="inline">unmark</code> で他の DOT を確認するのか？:</strong> Blind Dart と Noxious Trap の両方が同じターゲットに毒を付与する可能性があります。一方の DOT が終了しても、もう一方がまだ続いているなら毒マークを維持する必要があります。</div>
+</section>
+<section class="section" id="network">
+<div class="section-label">09 &mdash; Network Sync</div>
+<h2>ネットワーク同期の実装</h2>
+<p>teemo の Net Variables は <code class="inline">common_postinit</code>（クライアント＆サーバー）で定義しています。</p>
+
+<h3>定義</h3>
+<div class="code-block"><span class="lang-label">LUA</span>
+<code><span class="keyword">local</span> <span class="keyword">function</span> <span class="var">common_postinit</span>(<span class="var">inst</span>)
+    <span class="comment">-- スタック数（0〜5）: net_byte で十分</span>
+    <span class="var">inst</span>._noxiousTrapStacks = net_byte(<span class="var">inst</span>.GUID, <span class="string">"teemo._noxiousTrapStacks"</span>, <span class="string">"noxioustrapstacksdirty"</span>)
+
+    <span class="comment">-- クールダウン秒数（0〜300）: net_ushortint（0〜65535）</span>
+    <span class="var">inst</span>._flashCooldown = net_ushortint(<span class="var">inst</span>.GUID, <span class="string">"teemo._flashCooldown"</span>, <span class="string">"flashcooldowndirty"</span>)
+    <span class="var">inst</span>._igniteCooldown = net_ushortint(<span class="var">inst</span>.GUID, <span class="string">"teemo._igniteCooldown"</span>, <span class="string">"ignitecooldowndirty"</span>)
+
+    <span class="comment">-- サウンド通知用（値なし、イベントのみ）</span>
+    <span class="var">inst</span>._sound_spwn   = net_event(<span class="var">inst</span>.GUID, <span class="string">"teemo._sound_spwn"</span>)
+    <span class="var">inst</span>._sound_attack = net_event(<span class="var">inst</span>.GUID, <span class="string">"teemo._sound_attack"</span>)
+    <span class="var">inst</span>._sound_emote  = net_event(<span class="var">inst</span>.GUID, <span class="string">"teemo._sound_emote"</span>)
+    <span class="var">inst</span>._sound_move   = net_event(<span class="var">inst</span>.GUID, <span class="string">"teemo._sound_move"</span>)
+
+    <span class="comment">-- クライアント側でサウンドイベントを受信</span>
+    <span class="var">inst</span>:ListenForEvent(<span class="string">"teemo._sound_spwn"</span>, <span class="keyword">function</span>()
+        <span class="var">inst</span>.SoundEmitter:PlaySound(<span class="string">"dontstarve/characters/teemo/spwn"</span>)
+    <span class="keyword">end</span>)
+<span class="keyword">end</span></code>
+</div>
+
+<h3>サーバー側でのスタック管理</h3>
+<div class="code-block"><span class="lang-label">LUA</span>
+<code><span class="keyword">local</span> <span class="keyword">function</span> <span class="var">startNoxiousTrapRecovery</span>(<span class="var">inst</span>)
+    <span class="var">inst</span>._noxiousTrapTimer = <span class="var">inst</span>._noxiousTrapTimer <span class="keyword">or</span> <span class="flag">0</span>
+    <span class="var">inst</span>._noxiousTrapRecoveryTask = <span class="var">inst</span>:DoPeriodicTask(<span class="flag">1</span>, <span class="keyword">function</span>()
+        <span class="keyword">local</span> <span class="var">stacks</span> = <span class="var">inst</span>._noxiousTrapStacks:value()
+        <span class="keyword">if</span> <span class="var">stacks</span> &gt;= <span class="var">NOXIOUS_TRAP_MAX_STACKS</span> <span class="keyword">then</span>
+            <span class="var">inst</span>._noxiousTrapTimer = <span class="flag">0</span>
+            <span class="keyword">return</span>
+        <span class="keyword">end</span>
+        <span class="var">inst</span>._noxiousTrapTimer = <span class="var">inst</span>._noxiousTrapTimer + <span class="flag">1</span>
+        <span class="keyword">if</span> <span class="var">inst</span>._noxiousTrapTimer &gt;= <span class="var">NOXIOUS_TRAP_RECOVERY_INTERVAL</span> <span class="keyword">then</span>
+            <span class="var">inst</span>._noxiousTrapTimer = <span class="flag">0</span>
+            <span class="var">inst</span>._noxiousTrapStacks:set(<span class="var">stacks</span> + <span class="flag">1</span>)  <span class="comment">-- → クライアントに自動同期</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>)
+<span class="keyword">end</span></code>
+</div>
+
+<h3>データの流れ</h3>
+<div class="ascii-diagram"><pre><span class="highlight-line">サーバー: inst._noxiousTrapStacks:set(3)</span>
+    ↓ （自動同期）
+<span class="highlight-line">クライアント: "noxioustrapstacksdirty" イベント発火</span>
+    ↓
+<span class="highlight-line">UI ウィジェット: inst._noxiousTrapStacks:value() で値を取得して表示更新</span></pre>
+</div>
+</section>
+
+<section class="section" id="widgets">
+<div class="section-label">10 &mdash; UI Widgets</div>
+<h2>UI ウィジェットの実装</h2>
+
+<h3>NoxiousTrapSlot &mdash; トラップスタック UI</h3>
+<div class="code-block"><span class="lang-label">LUA</span>
+<code><span class="keyword">local</span> <span class="var">NoxiousTrapSlot</span> = <span class="keyword">Class</span>(Widget, <span class="keyword">function</span>(<span class="var">self</span>, <span class="var">owner</span>)
+    Widget._ctor(<span class="var">self</span>, <span class="string">"NoxiousTrapSlot"</span>)
+    <span class="var">self</span>.owner = <span class="var">owner</span>
+
+    <span class="comment">-- 背景: DST 標準のインベントリスロット</span>
+    <span class="var">self</span>.bgimage = <span class="var">self</span>:AddChild(Image(<span class="string">"images/hud.xml"</span>, <span class="string">"inv_slot.tex"</span>))
+
+    <span class="comment">-- アイコン: クリック可能なボタン</span>
+    <span class="var">self</span>.icon = <span class="var">self</span>:AddChild(ImageButton(
+        <span class="string">"images/inventoryimages/noxious_trap.xml"</span>, <span class="string">"noxious_trap.tex"</span>
+    ))
+    <span class="var">self</span>.icon:SetOnClick(<span class="keyword">function</span>() <span class="var">self</span>:OnClick() <span class="keyword">end</span>)
+
+    <span class="comment">-- スタック数テキスト</span>
+    <span class="var">self</span>.stackcount = <span class="var">self</span>:AddChild(Text(NUMBERFONT, <span class="flag">22</span>))
+    <span class="var">self</span>.stackcount:SetPosition(<span class="flag">16</span>, -<span class="flag">16</span>, <span class="flag">0</span>)
+
+    <span class="comment">-- Net Variable の変更を監視</span>
+    <span class="var">self</span>.inst:ListenForEvent(<span class="string">"noxioustrapstacksdirty"</span>, <span class="keyword">function</span>()
+        <span class="var">self</span>:UpdateDisplay()
+    <span class="keyword">end</span>, <span class="var">owner</span>)
+<span class="keyword">end</span>)
+
+<span class="keyword">function</span> <span class="var">NoxiousTrapSlot</span>:UpdateDisplay()
+    <span class="keyword">local</span> <span class="var">stacks</span> = <span class="var">self</span>.owner._noxiousTrapStacks:value()
+    <span class="var">self</span>.stackcount:SetString(tostring(<span class="var">stacks</span>))
+    <span class="comment">-- 0 でグレーアウト</span>
+    <span class="keyword">if</span> <span class="var">stacks</span> &gt; <span class="flag">0</span> <span class="keyword">then</span>
+        <span class="var">self</span>.icon.image:SetTint(<span class="flag">1</span>, <span class="flag">1</span>, <span class="flag">1</span>, <span class="flag">1</span>)
+    <span class="keyword">else</span>
+        <span class="var">self</span>.icon.image:SetTint(<span class="flag">0.3</span>, <span class="flag">0.3</span>, <span class="flag">0.3</span>, <span class="flag">1</span>)
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="keyword">function</span> <span class="var">NoxiousTrapSlot</span>:OnClick()
+    <span class="keyword">if</span> <span class="var">self</span>.owner._noxiousTrapStacks:value() &gt; <span class="flag">0</span> <span class="keyword">then</span>
+        <span class="var">SendModRPCToServer</span>(MOD_RPC[<span class="string">"teemo"</span>][<span class="string">"use_noxious_trap_stack"</span>])
+    <span class="keyword">end</span>
+<span class="keyword">end</span></code>
+</div>
+
+<h3>SummonerSpellSlot &mdash; Flash/Ignite UI</h3>
+<p>サモナースペル用のウィジェットは、設定をテーブルで受け取る汎用設計です。</p>
+<div class="code-block"><span class="lang-label">LUA</span>
+<code><span class="keyword">local</span> <span class="var">SummonerSpellSlot</span> = <span class="keyword">Class</span>(Widget, <span class="keyword">function</span>(<span class="var">self</span>, <span class="var">owner</span>, <span class="var">config</span>)
+    Widget._ctor(<span class="var">self</span>, <span class="string">"SummonerSpellSlot"</span>)
+    <span class="var">self</span>.spell_name = <span class="var">config</span>.spell_name       <span class="comment">-- "flash" or "ignite"</span>
+    <span class="var">self</span>.icon_atlas = <span class="var">config</span>.icon_atlas
+    <span class="var">self</span>.cooldown_event = <span class="var">config</span>.cooldown_event
+    <span class="var">self</span>.on_activate = <span class="var">config</span>.on_activate     <span class="comment">-- 発動時コールバック</span>
+    <span class="comment">-- ...</span>
+<span class="keyword">end</span>)</code>
+</div>
+
+<h4>Flash のターゲティングモード</h4>
+<p>Flash アイコンをクリックすると、地面にレティクル（照準円）が表示され、左クリックでテレポート先を指定します。</p>
+<div class="code-block"><span class="lang-label">LUA</span>
+<code><span class="keyword">function</span> <span class="var">SummonerSpellSlot</span>:StartFlashTargeting()
+    <span class="comment">-- レティクル生成（DST 標準の AoE ターゲティング円を流用）</span>
+    <span class="keyword">local</span> <span class="var">reticule</span> = SpawnPrefab(<span class="string">"reticuleaoe"</span>)
+    <span class="var">reticule</span>.AnimState:SetScale(<span class="flag">0.5</span>, <span class="flag">0.5</span>, <span class="flag">0.5</span>)
+    <span class="var">self</span>._reticule = <span class="var">reticule</span>
+
+    <span class="comment">-- マウス移動でレティクル位置を更新</span>
+    <span class="var">self</span>._moveHandler = TheInput:AddMoveHandler(<span class="keyword">function</span>(<span class="var">x</span>, <span class="var">y</span>)
+        <span class="keyword">local</span> <span class="var">pos</span> = TheInput:GetWorldPosition()
+        <span class="var">self</span>._reticule.Transform:SetPosition(<span class="var">pos</span>.x, <span class="flag">0</span>, <span class="var">pos</span>.z)
+        <span class="comment">-- 範囲内: 青、範囲外: 赤</span>
+        <span class="keyword">local</span> <span class="var">dist</span> = <span class="comment">-- プレイヤーとの距離を計算</span>
+        <span class="keyword">if</span> <span class="var">dist</span> &lt;= <span class="var">maxRange</span> <span class="keyword">then</span>
+            <span class="var">self</span>._reticule.AnimState:SetMultColour(<span class="flag">0.3</span>, <span class="flag">0.7</span>, <span class="flag">1.0</span>, <span class="flag">1</span>)
+        <span class="keyword">else</span>
+            <span class="var">self</span>._reticule.AnimState:SetMultColour(<span class="flag">1.0</span>, <span class="flag">0.2</span>, <span class="flag">0.2</span>, <span class="flag">1</span>)
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>)
+
+    <span class="comment">-- ESC でキャンセル</span>
+    <span class="var">self</span>._keyHandler = TheInput:AddKeyUpHandler(KEY_ESCAPE, <span class="keyword">function</span>()
+        <span class="var">self</span>:StopFlashTargeting()
+    <span class="keyword">end</span>)
+
+    <span class="comment">-- 左クリックでテレポート、右クリックでキャンセル</span>
+    <span class="var">self</span>._clickHandler = TheInput:AddMouseButtonHandler(<span class="keyword">function</span>(<span class="var">button</span>, <span class="var">down</span>, <span class="var">x</span>, <span class="var">y</span>)
+        <span class="keyword">if</span> <span class="var">button</span> == MOUSEBUTTON_LEFT <span class="keyword">then</span>
+            <span class="keyword">local</span> <span class="var">pos</span> = TheInput:GetWorldPosition()
+            <span class="var">SendModRPCToServer</span>(MOD_RPC[<span class="string">"teemo"</span>][<span class="string">"use_flash"</span>], <span class="var">pos</span>.x, <span class="var">pos</span>.z)
+            <span class="var">self</span>:StopFlashTargeting()
+            <span class="keyword">return</span> <span class="keyword">true</span>  <span class="comment">-- イベント消費</span>
+        <span class="keyword">elseif</span> <span class="var">button</span> == MOUSEBUTTON_RIGHT <span class="keyword">then</span>
+            <span class="var">self</span>:StopFlashTargeting()
+            <span class="keyword">return</span> <span class="keyword">true</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>)
+<span class="keyword">end</span></code>
+</div>
+<div class="callout warning"><strong>重要:</strong> <code class="inline">StopFlashTargeting</code> で全ハンドラを <code class="inline">Remove()</code> しています。入力ハンドラを解除し忘れると、ターゲティングモードが終了した後もマウス移動やクリックが処理され続けます。また、<code class="inline">Kill()</code> メソッドをオーバーライドして、ウィジェット破棄時にも確実にクリーンアップしています。</div>
+
+<h3>TeemoPopupNumber &mdash; フローティングダメージ数字</h3>
+<p>2 フェーズのアニメーション（上昇 → 下降 + フェードアウト）で数字を表示します。</p>
+<div class="code-block"><span class="lang-label">LUA</span>
+<code><span class="keyword">local</span> <span class="var">TeemoPopupNumber</span> = <span class="keyword">Class</span>(Widget,
+    <span class="keyword">function</span>(<span class="var">self</span>, <span class="var">owner</span>, <span class="var">val</span>, <span class="var">size</span>, <span class="var">pos</span>, <span class="var">dir</span>, <span class="var">height</span>, <span class="var">colour</span>)
+        Widget._ctor(<span class="var">self</span>, <span class="string">"TeemoPopupNumber"</span>)
+        <span class="var">self</span>.text = <span class="var">self</span>:AddChild(Text(NUMBERFONT, <span class="var">size</span>, tostring(<span class="var">val</span>)))
+        <span class="var">self</span>.colour = <span class="var">colour</span> <span class="keyword">or</span> {<span class="flag">1</span>, <span class="flag">1</span>, <span class="flag">1</span>, <span class="flag">1</span>}
+        <span class="var">self</span>.rise = <span class="flag">24</span>    <span class="comment">-- 上昇距離</span>
+        <span class="var">self</span>.drop = <span class="flag">24</span>    <span class="comment">-- 下降距離</span>
+        <span class="var">self</span>.speed = <span class="flag">68</span>   <span class="comment">-- 横移動速度</span>
+        <span class="var">self</span>.progress = <span class="flag">0</span>
+        <span class="var">self</span>:StartUpdating()  <span class="comment">-- 毎フレーム OnUpdate を呼ぶ</span>
+    <span class="keyword">end</span>
+)
+
+<span class="keyword">function</span> <span class="var">TeemoPopupNumber</span>:OnUpdate(<span class="var">dt</span>)
+    <span class="keyword">if</span> <span class="var">self</span>.progress &lt; <span class="flag">1</span> <span class="keyword">then</span>
+        <span class="comment">-- Phase 1: 上昇 + フェードイン</span>
+        <span class="var">self</span>.progress = math.min(<span class="flag">1</span>, <span class="var">self</span>.progress + <span class="var">dt</span> * <span class="var">self</span>.ts_step_1)
+        <span class="comment">-- イージング計算...</span>
+    <span class="keyword">elseif</span> <span class="var">self</span>.progress &lt; <span class="flag">2</span> <span class="keyword">then</span>
+        <span class="comment">-- Phase 2: 下降 + フェードアウト</span>
+        <span class="var">self</span>.progress = math.min(<span class="flag">2</span>, <span class="var">self</span>.progress + <span class="var">dt</span> * <span class="var">self</span>.ts_step_2)
+        <span class="comment">-- イージング計算...</span>
+    <span class="keyword">else</span>
+        <span class="var">self</span>:Kill()  <span class="comment">-- アニメーション完了 → 自動削除</span>
+        <span class="keyword">return</span>
+    <span class="keyword">end</span>
+    <span class="comment">-- ワールド座標 → スクリーン座標に変換</span>
+    <span class="var">self</span>:SetPosition(TheSim:GetScreenPos(<span class="var">self</span>.pos:Get()))
+<span class="keyword">end</span></code>
+</div>
+</section>
+
+<section class="section" id="saveload">
+<div class="section-label">11 &mdash; Save &amp; Load</div>
+<h2>セーブ・ロードの実装</h2>
+<p>teemo では Net Variables の値とタイマーをセーブデータに保存しています。</p>
+<div class="code-block"><span class="lang-label">LUA</span>
+<code><span class="comment">-- master_postinit 内</span>
+
+<span class="keyword">local</span> <span class="var">_OnSave</span> = <span class="var">inst</span>.OnSave
+<span class="var">inst</span>.OnSave = <span class="keyword">function</span>(<span class="var">inst</span>, <span class="var">data</span>)
+    <span class="keyword">if</span> <span class="var">_OnSave</span> <span class="keyword">then</span> <span class="var">_OnSave</span>(<span class="var">inst</span>, <span class="var">data</span>) <span class="keyword">end</span>     <span class="comment">-- 元の OnSave を呼ぶ</span>
+    <span class="var">data</span>.noxious_trap_stacks = <span class="var">inst</span>._noxiousTrapStacks:value()
+    <span class="var">data</span>.noxious_trap_timer = <span class="var">inst</span>._noxiousTrapTimer
+    <span class="var">data</span>.flash_cooldown = <span class="var">inst</span>._flashCooldown:value()
+    <span class="var">data</span>.ignite_cooldown = <span class="var">inst</span>._igniteCooldown:value()
+<span class="keyword">end</span>
+
+<span class="keyword">local</span> <span class="var">_OnLoad</span> = <span class="var">inst</span>.OnLoad
+<span class="var">inst</span>.OnLoad = <span class="keyword">function</span>(<span class="var">inst</span>, <span class="var">data</span>)
+    <span class="keyword">if</span> <span class="var">_OnLoad</span> <span class="keyword">then</span> <span class="var">_OnLoad</span>(<span class="var">inst</span>, <span class="var">data</span>) <span class="keyword">end</span>     <span class="comment">-- 元の OnLoad を呼ぶ</span>
+    <span class="keyword">if</span> <span class="var">data</span> <span class="keyword">then</span>
+        <span class="keyword">if</span> <span class="var">data</span>.noxious_trap_stacks <span class="keyword">then</span>
+            <span class="var">inst</span>._noxiousTrapStacks:set(<span class="var">data</span>.noxious_trap_stacks)
+        <span class="keyword">end</span>
+        <span class="keyword">if</span> <span class="var">data</span>.noxious_trap_timer <span class="keyword">then</span>
+            <span class="var">inst</span>._noxiousTrapTimer = <span class="var">data</span>.noxious_trap_timer
+        <span class="keyword">end</span>
+        <span class="keyword">if</span> <span class="var">data</span>.flash_cooldown <span class="keyword">then</span>
+            <span class="var">inst</span>._flashCooldown:set(<span class="var">data</span>.flash_cooldown)
+        <span class="keyword">end</span>
+        <span class="keyword">if</span> <span class="var">data</span>.ignite_cooldown <span class="keyword">then</span>
+            <span class="var">inst</span>._igniteCooldown:set(<span class="var">data</span>.ignite_cooldown)
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span></code>
+</div>
+<div class="callout note"><strong>ポイント:</strong> <code class="inline">_noxiousTrapTimer</code>（ローカル変数）と <code class="inline">_noxiousTrapStacks:value()</code>（Net Variable の値）の両方を保存しています。Net Variable の <code class="inline">:value()</code> はサーバーの現在値を取得します。</div>
+
+<p>Noxious Trap のセーブ・ロードも同様に:</p>
+<div class="code-block"><span class="lang-label">LUA</span>
+<code><span class="comment">-- noxious_trap.lua</span>
+<span class="keyword">local</span> <span class="keyword">function</span> <span class="var">onSave</span>(<span class="var">inst</span>, <span class="var">data</span>)
+    <span class="var">data</span>.isSetTrap = <span class="var">inst</span>.isSetTrap
+    <span class="var">data</span>.elapsed = <span class="var">inst</span>.elapsed     <span class="comment">-- 経過時間を保存</span>
+<span class="keyword">end</span>
+
+<span class="keyword">local</span> <span class="keyword">function</span> <span class="var">onLoad</span>(<span class="var">inst</span>, <span class="var">data</span>)
+    <span class="keyword">if</span> <span class="var">data</span> <span class="keyword">and</span> <span class="var">data</span>.isSetTrap <span class="keyword">then</span>
+        <span class="var">startTrap</span>(<span class="var">inst</span>)             <span class="comment">-- 罠を再度有効化</span>
+    <span class="keyword">end</span>
+    <span class="keyword">if</span> <span class="var">data</span> <span class="keyword">and</span> <span class="var">data</span>.elapsed <span class="keyword">then</span>
+        <span class="var">inst</span>.elapsed = <span class="var">data</span>.elapsed <span class="comment">-- 残り時間を復元</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span></code>
+</div>
+</section>
+<section class="section" id="abilities">
+<div class="section-label">12 &mdash; Ability Summary</div>
+<h2>能力一覧まとめ</h2>
+<table class="styled-table">
+<thead><tr><th>能力</th><th>種類</th><th>持続時間</th><th>クールダウン</th><th>設定項目</th></tr></thead>
+<tbody>
+<tr><td>カモフラージュ</td><td>パッシブ</td><td>静止中ずっと</td><td>なし（静止 3 秒で発動）</td><td>なし（組み込み）</td></tr>
+<tr><td>Blind Dart（初撃）</td><td>武器</td><td>即時</td><td>攻撃間隔 1.0 秒</td><td>Hit Damage, Durability</td></tr>
+<tr><td>ブラインド効果</td><td>命中時</td><td>3 秒</td><td>10 秒</td><td>なし（組み込み）</td></tr>
+<tr><td>毒 DOT（Toxic Shot）</td><td>命中時</td><td>4 秒</td><td>なし</td><td>DOT Damage</td></tr>
+<tr><td>Noxious Trap（爆発）</td><td>設置型</td><td>5 分（罠の寿命）</td><td>30 秒（スタック回復）</td><td>Hit Damage, DOT Damage</td></tr>
+<tr><td>罠の移動速度低下</td><td>範囲</td><td>4 秒</td><td>なし</td><td>なし（-50% 固定）</td></tr>
+<tr><td>Flash</td><td>サモナースペル</td><td>即時</td><td>5 分</td><td>Range, Cooldown</td></tr>
+<tr><td>Ignite</td><td>サモナースペル</td><td>5 秒</td><td>3 分</td><td>Damage, Cooldown</td></tr>
+<tr><td>キノコの達人</td><td>パッシブ</td><td>永続</td><td>なし</td><td>On/Off</td></tr>
+<tr><td>毒による食料腐敗</td><td>パッシブ</td><td>永続</td><td>なし</td><td>Spoilage %, Off</td></tr>
+</tbody>
+</table>
+</section>
+
+<section class="section" id="references">
+<div class="section-label">13 &mdash; References</div>
+<h2>参考リンク</h2>
+<div class="ref-list">
+<a class="ref-item" href="README.html">
+<div>
+<div class="ref-source">Lua スクリプティング総合ガイド</div>
+<div class="ref-url">本ガイドの概念解説編</div>
+</div>
+</a>
+<a class="ref-item" href="https://github.com/pinpikokun/DST-teemo">
+<div>
+<div class="ref-source">DST-teemo GitHub リポジトリ</div>
+<div class="ref-url">https://github.com/pinpikokun/DST-teemo</div>
+</div>
+</a>
+<a class="ref-item" href="https://steamcommunity.com/sharedfiles/filedetails/?id=390684095">
+<div>
+<div class="ref-source">Captain Teemo（Steam Workshop）</div>
+<div class="ref-url">https://steamcommunity.com/sharedfiles/filedetails/?id=390684095</div>
+</div>
+</a>
+<a class="ref-item" href="../README.html">
+<div>
+<div class="ref-source">&larr; メインガイドに戻る</div>
+<div class="ref-url">DST-Mod-Tools トップページ</div>
+</div>
+</a>
+</div>
+</section>
+
+</main>
+
+<footer class="footer">
+    DST-Lua-Scripting 実践編 &#8212; このドキュメントは自由に利用・改変・再配布できます。DST MOD 制作にお役立てください。
+    <br><span style="display:inline-block;margin-top:8px"><a href="https://steamcommunity.com/profiles/76561198076111536/" style="color:inherit;text-decoration:none">Author: pinpikokun</a></span><br><span style="display:inline-flex;gap:6px;margin-top:6px"><a href="https://github.com/pinpikokun/DST-teemo"><img src="https://img.shields.io/badge/GitHub-Repository-black?logo=github" alt="GitHub"></a> <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=390684095"><img src="https://img.shields.io/badge/Steam%20Workshop-Subscribe-blue?logo=steam" alt="Steam Workshop"></a></span>
+</footer>
+
+</body>
+</html>

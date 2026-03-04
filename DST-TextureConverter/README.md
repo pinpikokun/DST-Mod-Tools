@@ -2,6 +2,8 @@
 
 Don't Starve Together (DST) の MOD 開発で必要になる **PNG → TEX 変換** の手順を、初心者向けにまとめたガイドです。
 
+> **HTML 版**: [README.html](README.html)
+
 ---
 
 ## 目次

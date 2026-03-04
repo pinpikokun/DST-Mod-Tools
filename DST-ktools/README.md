@@ -2,6 +2,8 @@
 
 Don't Starve Together (DST) の **アニメーションアセット（.zip）** を、編集可能な **Spriter プロジェクト（.scml）+ PNG 画像** にデコンパイルする手順を、初心者向けにまとめたガイドです。
 
+> **HTML 版**: [README.html](README.html)
+
 ---
 
 ## 目次

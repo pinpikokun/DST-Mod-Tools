@@ -180,10 +180,8 @@
   }
   .steps li {
     counter-increment: step;
-    display: flex;
-    align-items: flex-start;
-    gap: 16px;
-    padding: 14px 0;
+    position: relative;
+    padding: 14px 0 14px 44px;
     border-bottom: 1px solid var(--border-light);
     font-size: 15px;
     color: var(--text-secondary);
@@ -193,7 +191,9 @@
   .steps li:last-child { border-bottom: none; }
   .steps li::before {
     content: counter(step);
-    flex-shrink: 0;
+    position: absolute;
+    left: 0;
+    top: 14px;
     width: 28px;
     height: 28px;
     background: var(--bg-dark);
@@ -204,7 +204,6 @@
     justify-content: center;
     font-weight: 700;
     font-size: 13px;
-    margin-top: 2px;
   }
 
   /* Tables */
@@ -501,7 +500,7 @@
     <div class="hero-inner">
       <div class="hero-label">Effect Animation</div>
       <h1>エフェクトアニメーション編</h1>
-      <p class="hero-desc">エフェクト（視覚効果）・投射物・範囲表示など、キャラクターやアイテム以外のアニメーションについて解説します。<br>MOD に演出を加えるために重要な要素です。</p>
+      <p class="hero-desc">エフェクト（視覚効果）など、キャラクターやアイテム以外のアニメーションについて解説します。<br>MOD に演出を加えるために重要な要素です。</p>
       <div class="hero-nav">
         <a href="README.html">&larr; README に戻る</a>
         <a href="README-item-equipment.html">&larr; アイテム・武器防具編</a>
@@ -636,96 +635,6 @@
       </div>
     </section>
 
-    <!-- 投射物アニメーション -->
-    <section class="section">
-      <div class="section-label">Projectile</div>
-      <h2>投射物アニメーション</h2>
-      <p>矢や弾のように飛んでいくものが「投射物」です。</p>
-
-      <div class="spec-grid">
-        <div class="spec-item">
-          <span class="spec-label">idle_pipe</span>
-          <span class="spec-value">静止状態 / 発射前</span>
-        </div>
-        <div class="spec-item">
-          <span class="spec-label">dart_pipe</span>
-          <span class="spec-value">飛行中の見た目</span>
-        </div>
-      </div>
-
-      <div class="callout warn">
-        <span class="callout-label">注意</span>
-        <p><code>ANIM_ORIENTATION.OnGround</code> を設定しないと、投射物が正面を向いたまま飛んでいく不自然な見た目になります。</p>
-      </div>
-
-      <div class="panel">
-        <div class="panel-label">Lua 設定例</div>
-<pre><code><span class="cm">-- 投射物の設定例</span>
-inst.AnimState:<span class="fn">SetBank</span>(<span class="str">"blow_dart"</span>)
-inst.AnimState:<span class="fn">SetBuild</span>(<span class="str">"blow_dart"</span>)
-inst.AnimState:<span class="fn">PlayAnimation</span>(<span class="str">"dart_pipe"</span>)
-
-<span class="cm">-- 地面と平行に表示する</span>
-inst.AnimState:<span class="fn">SetOrientation</span>(ANIM_ORIENTATION.OnGround)</code></pre>
-      </div>
-
-      <h3>流用できる既存 Bank</h3>
-      <table>
-        <tr><th>Bank 名</th><th>元の用途</th></tr>
-        <tr><td><code>blow_dart</code></td><td>吹き矢</td></tr>
-        <tr><td><code>fire_projectile</code></td><td>火の投射物</td></tr>
-        <tr><td><code>ice_projectile</code></td><td>氷の投射物</td></tr>
-      </table>
-
-      <div class="callout tip">
-        <span class="callout-label">ヒント</span>
-        <p>吹き矢系の武器を作る場合は <code>blow_dart</code> Bank を流用し、Build だけ差し替えるのが簡単です。</p>
-      </div>
-    </section>
-
-    <!-- 範囲表示アニメーション -->
-    <section class="section">
-      <div class="section-label">Range Indicator</div>
-      <h2>範囲表示アニメーション</h2>
-      <p>射程範囲やターゲットリングなど、ゲーム画面上に表示される UI 的なアニメーションです。範囲表示は他のエフェクトと異なり、いくつかの特徴があります。</p>
-
-      <div class="spec-grid">
-        <div class="spec-item">
-          <span class="spec-label">Bank</span>
-          <span class="spec-value">独自 Bank を使う</span>
-        </div>
-        <div class="spec-item">
-          <span class="spec-label">表示先</span>
-          <span class="spec-value">クライアント側のみ</span>
-        </div>
-        <div class="spec-item">
-          <span class="spec-label">向き</span>
-          <span class="spec-value">OnGround で地面に表示</span>
-        </div>
-        <div class="spec-item">
-          <span class="spec-label">再生</span>
-          <span class="spec-value">ループ再生</span>
-        </div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-label">Lua 設定例</div>
-<pre><code><span class="cm">-- 射程範囲リングの例</span>
-<span class="kw">local</span> fx = <span class="fn">CreateEntity</span>()
-fx.entity:<span class="fn">AddAnimState</span>()
-
-fx.AnimState:<span class="fn">SetBank</span>(<span class="str">"my_range_indicator"</span>)
-fx.AnimState:<span class="fn">SetBuild</span>(<span class="str">"my_range_ring"</span>)
-fx.AnimState:<span class="fn">PlayAnimation</span>(<span class="str">"idle"</span>, <span class="kw">true</span>)  <span class="cm">-- ループ再生</span>
-fx.AnimState:<span class="fn">SetOrientation</span>(ANIM_ORIENTATION.OnGround)</code></pre>
-      </div>
-
-      <div class="callout info">
-        <span class="callout-label">詳細サンプル</span>
-        <p>範囲表示リングの Spriter での作り方は、本リポジトリに詳細なサンプルがあります。<br><a class="anchor" href="sample/README-blind-dart-renge-ring.html">ブラインドダートの射程範囲リング作成ガイド →</a></p>
-      </div>
-    </section>
-
     <!-- まとめ -->
     <section class="section">
       <div class="section-label">Summary</div>
@@ -735,8 +644,6 @@ fx.AnimState:<span class="fn">SetOrientation</span>(ANIM_ORIENTATION.OnGround)</
         <tr><th>作るもの</th><th>Bank</th><th>Build</th><th>ポイント</th></tr>
         <tr><td><strong>バフ / デバフ表示</strong></td><td><code>forcefield</code> 等（流用）</td><td>独自</td><td><code>open</code> → <code>idle_loop</code> のパターン</td></tr>
         <tr><td><strong>爆発 / 煙</strong></td><td><code>poopcloud</code> 等（流用）</td><td>独自</td><td><code>idle</code> 1 フレームで OK。<code>animover</code> で自動削除</td></tr>
-        <tr><td><strong>投射物</strong></td><td><code>blow_dart</code> 等（流用）</td><td>独自</td><td><code>SetOrientation(OnGround)</code> を忘れずに</td></tr>
-        <tr><td><strong>範囲表示</strong></td><td>独自</td><td>独自</td><td>クライアント側のみ。ループ再生</td></tr>
       </table>
 
       <div class="acc" onclick="this.classList.toggle('open')">

@@ -3,6 +3,8 @@
 Don't Starve Together (DST) キャラクター MOD 用の FMOD Designer プロジェクトテンプレートです。
 キャラクターボイスの定義からサウンドバンクのビルドまでの手順を解説します。
 
+> **HTML 版**: [README.html](README.html)
+
 > **このテンプレートの使い方:** このドキュメント内で `my_character` と表記されている部分は、あなたの MOD 名に置き換えてください。
 > 例: MOD名が `awesome_knight` なら、`DST-my_character` → `DST-awesome_knight` のように読み替えます。
 

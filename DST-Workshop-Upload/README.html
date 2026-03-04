@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DST-Workshop-Upload ガイド — Steam ワークショップへの公開マニュアル</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Noto+Sans+JP:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-primary: #faf9f7;
+    --bg-card: #ffffff;
+    --bg-warm: #f5f0eb;
+    --bg-dark: #191919;
+    --text-primary: #1a1a1a;
+    --text-secondary: #6b6560;
+    --text-light: #9a938d;
+    --accent-warm: #c4704b;
+    --accent-green: #2d7a5f;
+    --accent-red: #b85450;
+    --border: #e8e2db;
+    --border-light: #f0ece7;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.8;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Hero */
+  .hero {
+    background: var(--bg-dark);
+    color: #fff;
+    padding: 100px 0 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(196,112,75,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-inner {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 0 40px;
+    position: relative;
+  }
+  .hero-label {
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent-warm);
+    margin-bottom: 24px;
+    font-weight: 500;
+  }
+  .hero h1 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 38px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 20px;
+    letter-spacing: -0.5px;
+  }
+  .hero-sub {
+    font-size: 16px;
+    color: rgba(255,255,255,0.6);
+    font-weight: 300;
+    line-height: 1.8;
+  }
+
+  /* Main */
+  .content {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  /* Section */
+  .section {
+    padding: 72px 0;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .section:last-child { border-bottom: none; }
+
+  .section-label {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .section h2 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+  .section h3 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin-top: 40px;
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
+  .section p {
+    font-size: 16px;
+    color: var(--text-secondary);
+    line-height: 2;
+    font-weight: 300;
+  }
+  .section p + p {
+    margin-top: 12px;
+  }
+
+  /* Callout */
+  .callout {
+    margin: 32px 0;
+    padding: 24px 28px;
+    border-radius: 12px;
+    font-size: 15px;
+    line-height: 1.9;
+  }
+  .callout.note {
+    background: #fef8f0;
+    border-left: 3px solid var(--accent-warm);
+    color: var(--text-primary);
+  }
+  .callout.tip {
+    background: #f0f8f3;
+    border-left: 3px solid var(--accent-green);
+    color: var(--text-primary);
+  }
+  .callout.warning {
+    background: #fef3ef;
+    border-left: 3px solid var(--accent-red);
+    color: var(--text-primary);
+  }
+  .callout strong {
+    font-weight: 600;
+  }
+
+  /* Nav Path (vertical timeline) */
+  .nav-path {
+    margin: 12px 0;
+    padding: 0;
+    list-style: none;
+  }
+  .nav-path li {
+    position: relative;
+    padding: 4px 0 4px 32px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+  .nav-path li::before {
+    content: '';
+    position: absolute;
+    left: 9px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--border);
+  }
+  .nav-path li::after {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 10px;
+    width: 10px;
+    height: 10px;
+    background: var(--accent-warm);
+    border-radius: 50%;
+    z-index: 1;
+  }
+  .nav-path li:first-child::before {
+    top: 10px;
+  }
+  .nav-path li:last-child::before {
+    bottom: calc(100% - 16px);
+  }
+
+  /* Code Block */
+  .code-block {
+    margin: 24px 0;
+    background: #1e1e2e;
+    border-radius: 12px;
+    padding: 28px 32px;
+    overflow-x: auto;
+    position: relative;
+  }
+  .code-block code {
+    font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #cdd6f4;
+    white-space: pre;
+  }
+  .code-block .lang-label {
+    position: absolute;
+    top: 10px;
+    right: 16px;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+  .code-block .comment { color: #6c7086; }
+  .code-block .string { color: #a6e3a1; }
+  .code-block .keyword { color: #cba6f7; }
+  .code-block .flag { color: #f9e2af; }
+  .code-block .var { color: #89b4fa; }
+  .code-block .tag { color: #f38ba8; }
+  .code-block .attr { color: #fab387; }
+
+  /* Inline code */
+  code.inline {
+    font-family: 'Cascadia Code', 'Fira Code', monospace;
+    font-size: 13px;
+    background: #f0ece7;
+    padding: 2px 8px;
+    border-radius: 4px;
+    color: var(--accent-warm);
+  }
+
+  /* Table */
+  .styled-table {
+    width: 100%;
+    margin: 24px 0;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    font-size: 14px;
+  }
+  .styled-table thead {
+    background: var(--bg-warm);
+  }
+  .styled-table th {
+    padding: 14px 20px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border);
+  }
+  .styled-table td {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border-light);
+    color: var(--text-secondary);
+    font-weight: 300;
+    vertical-align: top;
+  }
+  .styled-table tr:last-child td {
+    border-bottom: none;
+  }
+  .styled-table td code {
+    font-family: 'Cascadia Code', 'Fira Code', monospace;
+    font-size: 12px;
+    background: #f0ece7;
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: var(--accent-warm);
+  }
+
+  /* Overview Grid */
+  .overview-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin: 40px 0;
+  }
+  .overview-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px 28px;
+    position: relative;
+  }
+  .overview-card.highlight {
+    background: linear-gradient(135deg, #f7faf8 0%, #eef5f1 100%);
+    border: 1px solid #c8ddd0;
+  }
+  .overview-card.warm {
+    background: linear-gradient(135deg, #fef8f0 0%, #fdf0e6 100%);
+    border: 1px solid #e8d5c4;
+  }
+  .card-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 100px;
+    margin-bottom: 16px;
+  }
+  .card-badge.good { background: #edf7f1; color: var(--accent-green); }
+  .card-badge.warn { background: #fef3ef; color: var(--accent-red); }
+  .card-badge.info { background: #f0ece7; color: var(--accent-warm); }
+  .card-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .card-desc {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.8;
+    font-weight: 300;
+  }
+
+  /* Steps */
+  .steps {
+    margin: 32px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .step {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+  .step-num {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    border-radius: 50%;
+    background: var(--accent-warm);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 14px;
+    margin-top: 2px;
+  }
+  .step-content {
+    flex: 1;
+  }
+  .step-content h4 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .step-content p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    font-weight: 300;
+    line-height: 1.8;
+  }
+
+  /* Error Card */
+  .error-card {
+    margin: 24px 0;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .error-card-header {
+    padding: 16px 28px;
+    background: #fef3ef;
+    border-bottom: 1px solid #e8d5c4;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--accent-red);
+  }
+  .error-card-body {
+    padding: 0;
+  }
+  .error-row {
+    display: flex;
+    border-bottom: 1px solid var(--border-light);
+    padding: 16px 28px;
+    gap: 20px;
+  }
+  .error-row:last-child { border-bottom: none; }
+  .error-cause {
+    flex: 1;
+    font-size: 14px;
+    color: var(--text-secondary);
+    font-weight: 400;
+  }
+  .error-fix {
+    flex: 1;
+    font-size: 14px;
+    color: var(--accent-green);
+    font-weight: 400;
+  }
+
+  /* References */
+  .ref-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 24px;
+  }
+  .ref-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 16px 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: border-color 0.2s;
+  }
+  .ref-item:hover { border-color: var(--accent-warm); }
+  .ref-item .ref-source {
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .ref-item .ref-url {
+    font-size: 12px;
+    color: var(--text-light);
+    word-break: break-all;
+    margin-top: 4px;
+    font-weight: 300;
+  }
+
+  /* Unordered list */
+  .section ul.feature-list {
+    list-style: none;
+    margin: 20px 0;
+    padding: 0;
+  }
+  .section ul.feature-list li {
+    position: relative;
+    padding: 6px 0 6px 24px;
+    font-size: 15px;
+    color: var(--text-secondary);
+    font-weight: 300;
+    line-height: 1.9;
+  }
+  .section ul.feature-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 15px;
+    width: 8px;
+    height: 8px;
+    background: var(--accent-warm);
+    border-radius: 50%;
+  }
+
+  /* TOC */
+  .toc {
+    margin: 40px 0;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 36px 40px;
+  }
+  .toc-title {
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 20px;
+    font-weight: 500;
+  }
+  .toc-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .toc-list a {
+    text-decoration: none;
+    font-size: 15px;
+    color: var(--text-secondary);
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 0;
+    transition: color 0.2s;
+  }
+  .toc-list a:hover {
+    color: var(--accent-warm);
+  }
+  .toc-num {
+    font-size: 12px;
+    color: var(--text-light);
+    font-weight: 500;
+    min-width: 28px;
+  }
+
+  /* Conclusion */
+  .conclusion {
+    background: var(--bg-dark);
+    color: #fff;
+    border-radius: 20px;
+    padding: 48px;
+    margin: 40px 0;
+  }
+  .conclusion h3 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 22px;
+    margin-bottom: 16px;
+    font-weight: 700;
+  }
+  .conclusion p {
+    color: rgba(255,255,255,0.7);
+    font-size: 15px;
+    line-height: 2;
+    font-weight: 300;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 48px 0;
+    font-size: 12px;
+    color: var(--text-light);
+    font-weight: 300;
+  }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .hero h1 { font-size: 26px; }
+    .hero { padding: 72px 0 56px; }
+    .overview-grid { grid-template-columns: 1fr; }
+    .content { padding: 0 24px; }
+    .hero-inner { padding: 0 24px; }
+    .conclusion { padding: 32px 24px; }
+    .code-block { padding: 20px; }
+    .toc { padding: 24px; }
+    .section h2 { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="hero-label">DST Mod Development Guide</div>
+      <h1>Steam ワークショップへの公開マニュアル</h1>
+      <p class="hero-sub">完成した MOD を Steam ワークショップに公開して、<br>世界中のプレイヤーに遊んでもらうための手順を解説します。</p>
+    </div>
+  </header>
+
+  <main class="content">
+
+    <!-- 目次 -->
+    <section class="section">
+      <div class="toc">
+        <div class="toc-title">Table of Contents</div>
+        <ol class="toc-list">
+          <li><a href="#workshop"><span class="toc-num">01</span>Steam ワークショップとは</a></li>
+          <li><a href="#preparation"><span class="toc-num">02</span>公開前の準備</a></li>
+          <li><a href="#uploader"><span class="toc-num">03</span>Mod Uploader の起動</a></li>
+          <li><a href="#upload"><span class="toc-num">04</span>はじめてのアップロード</a></li>
+          <li><a href="#update"><span class="toc-num">05</span>MOD の更新（アップデート）</a></li>
+          <li><a href="#errors"><span class="toc-num">06</span>よくあるエラーと対処法</a></li>
+          <li><a href="#tips"><span class="toc-num">07</span>Tips・参考情報</a></li>
+          <li><a href="#references"><span class="toc-num">08</span>参考リンク</a></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- 1. Steam ワークショップとは -->
+    <section class="section" id="workshop">
+      <div class="section-label">01 — Overview</div>
+      <h2>Steam ワークショップとは</h2>
+      <p>Steam ワークショップは、ユーザーが作成したゲームの MOD を共有・配布できる Steam の公式プラットフォームです。</p>
+      <p>ワークショップに MOD を公開すると、以下のメリットがあります。</p>
+
+      <ul class="feature-list">
+        <li>他のプレイヤーが「サブスクライブ」ボタンひとつで MOD をインストールできる</li>
+        <li>MOD のアップデートが自動で全ユーザーに配信される</li>
+        <li>コメント欄でフィードバックやバグ報告を受け取れる</li>
+        <li>評価やサブスクライブ数で、どれだけ遊んでもらえているかがわかる</li>
+      </ul>
+
+      <div class="callout note">
+        <strong>ポイント</strong>: 心配いりません。ワークショップへの公開は無料で、いつでも非公開に戻したり削除したりできます。気軽に公開してみましょう。
+      </div>
+    </section>
+
+    <!-- 2. 公開前の準備 -->
+    <section class="section" id="preparation">
+      <div class="section-label">02 — Preparation</div>
+      <h2>公開前の準備</h2>
+      <p>ワークショップにアップロードする前に、以下の項目を確認してください。</p>
+
+      <h3>modinfo.lua の確認</h3>
+      <p>MOD のルートフォルダにある <code class="inline">modinfo.lua</code> の以下の項目が正しく設定されているか確認します。</p>
+
+      <div class="code-block">
+        <span class="lang-label">Lua</span>
+        <code><span class="comment">-- ★書き換え: ワークショップに表示される情報</span>
+<span class="var">name</span> = <span class="string">"My Character MOD"</span>           <span class="comment">-- MOD の名前</span>
+<span class="var">description</span> = <span class="string">"A custom character."</span>  <span class="comment">-- MOD の説明</span>
+<span class="var">author</span> = <span class="string">"YourName"</span>                  <span class="comment">-- 作者名</span>
+<span class="var">version</span> = <span class="string">"1.0.0"</span>                    <span class="comment">-- バージョン番号</span></code>
+      </div>
+
+      <div class="callout warning">
+        <strong>重要</strong>: <code class="inline">version</code> はアップロードのたびに数字を上げる必要があります（例: <code class="inline">"1.0.0"</code> → <code class="inline">"1.0.1"</code>）。同じバージョン番号のままアップロードすると、エラーになることがあります。
+      </div>
+
+      <h3>MOD アイコンの確認</h3>
+      <p>MOD のルートフォルダに以下の 2 つのファイルがあることを確認してください。</p>
+
+      <table class="styled-table">
+        <thead>
+          <tr><th>ファイル</th><th>説明</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>modicon.tex</code></td><td>MOD アイコンのテクスチャファイル</td></tr>
+          <tr><td><code>modicon.xml</code></td><td>MOD アイコンのアトラスファイル</td></tr>
+        </tbody>
+      </table>
+
+      <p>これらはゲーム内の MOD 一覧に表示されるアイコンです。PNG から TEX への変換方法は <a href="../DST-TextureConverter/README.html" style="color:var(--accent-warm);text-decoration:none;border-bottom:1px solid var(--accent-warm)">DST-TextureConverter ガイド</a> を参照してください。</p>
+
+      <h3>プレビュー画像の用意</h3>
+      <p>ワークショップページに表示されるサムネイル画像を用意します。</p>
+
+      <ul class="feature-list">
+        <li><strong>形式</strong>: JPG または PNG（TEX ファイルではありません）</li>
+        <li><strong>推奨サイズ</strong>: 512 x 512 以上</li>
+        <li><strong>ファイルの場所</strong>: MOD フォルダの中でなくても構いません（アップロード時に指定します）</li>
+      </ul>
+
+      <div class="callout note">
+        <strong>なぜ TEX ではないのか？</strong>: ワークショップのプレビュー画像は Steam のウェブページに表示されるものなので、通常の画像形式（JPG / PNG）を使います。ゲーム内で使う TEX ファイルとは別のものです。
+      </div>
+
+      <div class="callout tip">
+        <strong>初心者向けTip:</strong> まだプレビュー画像がなくても大丈夫です。MOD アイコンと同じ画像の PNG 版を使っても問題ありません。あとから差し替えることもできます。
+      </div>
+
+      <h3>ゲーム内テスト</h3>
+      <p>公開する前に、必ずゲーム内で MOD が正しく動作するか確認してください。</p>
+
+      <ul class="nav-path">
+        <li>DST を起動する</li>
+        <li>MOD を有効化してゲームを開始する</li>
+        <li>キャラクターが正しく表示されるか確認する</li>
+        <li>アイテムやクラフトが動作するか確認する</li>
+        <li>マルチプレイでホストとクライアント両方で問題がないか確認する</li>
+      </ul>
+
+      <h3>公開前チェックリスト</h3>
+
+      <table class="styled-table">
+        <thead>
+          <tr><th>項目</th><th>確認内容</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>modinfo.lua</code></td><td>name、description、author、version が正しい</td></tr>
+          <tr><td>MOD アイコン</td><td><code>modicon.tex</code> と <code>modicon.xml</code> が存在する</td></tr>
+          <tr><td>プレビュー画像</td><td>JPG または PNG ファイルを用意した</td></tr>
+          <tr><td>ゲーム内テスト</td><td>シングルプレイで動作確認した</td></tr>
+          <tr><td>マルチプレイテスト</td><td>ホスト・クライアント両方で動作確認した</td></tr>
+          <tr><td>不要ファイル</td><td><code>exported/</code> フォルダなどの不要ファイルを削除した</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout note">
+        <strong>ポイント</strong>: <code class="inline">exported/</code> フォルダは Spriter がアニメーションをエクスポートする際に作成される作業用フォルダです。MOD の動作には不要なので、アップロード前に削除しておくとファイルサイズを節約できます。
+      </div>
+    </section>
+
+    <!-- 3. Mod Uploader の起動 -->
+    <section class="section" id="uploader">
+      <div class="section-label">03 — Mod Uploader</div>
+      <h2>Mod Uploader の起動</h2>
+      <p>MOD をワークショップにアップロードするには、Steam に付属の <strong>Mod Uploader</strong> ツールを使います。</p>
+
+      <h3>起動手順</h3>
+
+      <ul class="nav-path">
+        <li>Steam を開く</li>
+        <li>ライブラリを選択する</li>
+        <li>検索バーの横にある絞り込みで「ツール」にチェックを入れる</li>
+        <li>検索バーに <code class="inline">Don't Starve Mod Tools</code> と入力する</li>
+        <li><strong>Don't Starve Mod Tools</strong> をクリックして起動する</li>
+        <li>表示されたメニューから <strong>Mod Uploader</strong> を選択する</li>
+      </ul>
+
+      <div class="callout note">
+        <strong>ヒント</strong>: Don't Starve Mod Tools がインストールされていない場合は、上記の手順で見つけてインストールしてください（無料です）。インストール方法の詳細は <a href="../README.html" style="color:var(--accent-warm);text-decoration:none;border-bottom:1px solid var(--accent-warm)">メインガイド</a> を参照してください。
+      </div>
+    </section>
+
+    <!-- 4. はじめてのアップロード -->
+    <section class="section" id="upload">
+      <div class="section-label">04 — First Upload</div>
+      <h2>はじめてのアップロード</h2>
+      <p>Mod Uploader を起動すると、アップロード画面が表示されます。以下の各項目を設定してください。</p>
+
+      <h3>各フィールドの説明</h3>
+
+      <table class="styled-table">
+        <thead>
+          <tr><th>フィールド</th><th>説明</th><th>設定内容</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Update Data folder</strong></td><td>MOD のファイルが入っているフォルダ</td><td>MOD のルートフォルダを指定（例: <code>mods/my_character/</code>）</td></tr>
+          <tr><td><strong>Preview Image</strong></td><td>ワークショップページのサムネイル画像</td><td>用意した JPG / PNG ファイルを指定</td></tr>
+          <tr><td><strong>Workshop Name</strong></td><td>ワークショップに表示される MOD の名前</td><td><code>modinfo.lua</code> の <code>name</code> と同じでも、別の名前でも OK</td></tr>
+          <tr><td><strong>Description</strong></td><td>ワークショップページに表示される説明文</td><td>MOD の機能や特徴を記載</td></tr>
+          <tr><td><strong>Tags</strong></td><td>MOD のカテゴリタグ</td><td>該当するものを選択（下記参照）</td></tr>
+        </tbody>
+      </table>
+
+      <h3>タグの選び方</h3>
+      <p>アップロード画面でタグを選択すると、ワークショップでの検索性が向上します。</p>
+
+      <table class="styled-table">
+        <thead>
+          <tr><th>タグ</th><th>用途</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>character</strong></td><td>キャラクター MOD</td></tr>
+          <tr><td><strong>item</strong></td><td>アイテムを追加する MOD</td></tr>
+          <tr><td><strong>creature</strong></td><td>生物を追加・変更する MOD</td></tr>
+          <tr><td><strong>tweak</strong></td><td>ゲームバランスを調整する MOD</td></tr>
+          <tr><td><strong>scenario</strong></td><td>シナリオ・ゲームモードを追加する MOD</td></tr>
+          <tr><td><strong>server_admin</strong></td><td>サーバー管理者向けの MOD</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout note">
+        <strong>ポイント</strong>: キャラクター MOD なら <code class="inline">character</code> タグを選択してください。複数のタグを選ぶこともできます。
+      </div>
+
+      <h3>アップロードの実行</h3>
+
+      <ul class="nav-path">
+        <li>すべてのフィールドを設定する</li>
+        <li><strong>Upload</strong> ボタンをクリックする</li>
+        <li>アップロードが完了するまで待つ</li>
+        <li>「Success」と表示されたら完了</li>
+      </ul>
+
+      <h3>アップロード後の確認</h3>
+      <p>アップロードが成功したら、ワークショップページを確認しましょう。</p>
+
+      <ul class="nav-path">
+        <li>Steam を開く</li>
+        <li>DST のワークショップページに移動する</li>
+        <li>自分の MOD が表示されていることを確認する</li>
+      </ul>
+
+      <div class="callout tip">
+        <strong>初心者向けTip:</strong> アップロード直後は「非公開（Hidden）」状態になっている場合があります。ワークショップページの「公開設定」から「公開（Public）」に変更すると、全ユーザーに表示されます。
+      </div>
+    </section>
+
+    <!-- 5. MOD の更新 -->
+    <section class="section" id="update">
+      <div class="section-label">05 — Update</div>
+      <h2>MOD の更新（アップデート）</h2>
+      <p>MOD を修正・改善した場合は、ワークショップにアップロード済みの MOD を更新できます。</p>
+
+      <h3>更新手順</h3>
+
+      <ul class="nav-path">
+        <li><code class="inline">modinfo.lua</code> の <code class="inline">version</code> を上げる（例: <code class="inline">"1.0.0"</code> → <code class="inline">"1.0.1"</code>）</li>
+        <li>Mod Uploader を起動する</li>
+        <li>既存の MOD を選択する</li>
+        <li><strong>Update Data</strong> にチェックを入れる</li>
+        <li>MOD フォルダを指定する</li>
+        <li><strong>Upload</strong> をクリックする</li>
+      </ul>
+
+      <h3>チェックボックスの使い分け</h3>
+
+      <table class="styled-table">
+        <thead>
+          <tr><th>チェックボックス</th><th>用途</th><th>推奨</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Update Data</strong></td><td>MOD のファイル（スクリプト、画像等）を更新</td><td>更新時は毎回チェック</td></tr>
+          <tr><td><strong>Update Details</strong></td><td>ワークショップの名前・説明・タグを更新</td><td>名前や説明を変えたい時のみチェック</td></tr>
+          <tr><td><strong>Update Preview</strong></td><td>プレビュー画像を更新</td><td>サムネイルを変えたい時のみチェック</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout warning">
+        <strong>重要</strong>: <strong>Update Details</strong> はワークショップページの説明文をアップロード画面の内容で上書きします。ワークショップページ上で直接編集した説明がある場合、チェックを入れるとその内容が消えてしまいます。通常は <strong>Update Data</strong> のみチェックすれば十分です。
+      </div>
+
+      <div class="callout warning">
+        <strong>重要</strong>: <code class="inline">version</code> 番号を上げずにアップロードすると、エラーになることがあります。<code class="inline">modinfo.lua</code> の <code class="inline">version</code> を必ず変更してください。
+      </div>
+    </section>
+
+    <!-- 6. よくあるエラーと対処法 -->
+    <section class="section" id="errors">
+      <div class="section-label">06 — Troubleshooting</div>
+      <h2>よくあるエラーと対処法</h2>
+
+      <table class="styled-table">
+        <thead>
+          <tr><th>症状</th><th>原因</th><th>解決法</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>EResult 9 エラー</td><td>直前のアップロードと同じプレビュー画像を使った</td><td>プレビュー画像を別のファイルに変更する（1 ピクセルでも変えれば OK）</td></tr>
+          <tr><td>version 番号エラー</td><td><code>modinfo.lua</code> の version を更新していない</td><td>version を上げてから再アップロード</td></tr>
+          <tr><td>アップロードが失敗する</td><td>MOD のファイルサイズが 100MB を超えている</td><td>不要なファイル（<code>exported/</code> フォルダ等）を削除してサイズを減らす</td></tr>
+          <tr><td>Mod Uploader が起動しない</td><td>Don't Starve Mod Tools がインストールされていない</td><td>Steam ライブラリの「ツール」からインストール</td></tr>
+          <tr><td>アップロード後に MOD が見つからない</td><td>公開設定が「非公開」になっている</td><td>ワークショップページで「公開」に変更</td></tr>
+        </tbody>
+      </table>
+
+      <h3>ログファイルの確認</h3>
+      <p>アップロードに失敗した場合、ログファイルにエラーの詳細が記録されています。</p>
+
+      <div class="code-block">
+        <code>C:\Users\&lt;ユーザー名&gt;\AppData\Local\Don't Starve Mod Uploader\ModUploader.log</code>
+      </div>
+
+      <div class="callout note">
+        <strong>ヒント</strong>: <code class="inline">AppData</code> フォルダは通常は隠しフォルダです。エクスプローラーの「表示」メニューから「隠しファイル」にチェックを入れると表示されます。
+      </div>
+    </section>
+
+    <!-- 7. Tips・参考情報 -->
+    <section class="section" id="tips">
+      <div class="section-label">07 — Tips</div>
+      <h2>Tips・参考情報</h2>
+
+      <h3>英語の name と description で見つけてもらいやすく</h3>
+      <p><code class="inline">modinfo.lua</code> の <code class="inline">name</code> と <code class="inline">description</code> を英語で書くと、海外のプレイヤーにも見つけてもらいやすくなります。日本語の説明を添えたい場合は、英語の後に日本語を併記するとよいでしょう。</p>
+
+      <div class="code-block">
+        <span class="lang-label">Lua</span>
+        <code><span class="var">name</span> = <span class="string">"My Character MOD"</span>
+<span class="var">description</span> = <span class="string">"A custom character with special abilities.\n特殊能力を持つカスタムキャラクター。"</span></code>
+      </div>
+
+      <h3>ワークショップ説明文の書式</h3>
+      <p>ワークショップページの説明文では、Steam 独自のリッチテキスト記法が使えます。</p>
+
+      <table class="styled-table">
+        <thead>
+          <tr><th>記法</th><th>表示</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>[h1]見出し[/h1]</code></td><td>大見出し</td></tr>
+          <tr><td><code>[h2]小見出し[/h2]</code></td><td>小見出し</td></tr>
+          <tr><td><code>[b]太字[/b]</code></td><td><strong>太字</strong></td></tr>
+          <tr><td><code>[i]斜体[/i]</code></td><td><em>斜体</em></td></tr>
+          <tr><td><code>[list][*]項目1[*]項目2[/list]</code></td><td>箇条書きリスト</td></tr>
+          <tr><td><code>[url=https://...]リンク[/url]</code></td><td>リンク</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout note">
+        <strong>ポイント</strong>: この記法はワークショップページの「説明を編集」で直接入力します。<code class="inline">modinfo.lua</code> の <code class="inline">description</code> には使えません。
+      </div>
+
+      <h3>不要ファイルの除外</h3>
+      <p>アップロード前に、以下のようなファイルやフォルダが MOD に含まれていないか確認してください。</p>
+
+      <table class="styled-table">
+        <thead>
+          <tr><th>ファイル・フォルダ</th><th>説明</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>exported/</code></td><td>Spriter のエクスポート作業フォルダ</td></tr>
+          <tr><td><code>.psd</code> / <code>.xcf</code></td><td>画像編集ソフトのプロジェクトファイル</td></tr>
+          <tr><td><code>.scml</code></td><td>Spriter のプロジェクトファイル（anim/ 内の .zip があれば不要）</td></tr>
+          <tr><td><code>README.md</code></td><td>開発用のドキュメント</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout note">
+        <strong>なぜ不要ファイルを除外するのか？</strong>: ワークショップにはファイルサイズの上限（100MB）があります。また、サブスクライブしたユーザーのダウンロード時間を短くするためにも、不要なファイルは除外しておきましょう。
+      </div>
+    </section>
+
+    <!-- 8. 参考リンク -->
+    <section class="section" id="references">
+      <div class="section-label">08 — References</div>
+      <h2>参考リンク</h2>
+
+      <div class="ref-list">
+        <a class="ref-item" href="https://forums.kleientertainment.com/forums/topic/114247-tutorial-how-to-upload-a-ds-dst-mod-to-the-steam-workshop/" target="_blank" rel="noopener">
+          <div>
+            <div class="ref-source">How to upload a DS / DST mod to the Steam Workshop</div>
+            <div class="ref-url">Klei Forums</div>
+          </div>
+        </a>
+        <a class="ref-item" href="https://steamcommunity.com/app/322330/workshop/" target="_blank" rel="noopener">
+          <div>
+            <div class="ref-source">Don't Starve Together Steam Workshop</div>
+            <div class="ref-url">steamcommunity.com</div>
+          </div>
+        </a>
+        <a class="ref-item" href="../README.html">
+          <div>
+            <div class="ref-source">← メインガイドに戻る</div>
+            <div class="ref-url">DST-Mod-Tools メインガイド</div>
+          </div>
+        </a>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    DST-Workshop-Upload Guide &#8212; このドキュメントは自由に利用・改変・再配布できます。DST MOD 制作にお役立てください。
+    <br><span style="display:inline-block;margin-top:8px"><a href="https://steamcommunity.com/profiles/76561198076111536/" style="color:inherit;text-decoration:none">Author: pinpikokun</a></span><br><span style="display:inline-flex;gap:6px;margin-top:6px"><a href="https://github.com/pinpikokun/DST-teemo"><img src="https://img.shields.io/badge/GitHub-Repository-black?logo=github" alt="GitHub"></a> <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=390684095"><img src="https://img.shields.io/badge/Steam%20Workshop-Subscribe-blue?logo=steam" alt="Steam Workshop"></a></span>
+  </footer>
+
+</body>
+</html>

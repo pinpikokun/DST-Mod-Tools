@@ -2,7 +2,9 @@
 
 [← README.md に戻る](README.md)
 
-エフェクト（視覚効果）・投射物・範囲表示など、キャラクターやアイテム以外のアニメーションについて解説します。これらは MOD に演出を加えるために重要な要素です。
+エフェクト（視覚効果）など、キャラクターやアイテム以外のアニメーションについて解説します。これらは MOD に演出を加えるために重要な要素です。
+
+> **HTML 版**: [README-effect.html](README-effect.html)
 
 ---
 
@@ -112,93 +114,12 @@ end
 
 ---
 
-## 投射物アニメーション
-
-矢や弾のように飛んでいくものが「投射物」です。
-
-### 構成
-
-投射物には通常 2 つのアニメーションがあります。
-
-| アニメーション名 | 説明 |
-|---|---|
-| `idle_pipe` | 静止状態（手に持っている/発射前） |
-| `dart_pipe` | 飛行中の見た目 |
-
-### 向きの設定
-
-投射物は地面と平行に飛ぶため、`SetOrientation` で向きを設定する必要があります。
-
-```lua
--- 投射物の設定例
-inst.AnimState:SetBank("blow_dart")
-inst.AnimState:SetBuild("blow_dart")
-inst.AnimState:PlayAnimation("dart_pipe")
-
--- 地面と平行に表示する
-inst.AnimState:SetOrientation(ANIM_ORIENTATION.OnGround)
-```
-
-> **Note**: `ANIM_ORIENTATION.OnGround` を設定しないと、投射物が正面を向いたまま飛んでいく不自然な見た目になります。
-
-### 既存 Bank の流用
-
-DST 本体にはいくつかの投射物 Bank が用意されています。
-
-| Bank 名 | 元の用途 |
-|---|---|
-| `blow_dart` | 吹き矢 |
-| `fire_projectile` | 火の投射物 |
-| `ice_projectile` | 氷の投射物 |
-
-> **Tips**: 吹き矢系の武器を作る場合は `blow_dart` Bank を流用し、Build だけ差し替えるのが簡単です。
-
----
-
-## 範囲表示アニメーション
-
-射程範囲やターゲットリングなど、ゲーム画面上に表示される UI 的なアニメーションです。
-
-### 特徴
-
-範囲表示は他のエフェクトと異なり、以下の特徴があります。
-
-| 特徴 | 説明 |
-|---|---|
-| 独自 Bank を使う | 既存 Bank の流用ではなく、自分で Bank を定義する |
-| クライアント側のみ | サーバーには存在せず、プレイヤーの画面にのみ表示される |
-| 地面に表示 | `SetOrientation(ANIM_ORIENTATION.OnGround)` を使う |
-| ループ再生 | 条件を満たす間ずっと表示し続ける |
-
-### Lua 設定例
-
-```lua
--- 射程範囲リングの例
-local fx = CreateEntity()
-fx.entity:AddAnimState()
-
-fx.AnimState:SetBank("my_range_indicator")
-fx.AnimState:SetBuild("my_range_ring")
-fx.AnimState:PlayAnimation("idle", true)  -- ループ再生
-fx.AnimState:SetOrientation(ANIM_ORIENTATION.OnGround)
-```
-
-### 詳細サンプル
-
-範囲表示リングの Spriter での作り方は、本リポジトリに詳細なサンプルがあります。
-
-→ [README-blind-dart-renge-ring.md](sample/README-blind-dart-renge-ring.md) — ブラインドダートの射程範囲リング作成ガイド
-
----
-
 ## まとめ
 
 | 作るもの | Bank | Build | ポイント |
 |---|---|---|---|
 | バフ/デバフ表示 | `forcefield` 等（流用） | 独自 | `open` → `idle_loop` のパターン |
 | 爆発/煙 | `poopcloud` 等（流用） | 独自 | `idle` 1 フレームでOK。`animover` で自動削除 |
-| 投射物 | `blow_dart` 等（流用） | 独自 | `SetOrientation(OnGround)` を忘れずに |
-| 範囲表示 | 独自 | 独自 | クライアント側のみ。ループ再生 |
 
 ### 既存 Bank を調べる方法
 

@@ -181,10 +181,8 @@
   }
   .steps li {
     counter-increment: step;
-    display: flex;
-    align-items: flex-start;
-    gap: 16px;
-    padding: 14px 0;
+    position: relative;
+    padding: 14px 0 14px 44px;
     border-bottom: 1px solid var(--border-light);
     font-size: 15px;
     color: var(--text-secondary);
@@ -194,7 +192,9 @@
   .steps li:last-child { border-bottom: none; }
   .steps li::before {
     content: counter(step);
-    flex-shrink: 0;
+    position: absolute;
+    left: 0;
+    top: 14px;
     width: 28px;
     height: 28px;
     background: var(--bg-dark);
@@ -205,7 +205,46 @@
     justify-content: center;
     font-weight: 700;
     font-size: 13px;
-    margin-top: 2px;
+  }
+
+  /* Nav Path (vertical timeline) */
+  .nav-path {
+    margin: 12px 0;
+    padding: 0;
+    list-style: none;
+  }
+  .nav-path li {
+    position: relative;
+    padding: 4px 0 4px 32px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+  .nav-path li::before {
+    content: '';
+    position: absolute;
+    left: 9px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--border);
+  }
+  .nav-path li::after {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 10px;
+    width: 10px;
+    height: 10px;
+    background: var(--accent-warm);
+    border-radius: 50%;
+    z-index: 1;
+  }
+  .nav-path li:first-child::before {
+    top: 10px;
+  }
+  .nav-path li:last-child::before {
+    bottom: calc(100% - 16px);
   }
 
   /* Code */
@@ -762,7 +801,13 @@
 
       <div class="callout info">
         <span class="callout-label">メモ</span>
-        <p>バンク名を変更したい場合は、画面上部の <strong>Banks</strong> タブをクリック → 左ペインで変更したいバンク名を選択 → 右ペインの <strong>Name</strong> 欄で変更できます。ただし、変更するとビルド後の <code>.fsb</code> ファイル名も変わるため、MOD の Lua コード側で参照するパスも合わせて変更する必要があります。</p>
+        <p>バンク名を変更したい場合:</p>
+        <ol class="nav-path">
+          <li>画面上部の <strong>Banks</strong> タブをクリック</li>
+          <li>左ペインで変更したいバンク名を選択</li>
+          <li>右ペインの <strong>Name</strong> 欄で変更</li>
+        </ol>
+        <p>ただし、変更するとビルド後の <code>.fsb</code> ファイル名も変わるため、MOD の Lua コード側で参照するパスも合わせて変更する必要があります。</p>
       </div>
 
       <!-- 各イベントの設定 -->

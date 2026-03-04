@@ -166,10 +166,8 @@
   }
   .steps li {
     counter-increment: step;
-    display: flex;
-    align-items: flex-start;
-    gap: 16px;
-    padding: 14px 0;
+    position: relative;
+    padding: 14px 0 14px 44px;
     border-bottom: 1px solid var(--border-light);
     font-size: 15px;
     color: var(--text-secondary);
@@ -179,7 +177,9 @@
   .steps li:last-child { border-bottom: none; }
   .steps li::before {
     content: counter(step);
-    flex-shrink: 0;
+    position: absolute;
+    left: 0;
+    top: 14px;
     width: 28px;
     height: 28px;
     background: var(--bg-dark);
@@ -190,7 +190,46 @@
     justify-content: center;
     font-weight: 700;
     font-size: 13px;
-    margin-top: 2px;
+  }
+
+  /* Nav Path (vertical timeline) */
+  .nav-path {
+    margin: 12px 0;
+    padding: 0;
+    list-style: none;
+  }
+  .nav-path li {
+    position: relative;
+    padding: 4px 0 4px 32px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+  .nav-path li::before {
+    content: '';
+    position: absolute;
+    left: 9px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--border);
+  }
+  .nav-path li::after {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 10px;
+    width: 10px;
+    height: 10px;
+    background: var(--accent-warm);
+    border-radius: 50%;
+    z-index: 1;
+  }
+  .nav-path li:first-child::before {
+    top: 10px;
+  }
+  .nav-path li:last-child::before {
+    bottom: calc(100% - 16px);
   }
 
   /* Code */
@@ -1132,7 +1171,12 @@ my_character\anim\ghost_my_character_build.zip</code></pre>
       <div class="callout tip">
         <span class="callout-label">PNG 画像の作成について</span>
         <p>PNG 画像は Windows 標準の「ペイント」でも作成できますが、透過 PNG を扱う場合は <strong>GIMP</strong>（無料）や <strong>Photoshop</strong> を使用してください。ペイントは透過をサポートしていません。</p>
-        <p>画像サイズの確認方法: エクスプローラーでファイルを右クリック → プロパティ → 詳細タブで「幅」と「高さ」を確認できます。</p>
+        <p>画像サイズの確認方法:</p>
+        <ol class="nav-path">
+          <li>エクスプローラーでファイルを右クリック</li>
+          <li>「プロパティ」を選択</li>
+          <li>「詳細」タブで「幅」と「高さ」を確認</li>
+        </ol>
       </div>
 
       <h3>TEX への変換手順</h3>
@@ -1249,7 +1293,15 @@ my_character\anim\ghost_my_character_build.zip</code></pre>
 
       <h3>MOD フォルダをゲームに配置する</h3>
       <ol class="steps">
-        <li>完成した <code>my_character</code> フォルダを DST の <code>mods</code> フォルダにコピー（Steam → Don't Starve Together を右クリック → <strong>管理 → ローカルファイルを閲覧</strong> → <code>mods</code> フォルダ）</li>
+        <li>完成した <code>my_character</code> フォルダを DST の <code>mods</code> フォルダにコピー
+          <ol class="nav-path">
+            <li>Steam を開く</li>
+            <li>Don't Starve Together を右クリック</li>
+            <li><strong>管理</strong> を選択</li>
+            <li><strong>ローカルファイルを閲覧</strong> をクリック</li>
+            <li><code>mods</code> フォルダを開く</li>
+          </ol>
+        </li>
         <li><code>mods</code> フォルダ内の <code>dedicated_server_mods_setup.lua</code> は触らない</li>
       </ol>
 
@@ -1370,7 +1422,13 @@ my_character\anim\ghost_my_character_build.zip</code></pre>
       <div class="acc" onclick="this.classList.toggle('open')">
         <div class="acc-head">パスに日本語が含まれている</div>
         <div class="acc-body">
-          <p>Windows のユーザー名が日本語の場合、一部のツールが正常に動作しないことがあります。Steam のインストール先を <code>D:\Steam\</code> など日本語を含まないパスに変更するか、ゲームのインストール先だけを移動してください（Steam → ゲームを右クリック → プロパティ → インストールフォルダの移動）。</p>
+          <p>Windows のユーザー名が日本語の場合、一部のツールが正常に動作しないことがあります。Steam のインストール先を <code>D:\Steam\</code> など日本語を含まないパスに変更するか、ゲームのインストール先だけを移動してください。</p>
+          <ol class="nav-path">
+            <li>Steam を開く</li>
+            <li>ゲームを右クリック</li>
+            <li>「プロパティ」を選択</li>
+            <li>「インストールフォルダの移動」を実行</li>
+          </ol>
         </div>
       </div>
     </section>
@@ -1498,6 +1556,13 @@ my_character\anim\ghost_my_character_build.zip</code></pre>
           </div>
         </a>
       </div>
+    </section>
+
+    <!-- ライセンス -->
+    <section class="section">
+      <h2>ライセンス</h2>
+      <p>このガイドおよびリポジトリ内のテンプレートは、学習目的で自由に使用できます。</p>
+      <p>このドキュメントは自由に利用・改変・再配布できます。DST MOD 制作にお役立てください。</p>
     </section>
 
   </main>

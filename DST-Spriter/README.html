@@ -166,10 +166,8 @@
   }
   .steps li {
     counter-increment: step;
-    display: flex;
-    align-items: flex-start;
-    gap: 16px;
-    padding: 14px 0;
+    position: relative;
+    padding: 14px 0 14px 44px;
     border-bottom: 1px solid var(--border-light);
     font-size: 15px;
     color: var(--text-secondary);
@@ -179,7 +177,9 @@
   .steps li:last-child { border-bottom: none; }
   .steps li::before {
     content: counter(step);
-    flex-shrink: 0;
+    position: absolute;
+    left: 0;
+    top: 14px;
     width: 28px;
     height: 28px;
     background: var(--bg-dark);
@@ -190,7 +190,6 @@
     justify-content: center;
     font-weight: 700;
     font-size: 13px;
-    margin-top: 2px;
   }
 
   /* Code */
@@ -681,8 +680,6 @@
         <tr><td><strong>アイテム</strong></td><td>地面に置いたときの見た目</td><td><code>my_sword.zip</code></td><td>アイテム編</td></tr>
         <tr><td><strong>装備スワップ</strong></td><td>キャラが手に持ったときの見た目</td><td><code>swap_my_sword.zip</code></td><td>アイテム編</td></tr>
         <tr><td><strong>エフェクト</strong></td><td>視覚効果（バフ・爆発等）</td><td><code>my_effect.zip</code></td><td>エフェクト編</td></tr>
-        <tr><td><strong>投射物</strong></td><td>飛んでいくもの（矢・弾等）</td><td><code>my_projectile.zip</code></td><td>エフェクト編</td></tr>
-        <tr><td><strong>範囲表示</strong></td><td>射程リングなどの UI 表示</td><td><code>my_range_ring.zip</code></td><td>エフェクト編</td></tr>
       </table>
 
       <div class="callout info">
@@ -710,6 +707,10 @@
           <p>フォルダを右クリック →「Git Bash Here」で起動します。</p>
 
           <h4>1. シェル変数を設定する</h4>
+          <div class="callout tip">
+            <span class="callout-label">シェル変数とは？</span>
+            <p>シェルとは、Git Bash のような <strong>コマンドを入力する画面（ターミナル）そのもの</strong> のことです。シェル変数とは、その画面の中だけで使える <strong>一時的なメモ書き</strong> のようなものです。長いパスに短い名前を付けておくことで、後のコマンドで何度も長いパスを打ち直す手間を省けます。</p>
+          </div>
           <p>後続のコマンドで使う変数を設定します。<strong>必ず最初に実行してください。</strong></p>
 <pre><code><span class="fn">MOD_TOOLS</span>=<span class="str">"C:/Program Files (x86)/Steam/steamapps/common/Don't Starve Mod Tools/mod_tools"</span>
 <span class="fn">PROJECT_NAME</span>=<span class="str">"&lt;プロジェクト名&gt;"</span>  <span class="cm"># .scmlファイルの拡張子なしの名前</span></code></pre>

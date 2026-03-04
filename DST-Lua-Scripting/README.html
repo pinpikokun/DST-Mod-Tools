@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DST-Lua-Scripting — Lua スクリプティングガイド</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Noto+Sans+JP:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--bg-primary:#faf9f7;--bg-card:#ffffff;--bg-warm:#f5f0eb;--bg-dark:#191919;--text-primary:#1a1a1a;--text-secondary:#6b6560;--text-light:#9a938d;--accent-warm:#c4704b;--accent-green:#2d7a5f;--accent-red:#b85450;--border:#e8e2db;--border-light:#f0ece7}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Noto Sans JP',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg-primary);color:var(--text-primary);line-height:1.8;font-weight:400;-webkit-font-smoothing:antialiased}
+  .hero{background:var(--bg-dark);color:#fff;padding:100px 0 80px;position:relative;overflow:hidden}
+  .hero::before{content:'';position:absolute;top:-50%;right:-20%;width:600px;height:600px;background:radial-gradient(circle,rgba(196,112,75,0.15) 0%,transparent 70%);pointer-events:none}
+  .hero-inner{max-width:820px;margin:0 auto;padding:0 40px;position:relative}
+  .hero-label{font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--accent-warm);margin-bottom:24px;font-weight:500}
+  .hero h1{font-family:'Noto Serif JP',serif;font-size:38px;font-weight:700;line-height:1.4;margin-bottom:20px;letter-spacing:-0.5px}
+  .hero-sub{font-size:16px;color:rgba(255,255,255,0.6);font-weight:300;line-height:1.8}
+  .content{max-width:820px;margin:0 auto;padding:0 40px}
+  .section{padding:72px 0;border-bottom:1px solid var(--border-light)}.section:last-child{border-bottom:none}
+  .section-label{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--text-light);margin-bottom:16px;font-weight:500}
+  .section h2{font-family:'Noto Serif JP',serif;font-size:28px;font-weight:700;margin-bottom:24px;line-height:1.5}
+  .section h3{font-family:'Noto Serif JP',serif;font-size:20px;font-weight:700;margin-top:40px;margin-bottom:16px;line-height:1.5}
+  .section h4{font-size:16px;font-weight:600;margin-top:32px;margin-bottom:12px}
+  .section p{font-size:16px;color:var(--text-secondary);line-height:2;font-weight:300}.section p+p{margin-top:12px}
+  .callout{margin:32px 0;padding:24px 28px;border-radius:12px;font-size:15px;line-height:1.9}
+  .callout.note{background:#fef8f0;border-left:3px solid var(--accent-warm);color:var(--text-primary)}
+  .callout.tip{background:#f0f8f3;border-left:3px solid var(--accent-green);color:var(--text-primary)}
+  .callout.warning{background:#fef3ef;border-left:3px solid var(--accent-red);color:var(--text-primary)}
+  .callout strong{font-weight:600}
+  .code-block{margin:24px 0;background:#1e1e2e;border-radius:12px;padding:28px 32px;overflow-x:auto;position:relative}
+  .code-block code{font-family:'Cascadia Code','Fira Code','JetBrains Mono',monospace;font-size:13px;line-height:1.7;color:#cdd6f4;white-space:pre}
+  .code-block .lang-label{position:absolute;top:10px;right:16px;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.3);font-family:'Noto Sans JP',sans-serif}
+  .code-block .comment{color:#6c7086}.code-block .string{color:#a6e3a1}.code-block .keyword{color:#cba6f7}.code-block .flag{color:#f9e2af}.code-block .var{color:#89b4fa}.code-block .tag{color:#f38ba8}.code-block .attr{color:#fab387}
+  code.inline{font-family:'Cascadia Code','Fira Code',monospace;font-size:13px;background:#f0ece7;padding:2px 8px;border-radius:4px;color:var(--accent-warm)}
+  .styled-table{width:100%;margin:24px 0;border-collapse:separate;border-spacing:0;border:1px solid var(--border);border-radius:12px;overflow:hidden;font-size:14px}
+  .styled-table thead{background:var(--bg-warm)}
+  .styled-table th{padding:14px 20px;text-align:left;font-weight:600;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--text-secondary);border-bottom:1px solid var(--border)}
+  .styled-table td{padding:14px 20px;border-bottom:1px solid var(--border-light);color:var(--text-secondary);font-weight:300;vertical-align:top}
+  .styled-table tr:last-child td{border-bottom:none}
+  .styled-table td code{font-family:'Cascadia Code','Fira Code',monospace;font-size:12px;background:#f0ece7;padding:2px 6px;border-radius:3px;color:var(--accent-warm)}
+  .folder-tree{margin:24px 0;background:#1e1e2e;border-radius:12px;padding:28px 32px;overflow-x:auto}
+  .folder-tree pre{font-family:'Cascadia Code','Fira Code',monospace;font-size:13px;line-height:1.7;color:#cdd6f4}
+  .folder-tree .folder{color:#89b4fa}.folder-tree .file-tex{color:#a6e3a1}.folder-tree .file-xml{color:#f9e2af}.folder-tree .file-png{color:#f38ba8}.folder-tree .file-lua{color:#cba6f7}.folder-tree .annotation{color:#6c7086}
+  .toc{margin:40px 0;background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:36px 40px}
+  .toc-title{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--text-light);margin-bottom:20px;font-weight:500}
+  .toc-list{list-style:none;display:flex;flex-direction:column;gap:8px}
+  .toc-list a{text-decoration:none;font-size:15px;color:var(--text-secondary);font-weight:400;display:flex;align-items:center;gap:12px;padding:6px 0;transition:color 0.2s}
+  .toc-list a:hover{color:var(--accent-warm)}
+  .toc-num{font-size:12px;color:var(--text-light);font-weight:500;min-width:28px}
+  .ref-list{display:flex;flex-direction:column;gap:16px;margin-top:24px}
+  .ref-item{display:flex;align-items:flex-start;gap:16px;padding:16px 20px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;text-decoration:none;color:var(--text-primary);transition:border-color 0.2s}
+  .ref-item:hover{border-color:var(--accent-warm)}
+  .ref-item .ref-source{font-size:14px;font-weight:500}.ref-item .ref-url{font-size:12px;color:var(--text-light);word-break:break-all;margin-top:4px;font-weight:300}
+  .ascii-diagram{margin:24px 0;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:28px 32px;overflow-x:auto}
+  .ascii-diagram pre{font-family:'Cascadia Code','Fira Code',monospace;font-size:13px;line-height:1.5;color:var(--text-secondary)}
+  .ascii-diagram .highlight-line{color:var(--accent-warm);font-weight:600}
+  .footer{text-align:center;padding:48px 0;font-size:12px;color:var(--text-light);font-weight:300}
+  @media(max-width:640px){.hero h1{font-size:26px}.hero{padding:72px 0 56px}.content{padding:0 24px}.hero-inner{padding:0 24px}.code-block{padding:20px}.toc{padding:24px}.section h2{font-size:22px}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-label">DST Mod Development Guide</div>
+    <h1>Lua スクリプティングガイド</h1>
+    <p class="hero-sub">Don't Starve Together の MOD 開発に必要な Lua スクリプティングを<br>基本概念から実装パターンまで、初心者向けに体系的に解説します。</p>
+  </div>
+</header>
+
+<main class="content">
+
+<section class="section">
+  <div class="toc">
+    <div class="toc-title">Table of Contents</div>
+    <ol class="toc-list">
+      <li><a href="#learn"><span class="toc-num">01</span>このガイドで学べること</a></li>
+      <li><a href="#notcovered"><span class="toc-num">02</span>このガイドで扱わないもの</a></li>
+      <li><a href="#prerequisites"><span class="toc-num">03</span>前提知識・準備</a></li>
+      <li><a href="#structure"><span class="toc-num">04</span>MOD の基本構成</a></li>
+      <li><a href="#modinfo"><span class="toc-num">05</span>modinfo.lua</a></li>
+      <li><a href="#modmain"><span class="toc-num">06</span>modmain.lua</a></li>
+      <li><a href="#prefab"><span class="toc-num">07</span>キャラクター prefab の作成</a></li>
+      <li><a href="#item"><span class="toc-num">08</span>カスタムアイテム・武器の作成</a></li>
+      <li><a href="#component"><span class="toc-num">09</span>カスタムコンポーネントの作成</a></li>
+      <li><a href="#recipe"><span class="toc-num">10</span>レシピ追加・クラフティング</a></li>
+      <li><a href="#network"><span class="toc-num">11</span>ネットワーク同期（マルチプレイ対応）</a></li>
+      <li><a href="#ui"><span class="toc-num">12</span>UI ウィジェットの作成</a></li>
+      <li><a href="#saveload"><span class="toc-num">13</span>セーブ・ロード（データ永続化）</a></li>
+      <li><a href="#debug"><span class="toc-num">14</span>デバッグとトラブルシューティング</a></li>
+      <li><a href="#errors"><span class="toc-num">15</span>よくあるエラーと対処法</a></li>
+      <li><a href="#tips"><span class="toc-num">16</span>Tips・参考情報</a></li>
+      <li><a href="#refs"><span class="toc-num">17</span>参考リンク</a></li>
+    </ol>
+  </div>
+</section>
+
+<!-- 01 このガイドで学べること -->
+<section class="section" id="learn">
+  <div class="section-label">01 — Overview</div>
+  <h2>このガイドで学べること</h2>
+  <p>このガイドでは、DST の MOD 開発に必要な Lua スクリプティングの知識を体系的に学べます。</p>
+  <table class="styled-table">
+    <thead><tr><th>トピック</th><th>内容</th></tr></thead>
+    <tbody>
+      <tr><td>MOD の基本構成</td><td>フォルダ構成、modinfo.lua、modmain.lua の役割</td></tr>
+      <tr><td>キャラクター固有能力</td><td>体力・空腹・正気度の設定、特殊能力、イベント処理</td></tr>
+      <tr><td>カスタムアイテム・武器</td><td>prefab（プレハブ: ゲーム内オブジェクトの設計図）の定義、武器の作成</td></tr>
+      <tr><td>カスタムコンポーネント</td><td>独自の機能パーツの設計と実装</td></tr>
+      <tr><td>レシピ・クラフティング</td><td>レシピ登録、カスタムクラフトタブ、キャラクター専用レシピ</td></tr>
+      <tr><td>ネットワーク同期</td><td>マルチプレイでデータをサーバーとクライアント間で共有する仕組み</td></tr>
+      <tr><td>UI ウィジェット</td><td>HUD（画面上のボタンやアイコン表示）の追加</td></tr>
+      <tr><td>セーブ・ロード</td><td>ゲームの保存・読み込み時にデータを維持する方法</td></tr>
+      <tr><td>デバッグ</td><td>ログ出力、コンソールコマンド、よくあるエラー</td></tr>
+    </tbody>
+  </table>
+  <div class="callout note">
+    <strong>ポイント:</strong> 本ガイドの概念を実際の MOD コードで学べる実践ガイドも用意しています。<a href="README-DST-teemo.html" style="color:var(--accent-warm)">README-DST-teemo</a> では、Captain Teemo MOD を題材にした解説を行っています。
+  </div>
+</section>
+
+<!-- 02 このガイドで扱わないもの -->
+<section class="section" id="notcovered">
+  <div class="section-label">02 — Scope</div>
+  <h2>このガイドで扱わないもの（別途ガイドあり）</h2>
+  <table class="styled-table">
+    <thead><tr><th>内容</th><th>参照先ガイド</th></tr></thead>
+    <tbody>
+      <tr><td>アニメーションの作成（Spriter）</td><td><a href="../DST-Spriter/README.html" style="color:var(--accent-warm)">DST-Spriter ガイド</a></td></tr>
+      <tr><td>PNG から TEX への画像変換</td><td><a href="../DST-TextureConverter/README.html" style="color:var(--accent-warm)">DST-TextureConverter ガイド</a></td></tr>
+      <tr><td>ゲームアセットのデコンパイル</td><td><a href="../DST-ktools/README.html" style="color:var(--accent-warm)">DST-ktools ガイド</a></td></tr>
+      <tr><td>サウンド・ボイスの作成</td><td><a href="../DST-FMOD-Designer/README.html" style="color:var(--accent-warm)">DST-FMOD-Designer ガイド</a></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 03 前提知識・準備 -->
+<section class="section" id="prerequisites">
+  <div class="section-label">03 — Prerequisites</div>
+  <h2>前提知識・準備</h2>
+
+  <h3>Lua 言語の基礎</h3>
+  <p>DST の MOD は <strong>Lua</strong>（ルア）というプログラミング言語で書かれています。Lua は軽量でシンプルな言語で、ゲーム開発で広く使われています。</p>
+  <p>このガイドを読むために必要な Lua の知識は以下の通りです。</p>
+  <table class="styled-table">
+    <thead><tr><th>概念</th><th>説明</th><th>例</th></tr></thead>
+    <tbody>
+      <tr><td>変数</td><td>値を入れる箱</td><td><code>local x = 10</code></td></tr>
+      <tr><td>テーブル</td><td>複数の値をまとめるデータの入れ物</td><td><code>local t = {a = 1, b = 2}</code></td></tr>
+      <tr><td>関数</td><td>処理をまとめたもの</td><td><code>local function add(a, b) return a + b end</code></td></tr>
+      <tr><td>if 文</td><td>条件分岐</td><td><code>if x &gt; 0 then ... end</code></td></tr>
+      <tr><td>for 文</td><td>繰り返し</td><td><code>for i = 1, 10 do ... end</code></td></tr>
+      <tr><td>require</td><td>別ファイルの読み込み</td><td><code>local MyModule = require("mymodule")</code></td></tr>
+    </tbody>
+  </table>
+  <div class="callout tip">
+    <strong>初心者向けTip:</strong> Lua を全く知らなくても大丈夫です。このガイドのコード例にはすべてコメントで説明を付けています。読み進めるうちに自然と慣れていきます。
+  </div>
+
+  <h3>開発環境</h3>
+  <p>以下のツールが必要です（<a href="../README.html" style="color:var(--accent-warm)">メインガイド</a>で詳しく解説しています）。</p>
+  <p><strong>Don't Starve Mod Tools</strong>（Steam からインストール）、<strong>テキストエディタ</strong>（VSCode 推奨）、<strong>DST 本体</strong>（動作テスト用）</p>
+
+  <h3>バニラコードの参照方法</h3>
+  <p>DST のバニラ（ゲーム本体）のスクリプトは、MOD 開発の最良のリファレンス（お手本）です。</p>
+  <div class="code-block"><span class="lang-label">PATH</span><code>C:\Program Files (x86)\Steam\steamapps\common\Don't Starve Together\data\databundles\scripts.zip</code></div>
+  <div class="callout note">
+    <strong>なぜバニラコードを参照するのか？:</strong> DST の API（MOD から使える機能一覧）には公式ドキュメントがほとんどありません。既存のキャラクター（Wilson、Wendy など）や武器（blowdart など）の実装を読むことが、最も確実な学習方法です。
+  </div>
+  <p>この ZIP を展開すると、以下のようなフォルダ構成になっています。</p>
+  <div class="folder-tree"><pre><span class="folder">scripts/</span>
+├── <span class="folder">prefabs/</span>           <span class="annotation">← キャラクター・アイテム等の設計図（wilson.lua, spear.lua 等）</span>
+├── <span class="folder">components/</span>        <span class="annotation">← コンポーネント（機能パーツ: combat.lua, health.lua 等）</span>
+├── <span class="folder">stategraphs/</span>       <span class="annotation">← ステートグラフ（アニメーション制御）</span>
+├── <span class="folder">widgets/</span>           <span class="annotation">← UI ウィジェット（画面表示パーツ）</span>
+└── <span class="file-lua">tuning.lua</span>         <span class="annotation">← ゲームバランス定数（TUNING テーブル）</span></pre></div>
+</section>
+
+<!-- 04 MOD の基本構成 -->
+<section class="section" id="structure">
+  <div class="section-label">04 — Structure</div>
+  <h2>MOD の基本構成</h2>
+  <p>キャラクター MOD の典型的なフォルダ構成です。MOD のフォルダは以下の場所にあります。</p>
+  <div class="code-block"><span class="lang-label">PATH</span><code>C:\Program Files (x86)\Steam\steamapps\common\Don't Starve Together\mods\my_character\</code></div>
+  <div class="callout note">
+    <strong>ポイント:</strong> <code class="inline">my_character</code> の部分はあなたの MOD 名に置き換えてください。ここが MOD のルートフォルダ（一番上のフォルダ）になります。以降のファイルはすべてこのフォルダの中に作成します。
+  </div>
+  <div class="folder-tree"><pre><span class="folder">mods/my_character/</span>
+├── <span class="file-lua">modinfo.lua</span>                          <span class="annotation">← MOD の設定ファイル（必須）</span>
+├── <span class="file-lua">modmain.lua</span>                          <span class="annotation">← MOD の起動スクリプト（必須）</span>
+├── <span class="file-xml">modicon.xml</span> / <span class="file-tex">modicon.tex</span>             <span class="annotation">← MOD のアイコン</span>
+├── <span class="folder">anim/</span>                                <span class="annotation">← アニメーションファイル</span>
+├── <span class="folder">bigportraits/</span>                        <span class="annotation">← キャラクター大ポートレート</span>
+├── <span class="folder">images/</span>
+│   ├── <span class="folder">avatars/</span>                         <span class="annotation">← アバター画像（64 x 64）</span>
+│   ├── <span class="folder">map_icons/</span>                       <span class="annotation">← マップアイコン（64 x 64）</span>
+│   ├── <span class="folder">saveslot_portraits/</span>              <span class="annotation">← セーブスロット画像（128 x 128）</span>
+│   ├── <span class="folder">selectscreen_portraits/</span>          <span class="annotation">← キャラクター選択画面（256 x 512）</span>
+│   ├── <span class="folder">inventoryimages/</span>                 <span class="annotation">← インベントリアイテム画像</span>
+│   └── <span class="folder">hud/</span>                             <span class="annotation">← HUD（画面表示）用画像</span>
+├── <span class="folder">scripts/</span>
+│   ├── <span class="folder">prefabs/</span>                         <span class="annotation">← prefab 定義ファイル（ゲーム内オブジェクトの設計図）</span>
+│   │   ├── <span class="file-lua">my_character.lua</span>             <span class="annotation">← キャラクター本体</span>
+│   │   └── <span class="file-lua">my_item.lua</span>                  <span class="annotation">← カスタムアイテム</span>
+│   ├── <span class="folder">components/</span>                      <span class="annotation">← カスタムコンポーネント（独自の機能パーツ）</span>
+│   └── <span class="folder">widgets/</span>                         <span class="annotation">← カスタム UI ウィジェット（画面表示パーツ）</span>
+└── <span class="folder">sound/</span>                               <span class="annotation">← サウンドファイル</span></pre></div>
+
+  <h3>3 つの重要ファイル</h3>
+  <table class="styled-table">
+    <thead><tr><th>ファイル</th><th>役割</th><th>読み込みタイミング</th></tr></thead>
+    <tbody>
+      <tr><td><code>modinfo.lua</code></td><td>MOD の基本情報（名前・作者・バージョン）と設定オプション</td><td>MOD 一覧画面で読み込み</td></tr>
+      <tr><td><code>modmain.lua</code></td><td>MOD の起動スクリプト。全ての初期化処理を書くファイル</td><td>MOD 有効化時に読み込み</td></tr>
+      <tr><td><code>scripts/prefabs/*.lua</code></td><td>個々のゲーム内オブジェクト（キャラクター、アイテム等）の設計図</td><td>ゲーム内で必要になった時</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 05 modinfo.lua -->
+<section class="section" id="modinfo">
+  <div class="section-label">05 — modinfo.lua</div>
+  <h2>modinfo.lua — MOD の設定ファイル</h2>
+  <p>modinfo.lua は MOD の基本情報（名前、作者、バージョン）と、ユーザーが MOD の設定画面から変更できるオプションを定義するファイルです。</p>
+
+  <h3>ファイルの作成場所</h3>
+  <p>MOD のルートフォルダ（一番上のフォルダ）に <code class="inline">modinfo.lua</code> というファイルを作成してください。</p>
+  <div class="code-block"><span class="lang-label">PATH</span><code>mods/my_character/modinfo.lua   <span class="annotation">← このファイルを作成</span></code></div>
+  <div class="callout note">
+    <strong>ヒント:</strong> VSCode でファイルを作成するには、エクスプローラー（左のファイル一覧）で MOD のフォルダを右クリック → 「新しいファイル」を選び、ファイル名 <code class="inline">modinfo.lua</code> を入力します。
+  </div>
+
+  <h3>基本テンプレート</h3>
+  <p>以下の内容を <code class="inline">modinfo.lua</code> にコピー＆ペーストして、<code class="inline"><span style="color:var(--accent-red)">-- ★書き換え:</span></code> の行を自分の MOD に合わせて変更してください。</p>
+  <div class="code-block"><span class="lang-label">LUA</span><code><span class="comment"><span class="tag">-- ★書き換え:</span> MOD の基本情報</span>
+<span class="var">name</span> = <span class="string">"My Character MOD"</span>
+<span class="var">description</span> = <span class="string">"A custom character for DST."</span>
+<span class="var">author</span> = <span class="string">"YourName"</span>
+<span class="var">version</span> = <span class="string">"1.0.0"</span>
+
+<span class="comment">-- API バージョン（現在は 10 で固定）</span>
+<span class="var">api_version</span> = <span class="flag">10</span>
+
+<span class="comment">-- そのまま: DST 専用設定</span>
+<span class="var">dont_starve_compatible</span> = <span class="keyword">false</span>
+<span class="var">reign_of_giants_compatible</span> = <span class="keyword">false</span>
+<span class="var">dst_compatible</span> = <span class="keyword">true</span>
+
+<span class="comment">-- MOD アイコン</span>
+<span class="var">icon_atlas</span> = <span class="string">"modicon.xml"</span>
+<span class="var">icon</span> = <span class="string">"modicon.tex"</span>
+
+<span class="comment">-- マルチプレイ設定</span>
+<span class="var">all_clients_require_mod</span> = <span class="keyword">true</span>   <span class="comment">-- 全員がこの MOD を入れる必要がある</span>
+<span class="var">clients_only_mod</span> = <span class="keyword">false</span>          <span class="comment">-- サーバー MOD である</span>
+
+<span class="comment"><span class="tag">-- ★変更任意:</span> サーバーフィルタータグ</span>
+<span class="var">server_filter_tags</span> = {<span class="string">"my_character"</span>}</code></div>
+  <div class="callout note">
+    <strong>なぜ <code class="inline">all_clients_require_mod = true</code> なのか？:</strong> キャラクター MOD はアニメーションや画像を含むため、全プレイヤーがインストールしていないと表示が崩れます。
+  </div>
+
+  <h3>configuration_options（設定オプション）</h3>
+  <p>ユーザーが MOD の設定画面から変更できるオプションを定義します。先ほど作成した <code class="inline">modinfo.lua</code> の末尾に追加してください。</p>
+  <div class="code-block"><span class="lang-label">LUA</span><code><span class="var">configuration_options</span> = {
+    <span class="comment">-- ========== セクション見出し（設定画面での仕切り線） ==========</span>
+    <span class="comment">-- name が空文字のエントリは設定画面でカテゴリの区切りとして表示されます</span>
+    {
+        <span class="var">name</span> = <span class="string">""</span>,
+        <span class="var">label</span> = <span class="string">"Character Stats"</span>,
+        <span class="var">hover</span> = <span class="string">""</span>,
+        <span class="var">options</span> = {{<span class="var">description</span> = <span class="string">""</span>, <span class="var">data</span> = <span class="flag">0</span>}},
+        <span class="var">default</span> = <span class="flag">0</span>,
+    },
+
+    <span class="comment">-- ========== 実際の設定項目 ==========</span>
+    {
+        <span class="var">name</span> = <span class="string">"health"</span>,                <span class="comment"><span class="tag">-- ★書き換え:</span> GetModConfigData() で指定する名前</span>
+        <span class="var">label</span> = <span class="string">"Health"</span>,               <span class="comment">-- 設定画面に表示されるラベル</span>
+        <span class="var">hover</span> = <span class="string">"Max health"</span>,           <span class="comment">-- マウスオーバー時の説明</span>
+        <span class="var">options</span> = {
+            {<span class="var">description</span> = <span class="string">"100"</span>, <span class="var">data</span> = <span class="flag">100</span>},
+            {<span class="var">description</span> = <span class="string">"150"</span>, <span class="var">data</span> = <span class="flag">150</span>},
+            {<span class="var">description</span> = <span class="string">"200"</span>, <span class="var">data</span> = <span class="flag">200</span>},
+        },
+        <span class="var">default</span> = <span class="flag">150</span>,
+    },
+    {
+        <span class="var">name</span> = <span class="string">"damage_multiplier"</span>,
+        <span class="var">label</span> = <span class="string">"Damage Multiplier"</span>,
+        <span class="var">hover</span> = <span class="string">"Attack damage multiplier"</span>,
+        <span class="var">options</span> = {
+            {<span class="var">description</span> = <span class="string">"0.75x"</span>, <span class="var">data</span> = <span class="flag">0.75</span>},
+            {<span class="var">description</span> = <span class="string">"1.0x"</span>,  <span class="var">data</span> = <span class="flag">1.0</span>},
+            {<span class="var">description</span> = <span class="string">"1.5x"</span>,  <span class="var">data</span> = <span class="flag">1.5</span>},
+        },
+        <span class="var">default</span> = <span class="flag">1.0</span>,
+    },
+    {
+        <span class="var">name</span> = <span class="string">"enable_ability"</span>,
+        <span class="var">label</span> = <span class="string">"Special Ability"</span>,
+        <span class="var">hover</span> = <span class="string">"Enable or disable special ability"</span>,
+        <span class="var">options</span> = {
+            {<span class="var">description</span> = <span class="string">"On"</span>,  <span class="var">data</span> = <span class="keyword">true</span>},
+            {<span class="var">description</span> = <span class="string">"Off"</span>, <span class="var">data</span> = <span class="keyword">false</span>},
+        },
+        <span class="var">default</span> = <span class="keyword">true</span>,
+    },
+}</code></div>
+  <div class="callout note">
+    <strong>ポイント:</strong> <code class="inline">name</code> を空文字にしたエントリはカテゴリの見出しとして使えます。設定項目が多い MOD では、カテゴリごとに区切ると見やすくなります。
+  </div>
+</section>
+
+<!-- 06 modmain.lua -->
+<section class="section" id="modmain">
+  <div class="section-label">06 — modmain.lua</div>
+  <h2>modmain.lua — MOD の起動スクリプト</h2>
+  <p>modmain.lua は MOD が有効化された時に最初に実行されるファイルです。キャラクターの登録、素材ファイルの読み込み、設定値の取得、各種フック処理（ゲームの動作に割り込む処理）など、MOD の初期化処理をすべてここに書きます。</p>
+
+  <h3>ファイルの作成場所</h3>
+  <p>MOD のルートフォルダに <code class="inline">modmain.lua</code> というファイルを作成してください。</p>
+  <div class="code-block"><span class="lang-label">PATH</span><code>mods/my_character/modmain.lua   <span class="annotation">← このファイルを作成</span></code></div>
+
+  <h3>modmain.lua の実行環境</h3>
+  <p>modmain.lua はサンドボックス環境（MOD 専用の制限された実行空間）で実行されます。DST のグローバル変数（<code class="inline">TheWorld</code>、<code class="inline">SpawnPrefab</code> 等のゲーム本体の機能）に直接アクセスできません。</p>
+  <div class="code-block"><span class="lang-label">LUA</span><code><span class="comment">-- NG: サンドボックス内なので直接アクセスできない</span>
+<span class="comment">-- local player = ThePlayer</span>
+
+<span class="comment">-- OK: GLOBAL テーブル経由でアクセスする</span>
+<span class="keyword">local</span> <span class="var">player</span> = GLOBAL.ThePlayer</code></div>
+  <div class="callout note">
+    <strong>なぜサンドボックス？:</strong> MOD がゲーム本体のグローバル変数（全体で共有される値）を意図せず上書きしてしまうのを防ぐためです。<code class="inline">GLOBAL</code> を経由することで、意図的にアクセスしていることが明確になります。
+  </div>
+
+  <h3>設定値の読み込み</h3>
+  <p>modinfo.lua で定義した設定オプションの値を取得します。以下の内容を <code class="inline">modmain.lua</code> の先頭付近に書いてください。</p>
+  <div class="code-block"><span class="lang-label">LUA</span><code><span class="comment">-- GetModConfigData() で modinfo.lua の name に対応する値を取得</span>
+<span class="comment">-- or の後ろはデフォルト値（設定が読み込めなかった場合の代わりの値）</span>
+GLOBAL.MY_MOD_HEALTH = GetModConfigData(<span class="string">"health"</span>) <span class="keyword">or</span> <span class="flag">150</span>
+GLOBAL.MY_MOD_DAMAGE_MULT = GetModConfigData(<span class="string">"damage_multiplier"</span>) <span class="keyword">or</span> <span class="flag">1.0</span>
+
+<span class="comment">-- boolean（真偽値: true/false）型は or で代替できないため、nil チェックが必要</span>
+GLOBAL.MY_MOD_ENABLE_ABILITY = GetModConfigData(<span class="string">"enable_ability"</span>)
+<span class="keyword">if</span> GLOBAL.MY_MOD_ENABLE_ABILITY == <span class="keyword">nil</span> <span class="keyword">then</span>
+    GLOBAL.MY_MOD_ENABLE_ABILITY = <span class="keyword">true</span>
+<span class="keyword">end</span></code></div>
+  <div class="callout note">
+    <strong>なぜ boolean は <code class="inline">or</code> が使えないのか？:</strong> <code class="inline">false or true</code> は <code class="inline">true</code> になってしまいます。ユーザーが明示的に <code class="inline">false</code>（Off）を選んでも、常に <code class="inline">true</code> が返ってしまうため、nil（値が存在しない状態）チェックで分岐します。
+  </div>
+
+  <h3>アセット（素材ファイル）の登録</h3>
+  <p>MOD で使用する画像・アニメーション・サウンドファイルをゲームに読み込ませる宣言です。modmain.lua に以下を記述します。</p>
+  <div class="code-block"><span class="lang-label">LUA</span><code>Assets = {
+    <span class="comment">-- ポートレート画像</span>
+    Asset(<span class="string">"IMAGE"</span>, <span class="string">"images/saveslot_portraits/my_character.tex"</span>),
+    Asset(<span class="string">"ATLAS"</span>, <span class="string">"images/saveslot_portraits/my_character.xml"</span>),
+
+    Asset(<span class="string">"IMAGE"</span>, <span class="string">"images/selectscreen_portraits/my_character.tex"</span>),
+    Asset(<span class="string">"ATLAS"</span>, <span class="string">"images/selectscreen_portraits/my_character.xml"</span>),
+
+    Asset(<span class="string">"IMAGE"</span>, <span class="string">"bigportraits/my_character.tex"</span>),
+    Asset(<span class="string">"ATLAS"</span>, <span class="string">"bigportraits/my_character.xml"</span>),
+
+    <span class="comment">-- マップアイコン</span>
+    Asset(<span class="string">"IMAGE"</span>, <span class="string">"images/map_icons/my_character.tex"</span>),
+    Asset(<span class="string">"ATLAS"</span>, <span class="string">"images/map_icons/my_character.xml"</span>),
+
+    <span class="comment">-- アバター</span>
+    Asset(<span class="string">"IMAGE"</span>, <span class="string">"images/avatars/avatar_my_character.tex"</span>),
+    Asset(<span class="string">"ATLAS"</span>, <span class="string">"images/avatars/avatar_my_character.xml"</span>),
+
+    Asset(<span class="string">"IMAGE"</span>, <span class="string">"images/avatars/avatar_ghost_my_character.tex"</span>),
+    Asset(<span class="string">"ATLAS"</span>, <span class="string">"images/avatars/avatar_ghost_my_character.xml"</span>),
+
+    Asset(<span class="string">"IMAGE"</span>, <span class="string">"images/avatars/self_inspect_my_character.tex"</span>),
+    Asset(<span class="string">"ATLAS"</span>, <span class="string">"images/avatars/self_inspect_my_character.xml"</span>),
+
+    <span class="comment">-- インベントリアイテム画像</span>
+    Asset(<span class="string">"IMAGE"</span>, <span class="string">"images/inventoryimages/my_item.tex"</span>),
+    Asset(<span class="string">"ATLAS"</span>, <span class="string">"images/inventoryimages/my_item.xml"</span>),
+
+    <span class="comment">-- サウンド</span>
+    Asset(<span class="string">"SOUNDPACKAGE"</span>, <span class="string">"sound/my_mod.fev"</span>),
+    Asset(<span class="string">"SOUND"</span>, <span class="string">"sound/my_mod_bank00.fsb"</span>),
+}</code></div>
+
+  <h3>prefab（プレハブ: ゲーム内オブジェクトの設計図）の登録</h3>
+  <p>MOD で追加するゲーム内オブジェクト（キャラクター、アイテム等）を宣言します。ここに書いた名前に対応する <code class="inline">scripts/prefabs/&lt;名前&gt;.lua</code> ファイルが自動的に読み込まれます。</p>
+  <div class="code-block"><span class="lang-label">LUA</span><code>PrefabFiles = {
+    <span class="string">"my_character"</span>,       <span class="comment">-- scripts/prefabs/my_character.lua を読み込む</span>
+    <span class="string">"my_character_none"</span>,  <span class="comment">-- スキン定義ファイル</span>
+    <span class="string">"my_item"</span>,            <span class="comment">-- scripts/prefabs/my_item.lua を読み込む</span>
+}</code></div>
+  <div class="callout note">
+    <strong>なぜ <code class="inline">PrefabFiles</code> に登録するのか？:</strong> ここに宣言しないと、scripts/prefabs/ にファイルを置いてもゲームには読み込まれません。宣言し忘れると、そのオブジェクトはゲーム内に存在しないことになります。
+  </div>
+
+  <h3>キャラクターの登録</h3>
+  <p>キャラクターの名前・説明・セリフなどのテキスト情報を登録します。modmain.lua に記述してください。</p>
+  <div class="code-block"><span class="lang-label">LUA</span><code><span class="comment">-- キャラクターの表示テキスト</span>
+<span class="keyword">local</span> <span class="var">STRINGS</span> = GLOBAL.STRINGS
+
+STRINGS.CHARACTER_TITLES.my_character = <span class="string">"The Custom Character"</span>
+STRINGS.CHARACTER_NAMES.my_character = <span class="string">"My Character"</span>
+STRINGS.CHARACTER_DESCRIPTIONS.my_character =
+    <span class="string">"*Has a special ability\n*Gains sanity near trees\n*Runs fast"</span>
+STRINGS.CHARACTER_QUOTES.my_character = <span class="string">"\"Ready for adventure!\""</span>
+STRINGS.CHARACTER_ABOUTME.my_character = <span class="string">"A brave adventurer."</span>
+
+<span class="comment">-- セリフファイルの読み込み</span>
+STRINGS.CHARACTERS.MY_CHARACTER = GLOBAL.<span class="keyword">require</span> <span class="string">"speech_my_character"</span>
+
+<span class="comment">-- キャラクター名（他プレイヤーから見た時の名前）</span>
+STRINGS.NAMES.MY_CHARACTER = <span class="string">"My Character"</span>
+
+<span class="comment">-- スキン名</span>
+STRINGS.SKIN_NAMES.my_character_none = <span class="string">"My Character"</span>
+
+<span class="comment">-- 他キャラクターから見た時の説明</span>
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.MY_CHARACTER = {
+    GENERIC = <span class="string">"It's My Character!"</span>,
+    ATTACKER = <span class="string">"That one looks dangerous..."</span>,
+    MURDERER = <span class="string">"Murderer!"</span>,
+    REVIVER = <span class="string">"A helpful soul."</span>,
+    GHOST = <span class="string">"My Character could use a heart."</span>,
+}
+
+<span class="comment">-- キャラクターを登録</span>
+<span class="keyword">local</span> <span class="var">skin_modes</span> = {
+    {
+        type = <span class="string">"ghost_skin"</span>,
+        anim_bank = <span class="string">"ghost"</span>,
+        idle_anim = <span class="string">"idle"</span>,
+        scale = <span class="flag">0.75</span>,
+        offset = { <span class="flag">0</span>, <span class="flag">-25</span> },
+    },
+}
+AddModCharacter(<span class="string">"my_character"</span>, <span class="string">"MALE"</span>, skin_modes)
+AddMinimapAtlas(<span class="string">"images/map_icons/my_character.xml"</span>)
+
+<span class="comment">-- スキンの登録</span>
+GLOBAL.PREFAB_SKINS[<span class="string">"my_character"</span>] = { <span class="string">"my_character_none"</span> }</code></div>
+
+  <h3>サウンドのリマップ（音声の関連付け）</h3>
+  <p>カスタムサウンドを DST のキャラクターサウンドシステムに接続します。modmain.lua に追記します。</p>
+  <div class="code-block"><span class="lang-label">LUA</span><code>RemapSoundEvent(<span class="string">"dontstarve/characters/my_character/death_voice"</span>,
+    <span class="string">"my_mod/dontstarve/characters/my_character/death_voice"</span>)
+RemapSoundEvent(<span class="string">"dontstarve/characters/my_character/hurt"</span>,
+    <span class="string">"my_mod/dontstarve/characters/my_character/hurt"</span>)
+RemapSoundEvent(<span class="string">"dontstarve/characters/my_character/talk_LP"</span>,
+    <span class="string">"my_mod/dontstarve/characters/my_character/talk_LP"</span>)</code></div>
+
+  <h3>インベントリアイテム画像の登録</h3>
+  <p>カスタムアイテムのインベントリ画像を登録します。modmain.lua に追記します。</p>
+  <div class="code-block"><span class="lang-label">LUA</span><code>RegisterInventoryItemAtlas(<span class="string">"images/inventoryimages/my_item.xml"</span>, <span class="string">"my_item.tex"</span>)</code></div>
+
+  <h3>AddPrefabPostInit — 既存のゲーム内オブジェクトの改変</h3>
+  <p>既存のゲーム内オブジェクト（バニラの焚き火やアイテム等）の動作を変更したい時に使います。modmain.lua に記述します。</p>
+  <div class="code-block"><span class="lang-label">LUA</span><code><span class="comment">-- 例: 焚き火の光の範囲を特定キャラクターの近くで拡大する</span>
+AddPrefabPostInit(<span class="string">"campfire"</span>, <span class="keyword">function</span>(<span class="var">inst</span>)
+    <span class="keyword">if</span> <span class="keyword">not</span> GLOBAL.TheWorld.ismastersim <span class="keyword">then</span> <span class="keyword">return</span> <span class="keyword">end</span>
+
+    <span class="comment">-- 元の関数を保存</span>
+    <span class="keyword">local</span> <span class="var">_onbuilt</span> = inst.components.burnable.onextinguish
+
+    <span class="comment">-- 新しい関数で上書き</span>
+    inst.components.burnable.onextinguish = <span class="keyword">function</span>(<span class="var">inst</span>)
+        <span class="comment">-- 元の処理を実行</span>
+        <span class="keyword">if</span> _onbuilt ~= <span class="keyword">nil</span> <span class="keyword">then</span> _onbuilt(inst) <span class="keyword">end</span>
+        <span class="comment">-- 追加の処理</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>)</code></div>
+  <div class="callout note">
+    <strong>ポイント:</strong> <code class="inline">AddPrefabPostInit</code> は元の関数を <code class="inline">_original</code> のように保存してから上書きするのが定番パターンです。元の処理を完全に消してしまうと、他の MOD やバニラの動作が壊れる可能性があります。
+  </div>
+</section>
+
+<!-- 07 キャラクター prefab の作成 -->
+<section class="section" id="prefab">
+  <div class="section-label">07 — Character Prefab</div>
+  <h2>キャラクター prefab の作成</h2>
+  <p>キャラクターの能力・ステータス・イベント処理を定義する、MOD の中核ファイルです。</p>
+
+  <h3>ファイルの作成場所</h3>
+  <p>MOD フォルダ内の <code class="inline">scripts/prefabs/</code> フォルダに、キャラクター名と同じ名前の Lua ファイルを作成します。<code class="inline">scripts/prefabs/</code> フォルダがまだ存在しない場合は、先にフォルダを作成してください。</p>
+  <div class="code-block"><span class="lang-label">PATH</span><code>mods/my_character/scripts/prefabs/my_character.lua   <span class="annotation">← このファイルを作成</span></code></div>
+  <div class="callout note">
+    <strong>ヒント:</strong> modmain.lua の <code class="inline">PrefabFiles</code> に書いた名前と、このファイル名（拡張子を除いた部分）が一致している必要があります。
+  </div>
+
+  <h3>基本テンプレート</h3>
+  <p>以下の内容を <code class="inline">my_character.lua</code> にコピー＆ペーストして、<code class="inline"><span style="color:var(--accent-red)">-- ★書き換え:</span></code> の行を自分のキャラクターに合わせて変更してください。</p>
+  <div class="code-block"><span class="lang-label">LUA</span><code><span class="keyword">local</span> <span class="var">MakePlayerCharacter</span> = <span class="keyword">require</span>(<span class="string">"prefabs/player_common"</span>)
+
+<span class="keyword">local</span> <span class="var">assets</span> = {
+    Asset(<span class="string">"ANIM"</span>, <span class="string">"anim/my_character.zip"</span>),
+    Asset(<span class="string">"ANIM"</span>, <span class="string">"anim/ghost_my_character_build.zip"</span>),
+}
+<span class="keyword">local</span> <span class="var">prefabs</span> = {}
+
+<span class="comment"><span class="tag">-- ★書き換え:</span> 初期所持アイテム</span>
+<span class="keyword">local</span> <span class="var">start_inv</span> = {
+    <span class="string">"flint"</span>,
+    <span class="string">"flint"</span>,
+    <span class="string">"twigs"</span>,
+    <span class="string">"twigs"</span>,
+}
+
+<span class="comment">-- ========== common_postinit: クライアント＆サーバー両方で実行される部分 ==========</span>
+<span class="keyword">local</span> <span class="keyword">function</span> <span class="var">common_postinit</span>(inst)
+    <span class="comment">-- サウンド名の設定</span>
+    inst.soundsname = <span class="string">"my_character"</span>
+
+    <span class="comment">-- マップアイコンの設定</span>
+    inst.MiniMapEntity:SetIcon(<span class="string">"my_character.tex"</span>)
+
+    <span class="comment">-- キャラクター識別用タグ</span>
+    inst:AddTag(<span class="string">"my_character"</span>)
+
+    <span class="comment"><span class="tag">-- ★変更任意:</span> ネットワーク変数の定義（後述のセクションで解説）</span>
+<span class="keyword">end</span>
+
+<span class="comment">-- ========== master_postinit: サーバーのみで実行される部分 ==========</span>
+<span class="keyword">local</span> <span class="keyword">function</span> <span class="var">master_postinit</span>(inst)
+    <span class="comment"><span class="tag">-- ★書き換え:</span> キャラクターステータス</span>
+    inst.components.health:SetMaxHealth(MY_MOD_HEALTH)
+    inst.components.hunger:SetMax(<span class="flag">150</span>)
+    inst.components.sanity:SetMax(<span class="flag">200</span>)
+
+    <span class="comment"><span class="tag">-- ★変更任意:</span> 戦闘パラメータ</span>
+    inst.components.combat.damagemultiplier = MY_MOD_DAMAGE_MULT
+    inst.components.health:SetAbsorptionAmount(<span class="flag">0</span>)
+
+    <span class="comment"><span class="tag">-- ★変更任意:</span> 移動速度</span>
+    inst.components.locomotor.runspeed = TUNING.WILSON_RUN_SPEED * <span class="flag">1.25</span>
+
+    <span class="comment">-- ========== イベントリスナー ==========</span>
+    inst:ListenForEvent(<span class="string">"onattackother"</span>, <span class="keyword">function</span>(<span class="var">inst</span>, <span class="var">data</span>)
+        <span class="comment">-- 攻撃した時に実行される処理</span>
+    <span class="keyword">end</span>)
+
+    inst:ListenForEvent(<span class="string">"attacked"</span>, <span class="keyword">function</span>(<span class="var">inst</span>, <span class="var">data</span>)
+        <span class="comment">-- 攻撃を受けた時に実行される処理</span>
+    <span class="keyword">end</span>)
+
+    inst:ListenForEvent(<span class="string">"death"</span>, <span class="keyword">function</span>(<span class="var">inst</span>, <span class="var">data</span>)
+        <span class="comment">-- 死亡した時に実行される処理</span>
+    <span class="keyword">end</span>)
+
+    inst:ListenForEvent(<span class="string">"ms_respawnedfromghost"</span>, <span class="keyword">function</span>(<span class="var">inst</span>)
+        <span class="comment">-- ゴースト状態からリスポーンした時に実行される処理</span>
+    <span class="keyword">end</span>)
+<span class="keyword">end</span>
+
+<span class="keyword">return</span> MakePlayerCharacter(<span class="string">"my_character"</span>, prefabs, assets,
+    common_postinit, master_postinit, start_inv)</code></div>
+
+  <h3>common_postinit と master_postinit の違い</h3>
+  <table class="styled-table">
+    <thead><tr><th>関数</th><th>実行場所</th><th>用途</th></tr></thead>
+    <tbody>
+      <tr><td><code>common_postinit</code></td><td>クライアント＋サーバー</td><td>タグ追加、ネットワーク変数定義、見た目の設定</td></tr>
+      <tr><td><code>master_postinit</code></td><td>サーバーのみ</td><td>ステータス設定、イベントリスナー、ゲームロジック</td></tr>
+    </tbody>
+  </table>
+  <div class="callout note">
+    <strong>なぜ分かれているのか？:</strong> DST はマルチプレイゲームです。ゲームロジック（HP、ダメージ計算など）はサーバーだけが管理します。クライアント（各プレイヤーの PC）は見た目の表示だけを担当します。この分離により、チート防止とネットワーク効率が両立します。
+  </div>
+
+  <h3>主要なイベント一覧</h3>
+  <p>キャラクターに <code class="inline">ListenForEvent</code>（イベント監視）で登録できる主なイベントです。</p>
+  <table class="styled-table">
+    <thead><tr><th>イベント名</th><th>発火タイミング</th><th>data の内容</th></tr></thead>
+    <tbody>
+      <tr><td><code>onattackother</code></td><td>攻撃した時</td><td><code>target</code>, <code>weapon</code></td></tr>
+      <tr><td><code>attacked</code></td><td>攻撃を受けた時</td><td><code>attacker</code>, <code>damage</code>, <code>weapon</code></td></tr>
+      <tr><td><code>death</code></td><td>死亡した時</td><td><code>cause</code></td></tr>
+      <tr><td><code>ms_respawnedfromghost</code></td><td>ゴーストからリスポーンした時</td><td>なし</td></tr>
+      <tr><td><code>equipped</code></td><td>アイテムを装備した時</td><td><code>item</code>, <code>eslot</code></td></tr>
+      <tr><td><code>unequipped</code></td><td>アイテムを外した時</td><td><code>item</code>, <code>eslot</code></td></tr>
+      <tr><td><code>onpickup</code></td><td>アイテムを拾った時</td><td><code>item</code></td></tr>
+      <tr><td><code>buildsuccess</code></td><td>クラフト成功時</td><td>なし</td></tr>
+      <tr><td><code>oneatsomething</code></td><td>何かを食べた時</td><td><code>food</code></td></tr>
+      <tr><td><code>working</code></td><td>採掘・伐採等の作業中</td><td>なし</td></tr>
+      <tr><td><code>picksomething</code></td><td>草・花等を採取した時</td><td>なし</td></tr>
+      <tr><td><code>harvest</code></td><td>農作物等を収穫した時</td><td>なし</td></tr>
+    </tbody>
+  </table>
+
+  <h3>DoPeriodicTask — 一定間隔で繰り返す処理</h3>
+  <p>キャラクターの状態を定期的にチェックする処理は <code class="inline">DoPeriodicTask</code>（一定時間ごとに繰り返し実行する命令）で実装します。</p>
+  <div class="code-block"><span class="lang-label">LUA</span><code><span class="comment">-- 例: 夜間に正気度ボーナスを付与する能力</span>
+<span class="keyword">local</span> <span class="keyword">function</span> <span class="var">checkNightBonus</span>(inst)
+    <span class="keyword">if</span> inst.components.health == <span class="keyword">nil</span> <span class="keyword">then</span> <span class="keyword">return</span> <span class="keyword">end</span>
+    <span class="keyword">if</span> inst.components.sanity == <span class="keyword">nil</span> <span class="keyword">then</span> <span class="keyword">return</span> <span class="keyword">end</span>
+
+    <span class="comment">-- 騎乗中は無効</span>
+    <span class="keyword">if</span> inst.components.rider ~= <span class="keyword">nil</span> <span class="keyword">and</span> inst.components.rider:IsRiding() <span class="keyword">then</span>
+        <span class="keyword">return</span>
+    <span class="keyword">end</span>
+
+    <span class="comment">-- 夜間判定</span>
+    <span class="keyword">if</span> TheWorld.state.isnight <span class="keyword">then</span>
+        inst.components.sanity:DoDelta(<span class="flag">0.5</span>)
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="comment">-- master_postinit 内で:</span>
+inst._nightBonusTask = inst:DoPeriodicTask(<span class="flag">5.0</span>, checkNightBonus)</code></div>
+  <div class="callout note">
+    <strong>なぜ <code class="inline">DoPeriodicTask(5.0, ...)</code> なのか？:</strong> 毎フレーム（約 1/30 秒）チェックする必要はありません。適切な間隔（秒数）を設定することで、サーバー負荷を大幅に抑えられます。目安として 0.5〜5.0 秒が一般的です。
+  </div>
+
+  <h3>DoTaskInTime — 一定時間後に実行する処理</h3>
+  <p>一定時間後に元に戻す処理は <code class="inline">DoTaskInTime</code>（指定秒数後に 1 回だけ実行する命令）で実装します。</p>
+  <div class="code-block"><span class="lang-label">LUA</span><code><span class="comment">-- 例: 攻撃成功時にダメージ倍率を 5 秒間アップ</span>
+inst:ListenForEvent(<span class="string">"onattackother"</span>, <span class="keyword">function</span>(<span class="var">inst</span>, <span class="var">data</span>)
+    inst.components.combat.damagemultiplier = <span class="flag">1.5</span>
+
+    <span class="comment">-- 前回のタスクをキャンセル（連続攻撃時にタイマーをリセット）</span>
+    <span class="keyword">if</span> inst._resetDamageTask ~= <span class="keyword">nil</span> <span class="keyword">then</span>
+        inst._resetDamageTask:Cancel()
+    <span class="keyword">end</span>
+    inst._resetDamageTask = inst:DoTaskInTime(<span class="flag">5.0</span>, <span class="keyword">function</span>()
+        inst.components.combat.damagemultiplier = MY_MOD_DAMAGE_MULT
+        inst._resetDamageTask = <span class="keyword">nil</span>
+    <span class="keyword">end</span>)
+<span class="keyword">end</span>)</code></div>
+  <div class="callout note">
+    <strong>ポイント:</strong> 一時的な効果を付与する際は、前回のタスクを <code class="inline">Cancel()</code>（取り消し）してから新しいタスクを登録します。これにより、連続で発動した場合でもタイマーが正しくリセットされます。
+  </div>
+</section>
+
+<!-- 08 カスタムアイテム・武器の作成 -->
+<section class="section" id="item">
+  <div class="section-label">08 — Custom Items</div>
+  <h2>カスタムアイテム・武器の作成</h2>
+
+  <h3>ファイルの作成場所</h3>
+  <p>MOD フォルダ内の <code class="inline">scripts/prefabs/</code> フォルダに、アイテム名の Lua ファイルを作成します。このフォルダはキャラクター prefab と同じ場所です。</p>
+  <div class="code-block"><span class="lang-label">PATH</span><code>mods/my_character/scripts/prefabs/my_weapon.lua   <span class="annotation">← このファイルを作成</span></code></div>
+  <div class="callout warning">
+    <strong>重要:</strong> このファイル名（<code class="inline">my_weapon</code>）を modmain.lua の <code class="inline">PrefabFiles</code> にも追加してください。追加しないとゲームに読み込まれません。
+  </div>
+
+  <h3>基本テンプレート（武器アイテム）</h3>
+  <p>以下の内容を <code class="inline">my_weapon.lua</code> にコピー＆ペーストしてください。</p>
+  <div class="code-block"><span class="lang-label">LUA</span><code><span class="keyword">local</span> <span class="var">assets</span> = {
+    Asset(<span class="string">"ANIM"</span>, <span class="string">"anim/my_weapon.zip"</span>),
+    Asset(<span class="string">"ANIM"</span>, <span class="string">"anim/swap_my_weapon.zip"</span>),
+    Asset(<span class="string">"IMAGE"</span>, <span class="string">"images/inventoryimages/my_weapon.tex"</span>),
+    Asset(<span class="string">"ATLAS"</span>, <span class="string">"images/inventoryimages/my_weapon.xml"</span>),
+}
+
+<span class="keyword">local</span> <span class="keyword">function</span> <span class="var">onequip</span>(inst, owner)
+    <span class="comment">-- 装備時のアニメーション切り替え</span>
+    owner.AnimState:OverrideSymbol(<span class="string">"swap_object"</span>, <span class="string">"swap_my_weapon"</span>, <span class="string">"swap_my_weapon"</span>)
+    owner.AnimState:Show(<span class="string">"ARM_carry"</span>)
+    owner.AnimState:Hide(<span class="string">"ARM_normal"</span>)
+
+    <span class="comment"><span class="tag">-- ★変更任意:</span> 装備時に攻撃間隔を変更</span>
+    <span class="keyword">if</span> owner.components.combat <span class="keyword">then</span>
+        owner.components.combat.min_attack_period = <span class="flag">1.0</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="keyword">local</span> <span class="keyword">function</span> <span class="var">onunequip</span>(inst, owner)
+    <span class="comment">-- 装備解除時のアニメーション復元</span>
+    owner.AnimState:Hide(<span class="string">"ARM_carry"</span>)
+    owner.AnimState:Show(<span class="string">"ARM_normal"</span>)
+
+    <span class="comment">-- 攻撃間隔を通常に戻す</span>
+    <span class="keyword">if</span> owner.components.combat <span class="keyword">then</span>
+        owner.components.combat.min_attack_period = TUNING.WILSON_ATTACK_PERIOD
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="keyword">local</span> <span class="keyword">function</span> <span class="var">fn</span>()
+    <span class="keyword">local</span> <span class="var">inst</span> = CreateEntity()
+
+    <span class="comment">-- ========== 共通セットアップ ==========</span>
+    inst.entity:AddTransform()
+    inst.entity:AddAnimState()
+    inst.entity:AddSoundEmitter()
+    inst.entity:AddNetwork()
+
+    MakeInventoryPhysics(inst)
+
+    inst.AnimState:SetBank(<span class="string">"my_weapon"</span>)
+    inst.AnimState:SetBuild(<span class="string">"my_weapon"</span>)
+    inst.AnimState:PlayAnimation(<span class="string">"idle"</span>)
+
+    <span class="comment">-- タグ</span>
+    inst:AddTag(<span class="string">"sharp"</span>)
+    inst:AddTag(<span class="string">"weapon"</span>)
+
+    inst.entity:SetPristine()
+
+    <span class="comment">-- ========== ここから下はサーバーのみ ==========</span>
+    <span class="keyword">if</span> <span class="keyword">not</span> TheWorld.ismastersim <span class="keyword">then</span>
+        <span class="keyword">return</span> inst
+    <span class="keyword">end</span>
+
+    <span class="comment">-- 武器コンポーネント</span>
+    inst:AddComponent(<span class="string">"weapon"</span>)
+    inst.components.weapon:SetDamage(<span class="flag">34</span>)  <span class="comment"><span class="tag">-- ★書き換え:</span> ダメージ値</span>
+
+    inst:AddComponent(<span class="string">"inspectable"</span>)
+
+    inst:AddComponent(<span class="string">"inventoryitem"</span>)
+    inst.components.inventoryitem.atlasname = <span class="string">"images/inventoryimages/my_weapon.xml"</span>
+
+    <span class="comment">-- 耐久力</span>
+    inst:AddComponent(<span class="string">"finiteuses"</span>)
+    inst.components.finiteuses:SetMaxUses(<span class="flag">100</span>)  <span class="comment"><span class="tag">-- ★書き換え:</span> 最大使用回数</span>
+    inst.components.finiteuses:SetUses(<span class="flag">100</span>)
+    inst.components.finiteuses:SetOnFinished(<span class="keyword">function</span>(<span class="var">inst</span>)
+        inst:DoTaskInTime(<span class="flag">0</span>, <span class="keyword">function</span>() inst:Remove() <span class="keyword">end</span>)
+    <span class="keyword">end</span>)
+
+    <span class="comment">-- 装備可能</span>
+    inst:AddComponent(<span class="string">"equippable"</span>)
+    inst.components.equippable:SetOnEquip(onequip)
+    inst.components.equippable:SetOnUnequip(onunequip)
+
+    <span class="keyword">return</span> inst
+<span class="keyword">end</span>
+
+<span class="keyword">return</span> Prefab(<span class="string">"common/inventory/my_weapon"</span>, fn, assets)</code></div>
+
+  <h3>prefab の構造のポイント</h3>
+  <p>prefab ファイルは、以下の順番でオブジェクトを組み立てます。</p>
+  <div class="ascii-diagram"><pre>CreateEntity()                 <span class="highlight-line">← 空のオブジェクトを作成</span>
+    ↓
+基本パーツの追加（Transform, AnimState, Network 等）
+    ↓
+物理設定（MakeInventoryPhysics 等）
+    ↓
+アニメーション設定（Bank, Build, Animation）
+    ↓
+タグ追加（識別用の目印を付ける）
+    ↓
+SetPristine()                  <span class="highlight-line">← クライアントとサーバーの境界線</span>
+    ↓
+if not TheWorld.ismastersim then return inst end
+    ↓
+サーバー専用コンポーネント追加（weapon, inventoryitem 等）
+    ↓
+return inst</pre></div>
+  <div class="callout warning">
+    <strong>重要:</strong> <code class="inline">SetPristine()</code> と <code class="inline">ismastersim</code> チェックの間にコンポーネント（機能パーツ）を追加してはいけません。<code class="inline">SetPristine()</code> より上はクライアントでも実行される部分、下はサーバーのみです。
+  </div>
+</section>
+
+<!-- 09 カスタムコンポーネントの作成 -->
+<section class="section" id="component">
+  <div class="section-label">09 — Custom Components</div>
+  <h2>カスタムコンポーネントの作成</h2>
+  <p>コンポーネント（機能パーツ）は、ゲーム内オブジェクトに特定の機能を付与するモジュール（部品）です。DST のバニラには <code class="inline">health</code>（体力）、<code class="inline">combat</code>（戦闘）、<code class="inline">inventory</code>（所持品）など多数のコンポーネントがあります。独自のコンポーネントを作ることで、機能を整理して複数のオブジェクトで使い回せるようにできます。</p>
+
+  <h3>ファイルの作成場所</h3>
+  <p>MOD フォルダ内の <code class="inline">scripts/components/</code> フォルダに、コンポーネント名の Lua ファイルを作成します。<code class="inline">scripts/components/</code> フォルダがまだ存在しない場合は、先にフォルダを作成してください。</p>
+  <div class="code-block"><span class="lang-label">PATH</span><code>mods/my_character/scripts/components/my_component.lua   <span class="annotation">← このファイルを作成</span></code></div>
+
+  <h3>コンポーネントの基本テンプレート</h3>
+  <div class="code-block"><span class="lang-label">LUA</span><code><span class="keyword">local</span> <span class="var">MyComponent</span> = Class(<span class="keyword">function</span>(<span class="var">self</span>, <span class="var">inst</span>)
+    self.inst = inst       <span class="comment">-- このコンポーネントが付いているゲーム内オブジェクト</span>
+
+    <span class="comment"><span class="tag">-- ★書き換え:</span> プロパティ（設定値）の初期値</span>
+    self.value = <span class="flag">0</span>
+    self.enabled = <span class="keyword">true</span>
+<span class="keyword">end</span>)
+
+<span class="comment">-- 値の取得</span>
+<span class="keyword">function</span> <span class="var">MyComponent</span>:GetValue()
+    <span class="keyword">return</span> self.value
+<span class="keyword">end</span>
+
+<span class="comment">-- 値の設定</span>
+<span class="keyword">function</span> <span class="var">MyComponent</span>:SetValue(val)
+    self.value = val
+<span class="keyword">end</span>
+
+<span class="comment">-- 機能の実行</span>
+<span class="keyword">function</span> <span class="var">MyComponent</span>:DoSomething()
+    <span class="keyword">if</span> <span class="keyword">not</span> self.enabled <span class="keyword">then</span> <span class="keyword">return</span> <span class="keyword">end</span>
+    <span class="comment">-- ここに処理内容を書く</span>
+<span class="keyword">end</span>
+
+<span class="comment">-- セーブ・ロード</span>
+<span class="keyword">function</span> <span class="var">MyComponent</span>:OnSave()
+    <span class="keyword">return</span> {
+        value = self.value,
+        enabled = self.enabled,
+    }
+<span class="keyword">end</span>
+
+<span class="keyword">function</span> <span class="var">MyComponent</span>:OnLoad(data)
+    <span class="keyword">if</span> data <span class="keyword">then</span>
+        self.value = data.value <span class="keyword">or</span> self.value
+        self.enabled = data.enabled ~= <span class="keyword">false</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="keyword">return</span> MyComponent</code></div>
+
+  <h3>コンポーネントの使い方</h3>
+  <p>prefab ファイル内で、以下のようにコンポーネントをオブジェクトに取り付けます。</p>
+  <div class="code-block"><span class="lang-label">LUA</span><code><span class="comment">-- prefab ファイル内でコンポーネントを追加</span>
+inst:AddComponent(<span class="string">"my_component"</span>)
+inst.components.my_component:SetValue(<span class="flag">100</span>)</code></div>
+  <div class="callout note">
+    <strong>なぜコンポーネントを使うのか？:</strong> コンポーネントを使うことで、同じ機能を複数のオブジェクトに付与できます。例えば「キャラクター専用」コンポーネントを作れば、複数のアイテムにキャラクター制限を付けられます。
+  </div>
+
+  <h3>キャラクター専用アイテム制限の例</h3>
+  <div class="code-block"><span class="lang-label">LUA</span><code><span class="comment">-- scripts/components/characterspecific.lua</span>
+<span class="keyword">local</span> <span class="var">CharacterSpecific</span> = Class(<span class="keyword">function</span>(<span class="var">self</span>, <span class="var">inst</span>)
+    self.inst = inst
+    self.character = <span class="keyword">nil</span>
+    self.storable = <span class="keyword">false</span>
+<span class="keyword">end</span>)
+
+<span class="keyword">function</span> <span class="var">CharacterSpecific</span>:SetOwner(name)
+    self.character = name
+<span class="keyword">end</span>
+
+<span class="keyword">function</span> <span class="var">CharacterSpecific</span>:IsStorable()
+    <span class="keyword">return</span> self.storable
+<span class="keyword">end</span>
+
+<span class="keyword">function</span> <span class="var">CharacterSpecific</span>:SetStorable(value)
+    self.storable = value
+<span class="keyword">end</span>
+
+<span class="keyword">return</span> CharacterSpecific</code></div>
+</section>
+
+<!-- 10 レシピ追加・クラフティング -->
+<section class="section" id="recipe">
+  <div class="section-label">10 — Recipes &amp; Crafting</div>
+  <h2>レシピ追加・クラフティング</h2>
+
+  <h3>カスタムクラフトタブの作成</h3>
+  <p>キャラクター専用のクラフトタブ（クラフト画面に表示されるカテゴリ）を追加できます。modmain.lua に記述してください。</p>
+  <div class="code-block"><span class="lang-label">LUA</span><code><span class="keyword">local</span> <span class="var">myTab</span> = AddRecipeTab(
+    <span class="string">"My Items"</span>,                                              <span class="comment">-- タブ名</span>
+    <span class="flag">998</span>,                                                     <span class="comment">-- ソート順</span>
+    GLOBAL.resolvefilepath(<span class="string">"images/hud/my_tab.xml"</span>),         <span class="comment">-- タブアイコン</span>
+    <span class="string">"my_tab.tex"</span>,                                            <span class="comment">-- アイコンテクスチャ名</span>
+    <span class="string">"my_character"</span>                                           <span class="comment">-- このタグを持つキャラクターのみ表示</span>
+)</code></div>
+
+  <h3>レシピの登録</h3>
+  <p>modmain.lua に以下を追加します。</p>
+  <div class="code-block"><span class="lang-label">LUA</span><code>AddRecipe2(<span class="string">"my_item"</span>, {
+    <span class="comment"><span class="tag">-- ★書き換え:</span> 材料</span>
+    GLOBAL.Ingredient(<span class="string">"boards"</span>, <span class="flag">1</span>),      <span class="comment">-- 板 x1</span>
+    GLOBAL.Ingredient(<span class="string">"silk"</span>, <span class="flag">2</span>),        <span class="comment">-- シルク x2</span>
+    GLOBAL.Ingredient(<span class="string">"rope"</span>, <span class="flag">1</span>),        <span class="comment">-- ロープ x1</span>
+}, GLOBAL.TECH.NONE, {                   <span class="comment">-- 必要テクノロジー</span>
+    atlas = GLOBAL.resolvefilepath(<span class="string">"images/inventoryimages/my_item.xml"</span>),
+    image = <span class="string">"my_item.tex"</span>,
+    builder_tag = <span class="string">"my_character"</span>,        <span class="comment">-- このタグを持つキャラクターのみ</span>
+    tab = myTab,
+}, {<span class="string">"CHARACTER"</span>})</code></div>
+
+  <h3>アイテム名とレシピ説明の登録</h3>
+  <p>modmain.lua に追記します。</p>
+  <div class="code-block"><span class="lang-label">LUA</span><code>STRINGS.NAMES.MY_ITEM = <span class="string">"My Item"</span>
+STRINGS.RECIPE_DESC.MY_ITEM = <span class="string">"A special item."</span></code></div>
+  <div class="callout warning">
+    <strong>注意:</strong> <code class="inline">STRINGS.NAMES</code> と <code class="inline">STRINGS.RECIPE_DESC</code> のキーは <strong>大文字</strong> です。prefab 名が <code class="inline">my_item</code> なら、キーは <code class="inline">MY_ITEM</code> になります。
+  </div>
+
+  <h3>主なテクノロジーレベル</h3>
+  <table class="styled-table">
+    <thead><tr><th>定数</th><th>意味</th></tr></thead>
+    <tbody>
+      <tr><td><code>TECH.NONE</code></td><td>いつでもクラフト可能</td></tr>
+      <tr><td><code>TECH.SCIENCE_ONE</code></td><td>サイエンスマシンが必要</td></tr>
+      <tr><td><code>TECH.SCIENCE_TWO</code></td><td>錬金エンジンが必要</td></tr>
+      <tr><td><code>TECH.MAGIC_TWO</code></td><td>プレスティハッティテイターが必要</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 11 ネットワーク同期 -->
+<section class="section" id="network">
+  <div class="section-label">11 — Network Sync</div>
+  <h2>ネットワーク同期（マルチプレイ対応）</h2>
+  <p>DST はクライアント・サーバーモデル（各プレイヤーの PC がクライアント、ゲームのホストがサーバー）のマルチプレイゲームです。ゲームロジックはサーバーが管理し、クライアントは画面表示を担当します。サーバーの値をクライアントに通知するには <strong>Net Variables</strong>（ネットワーク変数）と <strong>RPC</strong> を使います。</p>
+
+  <h3>Net Variables（ネットワーク変数）とは</h3>
+  <p>サーバーで値を変更すると、自動的に全クライアントにその値が同期（共有）される特殊な変数です。</p>
+  <table class="styled-table">
+    <thead><tr><th>型</th><th>扱える値の範囲</th><th>用途の例</th></tr></thead>
+    <tbody>
+      <tr><td><code>net_byte</code></td><td>0〜255 の整数</td><td>スタック数、小さなカウンター</td></tr>
+      <tr><td><code>net_ushortint</code></td><td>0〜65535 の整数</td><td>クールダウン秒数</td></tr>
+      <tr><td><code>net_bool</code></td><td>true / false</td><td>能力の有効/無効</td></tr>
+      <tr><td><code>net_float</code></td><td>小数点付きの数値</td><td>パーセンテージ値</td></tr>
+      <tr><td><code>net_event</code></td><td>イベント通知のみ（値なし）</td><td>サウンド再生のきっかけ</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Net Variables の定義と使い方</h3>
+  <p>キャラクター prefab ファイル（<code class="inline">scripts/prefabs/my_character.lua</code>）の中に記述します。</p>
+  <div class="code-block"><span class="lang-label">LUA</span><code><span class="comment">-- common_postinit 内（クライアント＆サーバー両方で実行される部分）</span>
+<span class="keyword">local</span> <span class="keyword">function</span> <span class="var">common_postinit</span>(inst)
+    <span class="comment">-- Net Variables の定義</span>
+    inst._myCounter = net_byte(inst.GUID, <span class="string">"my_character._myCounter"</span>, <span class="string">"mycounterdirty"</span>)
+    inst._myCooldown = net_ushortint(inst.GUID, <span class="string">"my_character._myCooldown"</span>, <span class="string">"mycooldowndirty"</span>)
+
+    <span class="comment">-- サウンド通知用</span>
+    inst._sound_attack = net_event(inst.GUID, <span class="string">"my_character._sound_attack"</span>)
+
+    <span class="comment">-- クライアント側でイベントを受信して画面表示を更新する</span>
+    inst:ListenForEvent(<span class="string">"mycounterdirty"</span>, <span class="keyword">function</span>()
+        <span class="keyword">local</span> <span class="var">value</span> = inst._myCounter:value()
+    <span class="keyword">end</span>)
+
+    <span class="comment">-- net_event のリスナー</span>
+    inst:ListenForEvent(<span class="string">"my_character._sound_attack"</span>, <span class="keyword">function</span>()
+        inst.SoundEmitter:PlaySound(<span class="string">"dontstarve/characters/my_character/attack"</span>)
+    <span class="keyword">end</span>)
+<span class="keyword">end</span>
+
+<span class="comment">-- master_postinit 内（サーバーのみで実行される部分）</span>
+<span class="keyword">local</span> <span class="keyword">function</span> <span class="var">master_postinit</span>(inst)
+    <span class="comment">-- 値の設定（サーバーが値を変更 → 自動でクライアントに同期）</span>
+    inst._myCounter:set(<span class="flag">3</span>)
+
+    <span class="comment">-- カウントダウン処理</span>
+    inst:DoPeriodicTask(<span class="flag">1</span>, <span class="keyword">function</span>()
+        <span class="keyword">local</span> <span class="var">cd</span> = inst._myCooldown:value()
+        <span class="keyword">if</span> cd &gt; <span class="flag">0</span> <span class="keyword">then</span>
+            inst._myCooldown:set(cd - <span class="flag">1</span>)
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>)
+
+    <span class="comment">-- サウンドを全クライアントに通知</span>
+    inst._sound_attack:push()
+<span class="keyword">end</span></code></div>
+
+  <h3>RPC（Remote Procedure Call: 遠隔手続き呼び出し）とは</h3>
+  <p>クライアント（プレイヤーの PC）からサーバーに「この処理を実行してほしい」とリクエストを送る仕組みです。以下の内容を modmain.lua に記述します。</p>
+  <div class="code-block"><span class="lang-label">LUA</span><code><span class="comment">-- サーバー側 RPC ハンドラ</span>
+AddModRPCHandler(<span class="string">"my_mod"</span>, <span class="string">"use_ability"</span>, <span class="keyword">function</span>(<span class="var">player</span>)
+    <span class="comment">-- バリデーション</span>
+    <span class="keyword">if</span> <span class="keyword">not</span> player:HasTag(<span class="string">"my_character"</span>) <span class="keyword">then</span> <span class="keyword">return</span> <span class="keyword">end</span>
+    <span class="keyword">if</span> player:HasTag(<span class="string">"playerghost"</span>) <span class="keyword">then</span> <span class="keyword">return</span> <span class="keyword">end</span>
+    <span class="keyword">if</span> player._myCooldown == <span class="keyword">nil</span> <span class="keyword">or</span> player._myCooldown:value() &gt; <span class="flag">0</span> <span class="keyword">then</span> <span class="keyword">return</span> <span class="keyword">end</span>
+
+    player._myCooldown:set(<span class="flag">60</span>)
+
+    <span class="comment">-- 例: 周囲の敵にダメージを与える</span>
+    <span class="keyword">local</span> <span class="var">x</span>, <span class="var">y</span>, <span class="var">z</span> = player.Transform:GetWorldPosition()
+    <span class="keyword">local</span> <span class="var">ents</span> = GLOBAL.TheSim:FindEntities(x, y, z, <span class="flag">8</span>, {<span class="string">"_combat"</span>}, {<span class="string">"player"</span>})
+    <span class="keyword">for</span> _, ent <span class="keyword">in</span> pairs(ents) <span class="keyword">do</span>
+        <span class="keyword">if</span> ent.components.combat <span class="keyword">then</span>
+            ent.components.combat:GetAttacked(player, <span class="flag">20</span>)
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>)
+
+<span class="comment">-- クライアント側 RPC ハンドラ</span>
+AddClientModRPCHandler(<span class="string">"my_mod"</span>, <span class="string">"show_effect"</span>, <span class="keyword">function</span>(<span class="var">x</span>, <span class="var">y</span>, <span class="var">z</span>, <span class="var">value</span>)
+    <span class="comment">-- UI 表示やエフェクトの処理</span>
+<span class="keyword">end</span>)</code></div>
+
+  <h3>RPC の送信方法</h3>
+  <div class="code-block"><span class="lang-label">LUA</span><code><span class="comment">-- クライアント → サーバー</span>
+SendModRPCToServer(MOD_RPC[<span class="string">"my_mod"</span>][<span class="string">"use_ability"</span>], x, z)
+
+<span class="comment">-- サーバー → 特定クライアント</span>
+GLOBAL.SendModRPCToClient(
+    GLOBAL.CLIENT_MOD_RPC[<span class="string">"my_mod"</span>][<span class="string">"show_effect"</span>],
+    player.userid, x, y, z, value
+)
+
+<span class="comment">-- サーバー → 範囲内の全クライアント</span>
+<span class="keyword">local</span> <span class="var">players</span> = GLOBAL.FindPlayersInRange(x, y, z, <span class="flag">40</span>)
+<span class="keyword">for</span> _, player <span class="keyword">in</span> pairs(players) <span class="keyword">do</span>
+    GLOBAL.SendModRPCToClient(
+        GLOBAL.CLIENT_MOD_RPC[<span class="string">"my_mod"</span>][<span class="string">"show_effect"</span>],
+        player.userid, x, y, z, value
+    )
+<span class="keyword">end</span></code></div>
+  <div class="callout note">
+    <strong>なぜ RPC でバリデーション（チェック処理）が必要なのか？:</strong> クライアントからのリクエストは改ざんされる可能性があります。タグチェック、クールダウンチェック、範囲チェックなど、サーバー側で必ず検証してください。
+  </div>
+</section>
+
+<!-- 12 UI ウィジェットの作成 -->
+<section class="section" id="ui">
+  <div class="section-label">12 — UI Widgets</div>
+  <h2>UI ウィジェットの作成</h2>
+  <p>UI ウィジェット（画面に表示するボタンやアイコンなどの部品）を使って、HUD（ゲーム画面上の操作パネル）にカスタム要素（ボタン、カウンター、クールダウン表示など）を追加できます。</p>
+
+  <h3>AddClassPostConstruct — 既存 UI の拡張</h3>
+  <p>既存の画面表示に自分のウィジェットを追加する方法です。modmain.lua に記述します。</p>
+  <div class="code-block"><span class="lang-label">LUA</span><code><span class="comment">-- modmain.lua 内</span>
+AddClassPostConstruct(<span class="string">"widgets/inventorybar"</span>, <span class="keyword">function</span>(<span class="var">self</span>)
+    <span class="comment">-- 特定キャラクターのみ</span>
+    <span class="keyword">if</span> <span class="keyword">not</span> self.owner:HasTag(<span class="string">"my_character"</span>) <span class="keyword">then</span> <span class="keyword">return</span> <span class="keyword">end</span>
+
+    <span class="keyword">local</span> <span class="var">MyWidget</span> = <span class="keyword">require</span>(<span class="string">"widgets/my_widget"</span>)
+
+    <span class="comment">-- 既存の Rebuild メソッドをラップ</span>
+    <span class="keyword">local</span> <span class="var">_Rebuild</span> = self.Rebuild
+    self.Rebuild = <span class="keyword">function</span>(<span class="var">self</span>, ...)
+        <span class="keyword">if</span> self.mywidget ~= <span class="keyword">nil</span> <span class="keyword">then</span>
+            self.mywidget:Kill()
+            self.mywidget = <span class="keyword">nil</span>
+        <span class="keyword">end</span>
+
+        _Rebuild(self, ...)
+
+        self.mywidget = self.toprow:AddChild(MyWidget(self.owner))
+        self.mywidget:SetPosition(<span class="flag">0</span>, <span class="flag">0</span>, <span class="flag">0</span>)
+    <span class="keyword">end</span>
+
+    self.rebuild_pending = <span class="keyword">true</span>
+<span class="keyword">end</span>)</code></div>
+
+  <h3>ファイルの作成場所</h3>
+  <p>MOD フォルダ内の <code class="inline">scripts/widgets/</code> フォルダに、ウィジェット名の Lua ファイルを作成します。<code class="inline">scripts/widgets/</code> フォルダがまだ存在しない場合は、先にフォルダを作成してください。</p>
+  <div class="code-block"><span class="lang-label">PATH</span><code>mods/my_character/scripts/widgets/my_widget.lua   <span class="annotation">← このファイルを作成</span></code></div>
+
+  <h3>カスタムウィジェットの基本テンプレート</h3>
+  <div class="code-block"><span class="lang-label">LUA</span><code><span class="keyword">local</span> <span class="var">Widget</span> = <span class="keyword">require</span>(<span class="string">"widgets/widget"</span>)
+<span class="keyword">local</span> <span class="var">Image</span> = <span class="keyword">require</span>(<span class="string">"widgets/image"</span>)
+<span class="keyword">local</span> <span class="var">ImageButton</span> = <span class="keyword">require</span>(<span class="string">"widgets/imagebutton"</span>)
+<span class="keyword">local</span> <span class="var">Text</span> = <span class="keyword">require</span>(<span class="string">"widgets/text"</span>)
+
+<span class="keyword">local</span> <span class="var">MyWidget</span> = Class(Widget, <span class="keyword">function</span>(<span class="var">self</span>, <span class="var">owner</span>)
+    Widget._ctor(self, <span class="string">"MyWidget"</span>)
+    self.owner = owner
+
+    <span class="comment">-- 背景画像</span>
+    self.bg = self:AddChild(Image(<span class="string">"images/hud/my_bg.xml"</span>, <span class="string">"my_bg.tex"</span>))
+
+    <span class="comment">-- ボタン</span>
+    self.button = self:AddChild(ImageButton(
+        <span class="string">"images/hud/my_icon.xml"</span>, <span class="string">"my_icon.tex"</span>
+    ))
+    self.button:SetOnClick(<span class="keyword">function</span>()
+        self:OnClick()
+    <span class="keyword">end</span>)
+
+    <span class="comment">-- テキスト表示</span>
+    self.text = self:AddChild(Text(NUMBERFONT, <span class="flag">28</span>, <span class="string">"0"</span>))
+    self.text:SetPosition(<span class="flag">10</span>, <span class="flag">-15</span>)
+    self.text:SetColour(<span class="flag">1</span>, <span class="flag">1</span>, <span class="flag">1</span>, <span class="flag">1</span>)
+
+    <span class="comment">-- ネットワーク変数の変更を監視</span>
+    self.inst:ListenForEvent(<span class="string">"mycounterdirty"</span>, <span class="keyword">function</span>()
+        self:UpdateDisplay()
+    <span class="keyword">end</span>, owner)
+
+    self:UpdateDisplay()
+<span class="keyword">end</span>)
+
+<span class="keyword">function</span> <span class="var">MyWidget</span>:OnClick()
+    SendModRPCToServer(MOD_RPC[<span class="string">"my_mod"</span>][<span class="string">"use_ability"</span>])
+<span class="keyword">end</span>
+
+<span class="keyword">function</span> <span class="var">MyWidget</span>:UpdateDisplay()
+    <span class="keyword">local</span> <span class="var">value</span> = self.owner._myCounter:value()
+    self.text:SetString(tostring(value))
+
+    <span class="keyword">if</span> value &lt;= <span class="flag">0</span> <span class="keyword">then</span>
+        self.button:SetTint(<span class="flag">0.5</span>, <span class="flag">0.5</span>, <span class="flag">0.5</span>, <span class="flag">1</span>)
+    <span class="keyword">else</span>
+        self.button:SetTint(<span class="flag">1</span>, <span class="flag">1</span>, <span class="flag">1</span>, <span class="flag">1</span>)
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="keyword">return</span> MyWidget</code></div>
+</section>
+
+<!-- 13 セーブ・ロード -->
+<section class="section" id="saveload">
+  <div class="section-label">13 — Save &amp; Load</div>
+  <h2>セーブ・ロード（データ永続化）</h2>
+  <p>ゲームを保存・読み込みした時に、MOD のデータを維持するための仕組みです。この処理を入れないと、ゲームを閉じて再開した時にクールダウンやカウンターがリセットされてしまいます。</p>
+
+  <h3>キャラクター prefab での OnSave/OnLoad</h3>
+  <p>キャラクター prefab ファイル（<code class="inline">scripts/prefabs/my_character.lua</code>）の <code class="inline">master_postinit</code> 内に記述します。</p>
+  <div class="code-block"><span class="lang-label">LUA</span><code><span class="comment">-- master_postinit 内</span>
+
+<span class="comment">-- セーブ（ゲーム保存時に呼ばれる）</span>
+<span class="keyword">local</span> <span class="var">_OnSave</span> = inst.OnSave
+inst.OnSave = <span class="keyword">function</span>(<span class="var">inst</span>, <span class="var">data</span>)
+    <span class="keyword">if</span> _OnSave <span class="keyword">then</span> _OnSave(inst, data) <span class="keyword">end</span>
+    data.my_counter = inst._myCounter:value()
+    data.my_cooldown = inst._myCooldown:value()
+    data.my_timer = inst._myTimer
+<span class="keyword">end</span>
+
+<span class="comment">-- ロード（ゲーム読み込み時に呼ばれる）</span>
+<span class="keyword">local</span> <span class="var">_OnLoad</span> = inst.OnLoad
+inst.OnLoad = <span class="keyword">function</span>(<span class="var">inst</span>, <span class="var">data</span>)
+    <span class="keyword">if</span> _OnLoad <span class="keyword">then</span> _OnLoad(inst, data) <span class="keyword">end</span>
+    <span class="keyword">if</span> data <span class="keyword">then</span>
+        <span class="keyword">if</span> data.my_counter <span class="keyword">then</span>
+            inst._myCounter:set(data.my_counter)
+        <span class="keyword">end</span>
+        <span class="keyword">if</span> data.my_cooldown <span class="keyword">then</span>
+            inst._myCooldown:set(data.my_cooldown)
+        <span class="keyword">end</span>
+        <span class="keyword">if</span> data.my_timer <span class="keyword">then</span>
+            inst._myTimer = data.my_timer
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span></code></div>
+  <div class="callout note">
+    <strong>なぜ <code class="inline">_OnSave</code> を保存するのか？:</strong> <code class="inline">MakePlayerCharacter</code> がゲームの内部で <code class="inline">OnSave</code> / <code class="inline">OnLoad</code> を定義しています。それを上書きしてしまうと、バニラの保存機能が壊れます。元の関数を保存して呼び出すことで、安全に機能を拡張できます。
+  </div>
+
+  <h3>アイテム prefab での OnSave/OnLoad</h3>
+  <div class="code-block"><span class="lang-label">LUA</span><code><span class="keyword">local</span> <span class="keyword">function</span> <span class="var">onSave</span>(inst, data)
+    data.is_activated = inst.isActivated
+    data.elapsed_time = inst.elapsedTime
+<span class="keyword">end</span>
+
+<span class="keyword">local</span> <span class="keyword">function</span> <span class="var">onLoad</span>(inst, data)
+    <span class="keyword">if</span> data <span class="keyword">then</span>
+        <span class="keyword">if</span> data.is_activated <span class="keyword">then</span>
+            inst.isActivated = data.is_activated
+        <span class="keyword">end</span>
+        <span class="keyword">if</span> data.elapsed_time <span class="keyword">then</span>
+            inst.elapsedTime = data.elapsed_time
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="comment">-- fn() 内で:</span>
+inst.OnSave = onSave
+inst.OnLoad = onLoad</code></div>
+
+  <h3>保存できるデータ型</h3>
+  <table class="styled-table">
+    <thead><tr><th>型</th><th>例</th></tr></thead>
+    <tbody>
+      <tr><td>数値</td><td><code>data.count = 5</code></td></tr>
+      <tr><td>文字列</td><td><code>data.name = "hello"</code></td></tr>
+      <tr><td>真偽値</td><td><code>data.enabled = true</code></td></tr>
+      <tr><td>テーブル（データの入れ物）</td><td><code>data.items = {1, 2, 3}</code></td></tr>
+    </tbody>
+  </table>
+  <div class="callout warning">
+    <strong>注意:</strong> 関数、ゲーム内オブジェクトの参照（inst）、メタテーブルは保存できません。保存が必要な場合は、固有 ID や prefab 名などの文字列・数値に変換してから保存してください。
+  </div>
+</section>
+
+<!-- 14 デバッグとトラブルシューティング -->
+<section class="section" id="debug">
+  <div class="section-label">14 — Debugging</div>
+  <h2>デバッグとトラブルシューティング</h2>
+
+  <h3>ログ出力</h3>
+  <p>問題が起きた時、まずはログ（動作記録）を確認するのが基本です。</p>
+  <div class="code-block"><span class="lang-label">LUA</span><code><span class="comment">-- modmain.lua や prefab 内で print() を使うとログファイルに出力される</span>
+print(<span class="string">"My MOD: value ="</span>, someValue)
+
+<span class="comment">-- ログファイルの場所</span>
+<span class="comment">-- C:\Users\&lt;ユーザー名&gt;\Documents\Klei\DoNotStarveTogether\client_log.txt</span>
+<span class="comment">-- C:\Users\&lt;ユーザー名&gt;\Documents\Klei\DoNotStarveTogether\Cluster_X\Master\server_log.txt</span></code></div>
+
+  <h3>コンソールコマンド</h3>
+  <p>ゲーム内でコンソール（<code class="inline">~</code> キーで開く入力欄）を使って実行できるデバッグ用コマンドです。</p>
+  <div class="code-block"><span class="lang-label">LUA</span><code><span class="comment">-- 選択中のオブジェクトの情報を表示</span>
+c_select()
+
+<span class="comment">-- 選択中オブジェクトに付いているコンポーネントの一覧を表示</span>
+<span class="keyword">for</span> k, v <span class="keyword">in</span> pairs(c_select().components) <span class="keyword">do</span> print(k) <span class="keyword">end</span>
+
+<span class="comment">-- アイテムをプレイヤーの所持品に追加</span>
+c_give(<span class="string">"my_item"</span>)
+
+<span class="comment">-- 指定した prefab をプレイヤーの近くにスポーン</span>
+c_spawn(<span class="string">"my_item"</span>)
+
+<span class="comment">-- 無敵モード（テスト用）</span>
+c_godmode()
+
+<span class="comment">-- ワールド再生成</span>
+c_regenerateworld()
+
+<span class="comment">-- prefab のリロード</span>
+c_reset()</code></div>
+
+  <h3>デバッグの進め方</h3>
+  <p>ゲーム内コンソールの入力は1行に限られます。複雑なデバッグには、以下の手順で対応できます。</p>
+  <p>1. MOD 内の怪しい箇所に <code class="inline">print()</code> を仕込む<br>2. ゲームを起動して動作させる<br>3. <code class="inline">client_log.txt</code> でログを確認する</p>
+  <div class="callout tip">
+    <strong>初心者向けTip:</strong> <code class="inline">print()</code> は最も基本的で確実なデバッグ手段です。問題が起きたら、まず怪しい箇所に <code class="inline">print()</code> を入れてログを確認しましょう。
+  </div>
+</section>
+
+<!-- 15 よくあるエラーと対処法 -->
+<section class="section" id="errors">
+  <div class="section-label">15 — Common Errors</div>
+  <h2>よくあるエラーと対処法</h2>
+  <table class="styled-table">
+    <thead><tr><th>症状</th><th>原因</th><th>解決法</th></tr></thead>
+    <tbody>
+      <tr><td><code>attempt to index a nil value</code></td><td>存在しないコンポーネントやプロパティにアクセスした</td><td><code>if inst.components.health then</code> のように nil チェックを追加</td></tr>
+      <tr><td><code>variable is not declared</code></td><td>modmain.lua でグローバル変数に直接アクセスした</td><td><code>GLOBAL.TheWorld</code> のように <code>GLOBAL</code> を経由する</td></tr>
+      <tr><td>キャラクターが表示されない</td><td>PrefabFiles に登録していない</td><td>modmain.lua の <code>PrefabFiles</code> にファイル名を追加</td></tr>
+      <tr><td>アイテム画像が白い四角</td><td>Asset の登録漏れまたはパスの間違い</td><td><code>Assets</code> テーブルと実際のファイルパスを確認</td></tr>
+      <tr><td>レシピが表示されない</td><td><code>builder_tag</code> とキャラクターのタグが不一致</td><td><code>AddTag()</code> と <code>builder_tag</code> が同じ文字列か確認</td></tr>
+      <tr><td>クラフトが「Character only」と表示</td><td><code>AddRecipe2</code> の第5引数が不正</td><td><code>{"CHARACTER"}</code> を指定しているか確認</td></tr>
+      <tr><td>マルチプレイで他プレイヤーに反映されない</td><td>サーバー専用処理をクライアントで実行している</td><td><code>ismastersim</code> チェックの位置を確認、Net Variables を使用</td></tr>
+      <tr><td>セーブ後にデータが消える</td><td>OnSave/OnLoad の実装漏れ</td><td>Net Variables の値を OnSave で保存しているか確認</td></tr>
+      <tr><td><code>attempt to call a nil value</code></td><td>関数名のタイプミスまたは require のパス間違い</td><td>関数名とファイルパスのスペルを確認</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 16 Tips・参考情報 -->
+<section class="section" id="tips">
+  <div class="section-label">16 — Tips</div>
+  <h2>Tips・参考情報</h2>
+
+  <h3>バニラコードの読み方のコツ</h3>
+  <p><strong>似た機能のキャラクター</strong>を探して実装を読む（例: Wortox のテレポート → <code class="inline">scripts/prefabs/wortox.lua</code>）</p>
+  <p><strong>バニラのコンポーネント</strong>をまず調べる。独自に作る前に、既存のコンポーネントで代替できないか確認する</p>
+  <p><code class="inline">TUNING.lua</code> にはゲームバランス定数がすべて定義されている（HP、ダメージ、速度など）</p>
+
+  <h3>パフォーマンス（動作速度）のコツ</h3>
+  <p><code class="inline">DoPeriodicTask</code> の間隔は最低 0.3〜0.5 秒にする（短すぎるとサーバー負荷が増大）</p>
+  <p><code class="inline">FindEntities</code>（周囲のオブジェクト検索）の検索範囲は必要最小限にする</p>
+  <p>クライアント専用の描画処理は <code class="inline">if not TheNet:IsDedicated()</code> で囲む</p>
+
+  <h3>マルチプレイ対応のチェックリスト</h3>
+  <p>ゲームロジックは <code class="inline">ismastersim</code> チェックの後に書いているか</p>
+  <p>プレイヤーに見せたい値は Net Variables（ネットワーク変数）で同期しているか</p>
+  <p>クライアントからサーバーへの指示は RPC 経由にしているか</p>
+  <p>RPC ハンドラにバリデーション（タグ・クールダウン・範囲チェック）を入れているか</p>
+</section>
+
+<!-- 17 参考リンク -->
+<section class="section" id="refs">
+  <div class="section-label">17 — References</div>
+  <h2>参考リンク</h2>
+  <div class="ref-list">
+    <a class="ref-item" href="https://forums.kleientertainment.com/forums/topic/72-dont-starve-together-api/" target="_blank">
+      <div>
+        <div class="ref-source">Don't Starve Together Modding Guide（Klei Forums）</div>
+        <div class="ref-url">https://forums.kleientertainment.com/forums/topic/72-dont-starve-together-api/</div>
+      </div>
+    </a>
+    <a class="ref-item" href="https://dontstarve.fandom.com/wiki/Guides/Don%27t_Starve_Together_Lua_Modding" target="_blank">
+      <div>
+        <div class="ref-source">DST API Documentation（非公式 Wiki）</div>
+        <div class="ref-url">https://dontstarve.fandom.com/wiki/Guides/Don't_Starve_Together_Lua_Modding</div>
+      </div>
+    </a>
+    <a class="ref-item" href="#prerequisites">
+      <div>
+        <div class="ref-source">バニラソースコード</div>
+        <div class="ref-url">C:\Program Files (x86)\Steam\steamapps\common\Don't Starve Together\data\databundles\scripts.zip</div>
+      </div>
+    </a>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+    DST-Lua-Scripting Guide &#8212; このドキュメントは自由に利用・改変・再配布できます。DST MOD 制作にお役立てください。
+    <br><span style="display:inline-block;margin-top:8px"><a href="https://steamcommunity.com/profiles/76561198076111536/" style="color:inherit;text-decoration:none">Author: pinpikokun</a></span><br><span style="display:inline-flex;gap:6px;margin-top:6px"><a href="https://github.com/pinpikokun/DST-teemo"><img src="https://img.shields.io/badge/GitHub-Repository-black?logo=github" alt="GitHub"></a> <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=390684095"><img src="https://img.shields.io/badge/Steam%20Workshop-Subscribe-blue?logo=steam" alt="Steam Workshop"></a></span>
+</footer>
+
+</body>
+</html>

@@ -1,5 +1,7 @@
 # Chatterbox TTS - キャラクター音声ジェネレーター
 
+> **HTML 版**: [README.html](README.html)
+
 ## 目次
 
 - [概要](#概要)
