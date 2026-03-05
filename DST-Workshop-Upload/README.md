@@ -2,7 +2,7 @@
 
 完成した MOD を Steam ワークショップ（Steam Workshop）に公開して、世界中のプレイヤーに遊んでもらうための手順を解説します。
 
-> **HTML 版**: [README.html](README.html)
+> **HTML 版**: [README.html](https://pinpikokun.github.io/DST-Mod-Guide/DST-Workshop-Upload/README.html)
 
 ---
 

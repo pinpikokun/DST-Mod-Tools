@@ -2,7 +2,7 @@
 
 AI エージェント（AI Agent）を使って、プログラミング経験ゼロでも Don't Starve Together (DST) のキャラクター MOD を作成する方法を解説します。このガイドに従えば、AI に指示を出すだけでスクリプトやフォルダ構成を自動生成し、人間は画像の準備とゲーム内テストに集中できます。
 
-> **HTML 版**: [README.html](README.html)
+> **HTML 版**: [README.html](https://pinpikokun.github.io/DST-Mod-Guide/DST-AI-Agent/README.html)
 
 ---
 

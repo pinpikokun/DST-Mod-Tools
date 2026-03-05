@@ -2,7 +2,7 @@
 
 Don't Starve Together (DST) の MOD で、プレイヤーがゲーム内の設定画面から値を変更できる **コンフィグオプション（configuration_options）** の作り方を解説します。体力や攻撃力をユーザーが自由に調整できる MOD を作りましょう。
 
-> **HTML 版**: [README-modinfo-config.html](README-modinfo-config.html)
+> **HTML 版**: [README-modinfo-config.html](https://pinpikokun.github.io/DST-Mod-Guide/DST-Lua-Scripting/README-modinfo-config.html)
 
 ---
 

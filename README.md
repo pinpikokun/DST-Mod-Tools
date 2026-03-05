@@ -4,7 +4,7 @@ Don't Starve Together (DST) の **キャラクター MOD** を作りたい人の
 
 このガイドでは、ウィルソン（ゲーム内の基本キャラクター）をベースに **見た目だけを変更したオリジナルキャラクター** を、コピペ＋キャラクター名の書き換えだけで作れるようになるまでを解説します。
 
-> **HTML 版**: [README.html](README.html)
+> **HTML 版**: [README.html](https://pinpikokun.github.io/DST-Mod-Guide/README.html)
 
 ---
 

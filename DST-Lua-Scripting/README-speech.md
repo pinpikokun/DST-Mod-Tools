@@ -2,7 +2,7 @@
 
 Don't Starve Together (DST) のキャラクター MOD で、アイテムを調べた時やイベント発生時に表示される **セリフ（Speech）** をカスタマイズする方法を解説します。セリフはキャラクターの個性を表現する最も重要な要素です。
 
-> **HTML 版**: [README-speech.html](README-speech.html)
+> **HTML 版**: [README-speech.html](https://pinpikokun.github.io/DST-Mod-Guide/DST-Lua-Scripting/README-speech.html)
 
 ---
 

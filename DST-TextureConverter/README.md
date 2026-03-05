@@ -2,7 +2,7 @@
 
 Don't Starve Together (DST) の MOD 開発で必要になる **PNG → TEX 変換** の手順を、初心者向けにまとめたガイドです。
 
-> **HTML 版**: [README.html](README.html)
+> **HTML 版**: [README.html](https://pinpikokun.github.io/DST-Mod-Guide/DST-TextureConverter/README.html)
 
 ---
 

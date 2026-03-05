@@ -1,6 +1,6 @@
 # Chatterbox TTS - キャラクター音声ジェネレーター
 
-> **HTML 版**: [README.html](README.html)
+> **HTML 版**: [README.html](https://pinpikokun.github.io/DST-Mod-Guide/DST-Chatterbox/README.html)
 
 ## 目次
 

@@ -4,7 +4,7 @@
 
 エフェクト（視覚効果）など、キャラクターやアイテム以外のアニメーションについて解説します。これらは MOD に演出を加えるために重要な要素です。
 
-> **HTML 版**: [README-effect.html](README-effect.html)
+> **HTML 版**: [README-effect.html](https://pinpikokun.github.io/DST-Mod-Guide/DST-Spriter/README-effect.html)
 
 ---
 

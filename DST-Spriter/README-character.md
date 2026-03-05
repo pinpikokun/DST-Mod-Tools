@@ -4,7 +4,7 @@
 
 キャラクター MOD を作るときに必要なアニメーションについて解説します。DST のキャラクターアニメーションは他の種類に比べて最も複雑ですが、基本の仕組みを理解すれば作成できます。
 
-> **HTML 版**: [README-character.html](README-character.html)
+> **HTML 版**: [README-character.html](https://pinpikokun.github.io/DST-Mod-Guide/DST-Spriter/README-character.html)
 
 ---
 
