@@ -259,6 +259,8 @@ DST-Mod-Tools/
 │   ├── README-DST-teemo.md / .html ← Captain Teemo MOD 実践解説
 │   ├── README-speech.md / .html   ← キャラクターセリフ（Speech）作成ガイド
 │   └── README-modinfo-config.md / .html ← modinfo コンフィグオプション詳細ガイド
+├── DST-AI-Agent/
+│   └── README.md / .html          ← AI エージェント活用ガイド
 ├── DST-Workshop-Upload/
 │   └── README.md / .html          ← Steam ワークショップ公開ガイド
 ├── DST-FMOD-Designer/

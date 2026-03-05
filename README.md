@@ -45,6 +45,7 @@ DST の MOD（モッド）とは、ゲームに **自分だけのキャラクタ
 | Lua スクリプティング（キャラクター固有能力・カスタムコンポーネント・レシピ追加など） | [DST-Lua-Scripting ガイド](DST-Lua-Scripting/README.md) |
 | キャラクターのセリフ（Speech）カスタマイズ | [Speech ファイル作成ガイド](DST-Lua-Scripting/README-speech.md) |
 | MOD のコンフィグオプション（設定画面） | [modinfo コンフィグガイド](DST-Lua-Scripting/README-modinfo-config.md) |
+| AI エージェントを使った MOD 開発 | [DST-AI-Agent ガイド](DST-AI-Agent/README.md) |
 
 ### 対象読者
 
@@ -928,6 +929,7 @@ C:\Users\<ユーザー名>\Documents\Klei\DoNotStarveTogether\client_log.txt
 | **DST-Chatterbox** | AI 音声合成によるボイス生成 | [DST-Chatterbox/README.md](DST-Chatterbox/README.md) |
 | **Speech ファイル** | キャラクターのセリフカスタマイズ | [DST-Lua-Scripting/README-speech.md](DST-Lua-Scripting/README-speech.md) |
 | **modinfo コンフィグ** | MOD 設定画面のオプション作成 | [DST-Lua-Scripting/README-modinfo-config.md](DST-Lua-Scripting/README-modinfo-config.md) |
+| **DST-AI-Agent** | AI エージェントを使った MOD 開発 | [DST-AI-Agent/README.md](DST-AI-Agent/README.md) |
 
 ### おすすめの学習順序
 
@@ -939,6 +941,7 @@ C:\Users\<ユーザー名>\Documents\Klei\DoNotStarveTogether\client_log.txt
 6. [modinfo コンフィグガイド](DST-Lua-Scripting/README-modinfo-config.md) で **設定オプション** を追加する
 7. [DST-FMOD-Designer ガイド](DST-FMOD-Designer/README.md) で **キャラクターボイス** を追加する
 8. [DST-Chatterbox ガイド](DST-Chatterbox/README.md) で **AI 音声** を作成する
+9. [DST-AI-Agent ガイド](DST-AI-Agent/README.md) で **AI エージェント** を使って MOD を作成する
 
 ---
 
